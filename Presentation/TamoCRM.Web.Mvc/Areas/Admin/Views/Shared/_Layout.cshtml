@@ -1,0 +1,282 @@
+﻿@using TamoCRM.Core
+@using TamoCRM.Domain.Catalogs
+@using TamoCRM.Domain.Channels
+@using TamoCRM.Domain.Collectors
+@using TamoCRM.Domain.EducationLevels
+@using TamoCRM.Domain.Levels
+@using TamoCRM.Domain.SourceTypes
+@using TamoCRM.Domain.StatusMap
+@using TamoCRM.Domain.UserRole
+@using TamoCRM.Web.Framework.Users
+@{
+    var user = UserContext.GetCurrentUser();
+}
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+    <meta charset="utf-8" />
+    <title>Freetalk System - User: @UserContext.GetCurrentUser().UserName</title>
+
+    <meta name="description" content="overview &amp; stats" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- basic styles -->
+
+    <link href="/Content/themes/ace/assets/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/Content/themes/ace/assets/css/font-awesome.min.css" />
+    
+    <script src="~/Scripts/jquery.confirm.js"></script>
+    <script src="~/Scripts/jquery.confirm.min.js"></script>
+    <script src="~/Scripts/grid.rowspan.js"></script>
+
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/bootstrap-theme.min.css" rel="stylesheet" />
+
+    <!-- page specific plugin styles -->
+    <link rel="stylesheet" href="/Content/themes/ace/assets/css/jquery-ui-1.10.3.full.min.css" />
+    <link rel="stylesheet" href="/Content/themes/ace/assets/css/datepicker.css" />
+    <link rel="stylesheet" href="/Content/themes/ace/assets/css/bootstrap-timepicker.css" />
+    <link rel="stylesheet" href="/Content/themes/ace/assets/css/ui.jqgrid.css" />
+
+    <!-- fonts -->
+
+    <link rel="stylesheet" href="/Content/themes/ace/assets/css/ace-fonts.css" />
+
+    <!-- ace styles -->
+
+    <link rel="stylesheet" href="/Content/themes/ace/assets/css/ace.min.css" />
+    <link rel="stylesheet" href="/Content/themes/ace/assets/css/ace-rtl.min.css" />
+    <link rel="stylesheet" href="/Content/themes/ace/assets/css/ace-skins.min.css" />
+
+    <script src="/Content/themes/ace/assets/js/ace-extra.min.js"></script>
+
+    <script type="text/javascript">
+        window.jQuery || document.write("<script src='/Content/themes/ace/assets/js/jquery-2.0.3.min.js'>" + "<" + "/script>");
+    </script>
+
+    <script type="text/javascript">
+        if ("ontouchend" in document) document.write("<script src='/Content/themes/ace/assets/js/jquery.mobile.custom.min.js'>" + "<" + "/script>");
+    </script>
+    @*<script src="/Content/themes/ace/assets/js/bootstrap.min.js"></script>*@
+    <script src="/Content/themes/ace/assets/js/typeahead-bs2.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.btn.js"></script>
+    <!-- page specific plugin scripts -->
+
+    <script src="/Content/themes/ace/assets/js/date-time/bootstrap-datepicker.min.js"></script>
+    <script src="/Content/themes/ace/assets/js/date-time/bootstrap-timepicker.min.js"></script>
+    <script src="/Content/themes/ace/assets/js/jqGrid/jquery.jqGrid.min.js"></script>
+    <script src="/Content/themes/ace/assets/js/jqGrid/i18n/grid.locale-en.js"></script>
+
+    <!-- page specific plugin scripts -->
+    <script src="/Content/themes/ace/assets/js/jquery-ui-1.10.3.custom.min.js"></script>
+    <script src="/Content/themes/ace/assets/js/jquery.ui.touch-punch.min.js"></script>
+    <script src="/Content/themes/ace/assets/js/jquery.slimscroll.min.js"></script>
+    <script src="/Content/themes/ace/assets/js/jquery.easy-pie-chart.min.js"></script>
+    <script src="/Content/themes/ace/assets/js/jquery.sparkline.min.js"></script>
+    <script src="/Content/themes/ace/assets/js/flot/jquery.flot.min.js"></script>
+    <script src="/Content/themes/ace/assets/js/flot/jquery.flot.pie.min.js"></script>
+    <script src="/Content/themes/ace/assets/js/flot/jquery.flot.resize.min.js"></script>
+    <script src="/Scripts/fuelux.tree.min.js"></script>
+
+    <script type="text/javascript" src="/Content/themes/ace/assets/js/jquery.form.js"></script>
+    <script type="text/javascript" src="/Content/themes/ace/assets/js/jquery.tmpl.js"></script>
+
+    <!-- ace scripts -->
+
+    <script type="text/javascript" src="/Content/themes/ace/assets/js/ace-elements.min.js"></script>
+    <script type="text/javascript" src="/Content/themes/ace/assets/js/ace.min.js"></script>
+
+    <!-- tamo crm-->
+    <script src="/Scripts/admin.js"></script>
+    <script src="/Scripts/admin.utility.js"></script>
+    <script src="/Scripts/bootbox.min.js"></script>
+
+    <!-- tamo css -->
+    <link rel="stylesheet" href="/Content/themes/ace/assets/css/tamo.css" />
+    <link href="~/Scripts/autocomplete/jquery.scombobox.min.css" rel="stylesheet" />
+    <script src="~/Scripts/autocomplete/jquery.scombobox.js"></script>
+    <link href="~/Scripts/autocomplete/chosen.css" rel="stylesheet" />
+    <script src="~/Scripts/autocomplete/chosen.jquery.js"></script>
+
+</head>
+
+<body>
+    <div class="navbar navbar-default" id="navbar">
+        <script type="text/javascript">
+            try {
+                ace.settings.check('navbar', 'fixed'); } catch (e) { }
+        </script>
+
+        <div class="navbar-container" id="navbar-container">
+            <div class="navbar-header pull-left">
+                <a href="#" class="navbar-brand">
+                    <small>FREETALK SYSTEM
+                    </small>
+                </a>
+                <!-- /.brand -->
+            </div>
+            <!-- /.navbar-header -->
+            <div class="navbar-header pull-left">
+                <div style="margin-top: 7px;">
+                </div>
+                <!-- /.brand -->
+            </div>
+            <!-- /.navbar-header -->
+
+            <div class="navbar-header pull-right" role="navigation">
+                <ul class="nav ace-nav">
+                    <li class="light-blue" style="width: 115px; padding: 5px 15px 0 0; margin-right: 30px;">
+                        @Html.Action("BranchSelectBox", "Branch")
+                    </li>
+                    @Html.Action("CountDulicateContact", "Contact")
+                    @Html.Action("NotifyMissedCall", "MissedCall")
+                    @*@Html.Action("NotifyHandoverFailedAdvisor", "NotifyAdvisorHandoverFailed")*@
+                    
+                    <li class="light-blue">
+                        <a data-toggle="dropdown" href="#" class="dropdown-toggle">
+                            <span class="user-info">
+                                <small>Welcome,</small>
+                                @user.UserName
+                            </span>
+
+                            <i class="icon-caret-down"></i>
+                        </a>
+                        <ul class="user-menu pull-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
+                            <li>
+                                <a href="/Admin/User/ChangePassword">
+                                    <i class="icon-cog"></i>
+                                    Thay đối mật khẩu
+                                </a>
+                            </li>
+                            @if (user.IsConsultant)
+                            {
+                                <li>
+                                    <a href="/Admin/User/EmailSetting">
+                                        <i class="icon-globe"></i>
+                                        Thiết lập email
+                                    </a>
+                                </li>    
+                                <li>
+                                    <a href="/Admin/User/PhoneSetting">
+                                        <i class="icon-globe"></i>
+                                        Thiết lập điện thoại
+                                    </a>
+                                </li> 
+                            }
+                            <li class="divider"></li>
+                            <li>
+                                <a href="/Account/Logoff">
+                                    <i class="icon-off"></i>
+                                    Đăng xuất
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-header -->
+        </div>
+        <!-- /.container -->
+    </div>
+
+    <div class="main-container" id="main-container">
+
+        <script type="text/javascript">
+            try {
+                ace.settings.check('main-container', 'fixed');
+            }
+            catch (e) {
+                
+            }
+        </script>
+
+        <div class="main-container-inner">
+            <a class="menu-toggler" id="menu-toggler" href="#">
+                <span class="menu-text"></span>
+            </a>
+            <div class="sidebar" id="sidebar">
+
+                @Html.Partial("Menu")
+            </div>
+
+            <div class="main-content">
+                @RenderBody()
+                <div style="width: 100%; text-align: center; padding: 10px;">Copyright 2016 Freetalk . All Rights Reverved.</div>
+            </div>
+            <!-- /.main-content -->
+
+            <!-- /#ace-settings-container -->
+        </div>
+        <!-- /.main-container-inner -->
+
+        <a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
+            <i class="icon-double-angle-up icon-only bigger-110"></i>
+        </a>
+    </div>
+    <!-- /.main-container -->
+
+</body>
+
+</html>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var beforeload = new Date().getTime();
+        var filePath = '@Url.RouteUrl(this.ViewContext.RouteData.Values)';
+        var userName = '@UserContext.GetCurrentUser().UserName';
+        var time = new Date();
+        var logTime = time.getFromFormat('yyyy-mm-dd hh:ii:ss');
+        //window.onload = gettimeload;
+
+        //function gettimeload() {
+        //    var aftrload = new Date().getTime();
+        //    // Time calculating in seconds
+        //    time = (aftrload - beforeload) / 1000;
+        //    $.get("http://42.112.28.5:8010/Service/CreateAPI.svc/CreateCheckPoint?", { systemName: "CRM_NATIVE_VN", functional: filePath, checkpointName: "Time Load Page", userName: userName, logTime: logTime, information: time, type: "1" })
+        //    .done(function (data) {
+
+        //    });
+        //}
+    });
+    Date.prototype.getFromFormat = function(format) {
+        var yyyy = this.getFullYear().toString();
+        format = format.replace(/yyyy/g, yyyy)
+        var mm = (this.getMonth()+1).toString();
+        format = format.replace(/mm/g, (mm[1]?mm:"0"+mm[0]));
+        var dd  = this.getDate().toString();
+        format = format.replace(/dd/g, (dd[1]?dd:"0"+dd[0]));
+        var hh = this.getHours().toString();
+        format = format.replace(/hh/g, (hh[1]?hh:"0"+hh[0]));
+        var ii = this.getMinutes().toString();
+        format = format.replace(/ii/g, (ii[1]?ii:"0"+ii[0]));
+        var ss  = this.getSeconds().toString();
+        format = format.replace(/ss/g, (ss[1]?ss:"0"+ss[0]));
+        return format;
+    };
+</script>
+<script type="text/javascript">
+    globalLevels = @Html.Raw(Json.Encode(((IEnumerable<LevelInfo>)ViewBag.Levels).Select(c => new { LevelId = c.LevelId, Name = c.Name })))
+    globalStatusMaps = @Html.Raw(Json.Encode(((IEnumerable<StatusMapInfo>)ViewBag.StatusMaps).Select(c => new { Id = c.Id, Name = c.Name })))
+    globalUsers = @Html.Raw(Json.Encode(((IEnumerable<UserInfo>)ViewBag.Users).Select(c => new { UserID = c.UserID, FullName = c.FullName })))
+    globalStatusCares = @Html.Raw(Json.Encode(((IEnumerable<StatusCareInfo>)ViewBag.StatusCares).Select(c => new { Id = c.Id, Name = c.Name })))
+    //@*globalChannels = @Html.Raw(Json.Encode(((IEnumerable<ChannelInfo>)ViewBag.Channels).Select(c => new { ChannelId = c.ChannelId, Name = c.Name })))*@
+    globalCollectors = @Html.Raw(Json.Encode(((IEnumerable<CollectorInfo>)ViewBag.Collectors).Select(c => new { CollectorId = c.CollectorId, Name = c.Name })))
+    globalWebServiceTypes = @Html.Raw(Json.Encode((new SelectList(ViewBag.WebServiceConfigTypes, "Id", "Name")).Select(c => new { Id = c.Value, Name = c.Text })))
+    globalStatusConnectTypes = @Html.Raw(Json.Encode((new SelectList(ViewBag.StatusConnectTypes, "Id", "Name")).Select(c => new { Id = c.Value, Name = c.Text })))
+    globalSourceTypes = @Html.Raw(Json.Encode(((IEnumerable<SourceTypeInfo>)ViewBag.SourceTypes).Select(c => new { SourceTypeId = c.SourceTypeId, Name = c.Name })))
+    globalEducationLevels = @Html.Raw(Json.Encode(((IEnumerable<EducationLevelInfo>)ViewBag.EducationLevels).Select(c => new { EducationLevelId = c.EducationLevelId, Name = c.Name })))
+    globalStatus = @Html.Raw(Json.Encode((Util.SelectedList<StatusType>()).Select(c => new { Id = c.Value, Name = c.Text })))
+
+   $(document).ready(function () {
+       bindGlobalChannels()
+   });
+
+    function bindGlobalChannels() {
+        if (!globalChannels) {
+            $.getJSON('/admin/api/channel/get').done(function (data) {
+                globalChannels = data;
+            });
+        }
+    }
+</script>

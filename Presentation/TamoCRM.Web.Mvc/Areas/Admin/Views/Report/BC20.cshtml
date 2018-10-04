@@ -1,0 +1,145 @@
+﻿@using TamoCRM.Core
+@using TamoCRM.Domain.Groups
+@using TamoCRM.Web.Framework.Users
+@using TamoCRM.Domain.UserRole
+@using TamoCRM.Web.Framework
+@model TamoCRM.Web.Mvc.Areas.Admin.Models.Reports.BC20Model
+@{
+    ViewBag.Title = "Báo cáo nghiệm thu tổng hợp";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    var branchId = UserContext.GetDefaultBranch();
+
+    // Group
+    var groups = (List<GroupInfo>)ViewBag.Groups;
+    var user = UserContext.GetCurrentUser();
+    var lstUsers = StoreData.SelectedList<UserInfo>();
+   
+    //if (user.GroupConsultantType != (int)GroupConsultantType.ManagerConsultant)
+    //{
+    //    groups = groups.Where(c => c.LeaderId == UserContext.GetCurrentUser().UserID || c.GroupId == (int)ViewBag.GroupId).ToList();
+    //}
+    //groups = groups.Where(c => c.GroupId == (int)ViewBag.GroupId).ToList();
+    ((List<GroupInfo>)groups).RemoveAll(c => c.GroupId == 0);
+    if (((List<GroupInfo>)groups).Count > 1)
+    {
+        ((List<GroupInfo>)groups).Insert(0, new GroupInfo { GroupId = 0, Name = "Tất cả", BranchId = branchId, EmployeeTypeId = (int)EmployeeType.Consultant });
+    }
+    var lstGroups = new SelectList(((List<GroupInfo>)groups).Where(c => c.BranchId == branchId).Where(c => c.EmployeeTypeId == (int)EmployeeType.Consultant), "GroupId", "Name");
+  
+}
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        } catch (e) { }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Danh sách contact đã phân</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>Danh sách contact đã phân</h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="form-group">
+            <div class="col-sm-12" id="alert">
+            </div>
+        </div>
+        <div class="col-xs-12">
+            @using (Ajax.BeginForm("BC20", "Report", new AjaxOptions { HttpMethod = "POST" }, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "uploadexcelform" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="row">
+                    <label class="col-sm-1 control-label no-padding-right" style="text-align: left !important;" for="form-field-2">Nhóm </label>
+                    <div class="col-sm-2">
+                        @Html.DropDownList("GroupId", lstGroups, new { @class = "form-control" })
+                    </div>
+                    <label class="col-sm-1 control-label no-padding-right" style="text-align: left !important;" for="form-field-2">TVTS</label>
+                    <div class="col-sm-2">
+                        @Html.DropDownList("UserId", lstUsers, new { @class = "form-control" })
+                    </div>
+                    <label class="col-sm-1 control-label no-padding-right" style="text-align: left !important;" for="form-field-2">Ngày phân</label>
+                    <div class="col-sm-2">
+                        @Html.TextBox("HanoverDate", DateTime.Now.ToString("dd/MM/yyyy"), new { @class = "form-control" })
+                    </div>
+                    @*<label class="col-sm-1 control-label no-padding-right" style="text-align: left !important;" for="form-field-2">Đến Ngày</label>
+                    <div class="col-sm-2">
+                        @Html.TextBox("ToDate", DateTime.Now.ToString("dd/MM/yyyy"), new { @class = "form-control" })
+                    </div>*@
+                </div>
+                <div class="space-6"></div>
+                <div class="row">
+                    <div class="col-sm-5">
+                        <button type="button" class="btn-import btn-primary" id="btnReport">Xuất báo cáo</button>
+                        <button type="button" class="btn-import btn-primary" id="btnSave">Tải về</button>
+                    </div>
+                    <div class="col-sm-7">
+                    </div>
+                </div>
+            }
+
+            <div class="space-6"></div>
+            <div id="mydiv">
+                <iframe id="frame" style="width: 100%; height: 400px; border: none;"></iframe>
+            </div>
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+<!-- /.page-content -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        initPage();
+        
+        $("#btnReport").click(function (e) {
+            e.preventDefault();
+            var hanoverDate = $("#HanoverDate").val();
+            var userId = $("#UserId").val();
+            var groupId = $("#GroupId").val();
+            @*var branchId = '@ViewBag.BranchId';*@
+            var url = '/admin/report/showBC20?groupId={0}&userId={1}&hanoverDate={2}&reportType={3}';
+            var url = url.format(groupId, userId, hanoverDate, '@((int)ReportType.Pdf)');
+            $("#frame").attr("src", url);
+        });
+
+        $("#btnSave").click(function (e) {
+            e.preventDefault();
+            if ($("#ToDate").val() == '') {
+                alertError("Bạn chưa chọn khoảng thời gian tìm kiếm");
+                return;
+            }
+
+            var hanoverDate = $("#HanoverDate").val();
+            var userId = $("#UserId").val();
+            var groupId = $("#GroupId").val();
+          
+            var url = '/admin/report/showBC20?groupId={0}&userId={1}&hanoverDate={2}&reportType={3}';
+            var url = url.format(groupId, userId, hanoverDate, '@((int)ReportType.Excel)');
+            $("#frame").attr("src", url);
+        });    
+    });
+
+    function initPage() {
+        $("#HanoverDate").datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly: true});
+        
+        loadUserByGroupId();
+        $("#GroupId").change(function () {
+            
+            loadUserByGroupId();
+        });
+    }
+</script>

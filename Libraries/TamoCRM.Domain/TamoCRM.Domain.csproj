@@ -1,0 +1,157 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{E7E8FAA8-E51A-4925-A62D-0E9BCC99D091}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>TamoCRM.Domain</RootNamespace>
+    <AssemblyName>TamoCRM.Domain</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Build.Framework" />
+    <Reference Include="RestSharp">
+      <HintPath>..\..\packages\RestSharp.105.1.0\lib\net45\RestSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="StackExchange.Redis">
+      <HintPath>..\..\packages\StackExchange.Redis.1.0.223\lib\StackExchange.Redis.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Activity\ActivityLogInfo.cs" />
+    <Compile Include="Activity\ActivityObjectChangeInfo.cs" />
+    <Compile Include="BaseClassInfo.cs" />
+    <Compile Include="Branches\BranchInfo.cs" />
+    <Compile Include="CallHistories\CallHistoryInfo.cs" />
+    <Compile Include="CallHistories\CallInfo.cs" />
+    <Compile Include="CC3Report\CC3ReportInfo.cs" />
+    <Compile Include="Channels\ChannelInfo.cs" />
+    <Compile Include="Collectors\CollectorInfo.cs" />
+    <Compile Include="ContactDeleted\ContactDeletedInfo.cs" />
+    <Compile Include="ContactForward\ContactForwardInfo.cs" />
+    <Compile Include="ContactLevelInfos\ContactFixedMoney.cs" />
+    <Compile Include="ContactLevelInfos\ContactLevelInfo.cs" />
+    <Compile Include="Contacts\AcceptanceStatus.cs" />
+    <Compile Include="Contacts\ContactAllInfo.cs" />
+    <Compile Include="Contacts\ContactAppointmentInfo.cs" />
+    <Compile Include="Contacts\ContactError.cs" />
+    <Compile Include="Contacts\ContactTestInfo.cs" />
+    <Compile Include="Contacts\ContactInfo.cs" />
+    <Compile Include="ContactTmps\ContactTmpInfo.cs" />
+    <Compile Include="ContactDuplicates\ContactDuplicateInfo.cs" />
+    <Compile Include="AppointmentInterviews\AppointmentInterviewInfo.cs" />
+    <Compile Include="CasecAccounts\CasecAccountInfo.cs" />
+    <Compile Include="Catalogs\CatalogInfo.cs" />
+    <Compile Include="Email\EmailHistoryInfo.cs" />
+    <Compile Include="Email\EmailInfo.cs" />
+    <Compile Include="FailedAdvisor\FailedAdvisorInfo.cs" />
+    <Compile Include="LogDashBoard\LogDashBoard.cs" />
+    <Compile Include="LogsMoney\LogsMoneyInfo.cs" />
+    <Compile Include="Packge\PackgeInfo.cs" />
+    <Compile Include="Recharge\RechargeInfo.cs" />
+    <Compile Include="ReportFilter\ReportFilter.cs" />
+    <Compile Include="Reports\ReportBC47Info.cs" />
+    <Compile Include="Reports\ReportBC46Info.cs" />
+    <Compile Include="Reports\ReportLogDashBoardInfo.cs" />
+    <Compile Include="Reports\ReportModel.cs" />
+    <Compile Include="Reports\TmpJobReportBC53.cs" />
+    <Compile Include="Reports\TmpJobReportContactAriseBC300Info.cs" />
+    <Compile Include="Reports\TmpJobReportImportExportInfo.cs" />
+    <Compile Include="TemplateAds\TemplateAdsInfo.cs" />
+    <Compile Include="TestResults\TestResultInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="TestResults\TestResultLinkSb100Info.cs" />
+    <Compile Include="TestResults\TestResultInterviewInfo.cs" />
+    <Compile Include="TestResults\TestResultCasecInfo.cs" />
+    <Compile Include="Reports\TmpJobReportBC12Info.cs" />
+    <Compile Include="TestResults\TestResultLinkSb100TopicaInfo.cs" />
+    <Compile Include="TestResults\TestResultTopicaInfo.cs" />
+    <Compile Include="TopicaAccounts\TopicaAccountInfo.cs" />
+    <Compile Include="UserDraft\UserDraftInfo.cs" />
+    <Compile Include="UserRole\UserInfoTVST.cs" />
+    <Compile Include="WebServiceConfig\WebServiceConfigInfo.cs" />
+    <Compile Include="Table\TableInfo.cs" />
+    <Compile Include="Logs\MissedCallInfo.cs" />
+    <Compile Include="MissedCall\MissedCallInfo.cs" />
+    <Compile Include="Gender\GenderInfo.cs" />
+    <Compile Include="Reports\TmpJobReportBC11Info.cs" />
+    <Compile Include="Reports\TmpJobReportBC10Info.cs" />
+    <Compile Include="Reports\TmpJobReportBC09Info.cs" />
+    <Compile Include="Reports\TmpJobReportBC08Info.cs" />
+    <Compile Include="Reports\TmpJobReportBC07Info.cs" />
+    <Compile Include="Reports\TmpJobReportBC05Info.cs" />
+    <Compile Include="Reports\TmpJobReportBC300Info.cs" />
+    <Compile Include="Reports\TmpJobReportBC04Info.cs" />
+    <Compile Include="EducationLevels\EducationLevelInfo.cs" />
+    <Compile Include="Groups\GroupInfo.cs" />
+    <Compile Include="ImportExcels\ImportExcelInfo.cs" />
+    <Compile Include="Levels\LevelInfo.cs" />
+    <Compile Include="Phones\PhoneInfo.cs" />
+    <Compile Include="Phones\PhoneType.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Sources\SourceInfo.cs" />
+    <Compile Include="SourceTypes\SourceTypeInfo.cs" />
+    <Compile Include="UserRole\FunctionInfo.cs" />
+    <Compile Include="UserRole\RoleInfo.cs" />
+    <Compile Include="StatusMap\StatusMapInfo.cs" />
+    <Compile Include="UserRole\UserDraftInfo.cs" />
+    <Compile Include="UserRole\UserInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TamoCRM.Core\TamoCRM.Core.csproj">
+      <Project>{2a57a174-daeb-45a5-8864-861a25f5f443}</Project>
+      <Name>TamoCRM.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,248 @@
+﻿@{
+    ViewBag.Title = "Chức năng thay đổi số tiền đã đóng cho học viên có ưu đãi nhóm";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<style type="text/css">
+    .btn-import {
+        display: inline-block;
+        color: #FFF !important;
+        text-shadow: 0 -1px 0 rgba(0,0,0,0.25) !important;
+        background-image: none !important;
+        border-radius: 0;
+        box-shadow: none !important;
+        -webkit-transition: all ease .15s;
+        transition: all ease .15s;
+        cursor: pointer;
+        vertical-align: middle;
+        margin: 0;
+        position: relative;
+        font-size: 13px;
+        padding: 4px 9px;
+        line-height: 1.39;
+    }
+</style>
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        } catch (e) { }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">ImportExcel</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>
+            Sửa thông tin nạp tiền cho học viên ưu đãi nhóm
+        </h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="form-group">
+            <div class="col-sm-12" id="alert">
+            </div>
+        </div>
+
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            <div class="space-4"></div>
+            <div class="form-group">
+                <button id="btnAddPhone" class="btn-primary" style="float: right; margin-right: 10px;">Thêm số điện thoại</button>
+                @Html.TextBox("Mobile", String.Empty, new { @style = "float: right; height: 25px; margin-right: 10px; width: 100px; " })
+            </div>
+            <br /> 
+            @using (Ajax.BeginForm("FixedMoneyManagerConsulant", "ContactFilter", new AjaxOptions { HttpMethod = "POST" }, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "fixMoneyForm" }))
+            {
+                @Html.AntiForgeryToken()                            
+                
+                <div class="space-4"></div>
+                <input id="countRowTable" name="countRowTable" style="display: none;" />
+                <div id="valueHidden">
+
+                </div>
+
+            <table class="table table-striped table-bordered table-hover" id="divDataContacts">
+                <thead>
+                    <tr>
+                        <th>Tên học viên</th>
+                        <th>Level</th>
+                        <th>Điện thoại</th>
+                        <th>TVTS</th>
+                        <th>Số tiền đã đóng</th>
+                        <th>Thay đổi thành</th>
+                        <th>Số tiền trả lại</th>
+                        <th>Thao tác </th>
+                    </tr>
+                </thead>
+                <tbody>
+                        
+                </tbody>
+            </table>
+                
+                <hr />
+                <div class="space-4"></div>
+                <div class="form-group">
+                    <label class="col-sm-2 no-padding-right" for="form-field-5">Lý do thực hiện thay đổi</label>
+                    <div class="col-sm-10">
+                        @Html.TextArea("NotesManagerConsulant", new { @style = "float: right; width: 100%; height: 40%;" })
+                    </div>
+                </div>
+                <div class="space-4"></div>
+            }
+
+            <button id="btnSubmit" class="btn-primary" style="float:right; width: 100px; margin-top: 15px" onclick="return submitForm();">Duyệt</button>
+            <!-- PAGE CONTENT ENDS -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+
+@*Modal*@
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="left:0%">
+        <div class="modal-content" style="border-radius: 10px">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h3 class="modal-title" id="myModalLabel" style="color: #790000"><b>Xác nhận giao dịch</b></h3>
+            </div>
+            <div class="col-sm-20" id="alert">
+                <laber id="alert_payment" />
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12" >
+                        <b>Dữ liệu thay đổi này sẽ được đồng bộ sang bên kế toán. Bạn chắc chắn muốn thực hiện thay đổi này</b>
+                    </div>
+                    <div class="col-sm-5">
+                        <label id="m_fee" />
+                    </div>
+                </div>
+                <div class="space-4"></div>
+            </div>
+
+            <div class="modal-footer" style="border-radius: 10px">
+                <button id="cancelMoney" type="button" class="btn btn-default" data-dismiss="modal" style="border-radius: 10px" onclick="$('#myModal').modal('hide');">Hủy bỏ</button>
+                <button id="okMoney" type="button" class="btn btn-primary" style="border-radius: 10px" onclick="$('#fixMoneyForm').submit();">OK, Tôi đồng ý</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/Content/themes/ace/assets/js/jquery.form.js"></script>
+<script src="/Content/themes/ace/assets/js/jquery.validate.min.js"></script>
+<script src="/Content/themes/ace/assets/js/additional-methods.min.js"></script>
+<script src="~/Scripts/jquery.number.js"></script>
+
+<script type="text/javascript">
+
+    var message = '@ViewBag.Message';
+    if (message == null || message == '') {
+        $("#alert").removeClass();
+        $("#alert").html('');
+    }
+    else {
+        $("#alert").addClass("alert alert-block alert-success");
+        $("#alert").html(message);
+        
+    }
+
+    $(document).ready(function () {
+
+        $("#btnAddPhone").click(function (e) {
+            var mobile = $("#Mobile").val();
+            var html = "";
+            var html2 = "";
+            
+            $.ajax({
+                type: 'POST',
+                data: { mobile: mobile },
+                url: '/admin/api/Contact/GetInfoByPhoneContact', //API lấy thông tin contact và số tiền học viên đã đóng.
+                success: function (data) {
+                    var checkDulicate = false;
+
+                    if (data == null) {
+                        alert("Contacts chưa có trong hệ thống");
+                        return false;
+                    }
+                    
+                    $("#divDataContacts tbody tr").each(function () {
+                        var mobile = parseInt($(this).find("td").eq(2).html()); 
+                        if (mobile == data.Mobile)
+                        {
+                            checkDulicate = true;
+                            return true;
+                        }
+                    });
+                     
+                    if (checkDulicate == true) {
+                        alert("Số điện thoại đã được thêm");
+                    }
+                    else {
+                        var id = $("#divDataContacts tr").length;                       
+
+                        html += '<tr><td><a style="text-decoration: none" name="NameCts_' + id + '">' + data.Name + '</a></td>';
+                        html += '<td><a style="text-decoration: none" name="LevelCts_' + id + '">' + data.Level + '</td>';
+                        html += '<td><a style="text-decoration: none" name="MobileCts_' + id + '">' + data.Mobile + '</td>';
+                        html += '<td><a style="text-decoration: none" name="UserConsulantCts_' + id + '">' + data.UserConsulant + '</td>';
+                        html += '<td><a style="text-decoration: none" name="FeeEduCts_' + id + '">' + data.FeeEdu + '</a></td>';
+                        html += '<td><input type="text" name="FeeEduChange_' + id + '" id="FeeEduChange_' + id + '" ></td>';
+                        html += '<td><input type="text" name="FeeReturn_' + id + '" id="FeeReturn_' + id + '" ></td>';
+                        html += '<th><img src="../../Images/delete.png" align="middle" onclick="deleteRow()"/></th></tr>';
+
+                        html2 += '<input style="display: none;" name="CodeCts_' + id + '" value="' + data.Code + '"/>';
+                        html2 += '<input style="display: none;" name="EmailCts_' + id + '" value="' + data.Email + '"/>';
+                        html2 += '<input style="display: none;" name="NameCts_' + id + '" value="'  + data.Name + '"/>';
+                        html2 += '<input style="display: none;" name="LevelCts_' + id + '" value="' + data.Level + '"/>';
+                        html2 += '<input style="display: none;" name="MobileCts_' + id + '" value="' + data.Mobile + '"/>';
+                        html2 += '<input style="display: none;" name="UserConsulant_' + id + '" value="' + data.UserConsulant + '"/>';
+                        html2 += '<input style="display: none;" name="FeeEdu_' + id + '" value="' + data.FeeEdu + '"/>';
+                                              
+                        $("#divDataContacts tbody").append(html);
+                        
+                        $("#valueHidden").append(html2);
+                        
+                        $("#Mobile").val("");
+                        
+                        $('#countRowTable').val(id);
+                    }
+                    
+                },
+                error: function (request, status, ex) {
+                    alert("Đã có lỗi xảy ra");
+                }
+            });
+
+        });        
+    });
+
+    function submitForm()
+    {
+        $('#myModal').modal('show');
+        return true;
+    }
+
+    function deleteRow()
+    {
+        $('#divDataContacts tr').click(function (e) {
+            $(this).remove();
+        });
+    }
+  
+   
+</script>
+
+

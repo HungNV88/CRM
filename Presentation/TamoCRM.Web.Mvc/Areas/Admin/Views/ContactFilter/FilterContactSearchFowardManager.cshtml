@@ -1,0 +1,332 @@
+﻿@using TamoCRM.Core
+@using TamoCRM.Domain.Branches
+@using TamoCRM.Domain.UserRole
+@using TamoCRM.Web.Framework
+@using TamoCRM.Web.Framework.Users
+
+@model TamoCRM.Web.Mvc.Areas.Admin.Models.Contacts.ContactCreateModel
+
+@{
+    ViewBag.Title = "Tìm kiếm và chuyển contact cho quản lý TVTS";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+
+    var lstUsers = StoreData.SelectedList<UserInfo>();
+    var lstBranches = StoreData.SelectedList<BranchInfo>();
+
+}
+
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        }
+        catch (e) {
+
+        }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Contact</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>@ViewBag.Title</h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="form-group">
+            <div class="col-sm-12" id="alert">
+            </div>
+        </div>
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            @using (Ajax.BeginForm("FilterContactSearchManager", "ContactFilter", new AjaxOptions { HttpMethod = "POST" }, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "filter_contact_search_fast_form" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.Hidden("HandoverDate", DateTime.Now.ToString("dd/MM/yyyy"))
+                <div style="border: 1px solid #c5d0dc; padding: 15px">
+                    <div class="form-group">
+                        <div class="col-sm-1">
+                            Họ và Tên
+                        </div>
+                        <div class="col-sm-3">
+                            <input id="txtName" type="text" style="width: 90%;" />
+                        </div>
+                        <div class="col-sm-1" style="width: 9%;">
+                            Điện thoại
+                        </div>
+                        <div class="col-sm-3" style="width: 24%;">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="icon-phone"></i>
+                                </span>
+                                <input id="txtMobile" type="text" />
+                            </div>
+                        </div>
+                        <div class="col-sm-1">
+                            Email
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="icon-envelope"></i>
+                                </span>
+                                <input id="txtEmail" type="text" style="width: 100%;" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="float: right">
+                        <button id="btnClearFilter" class="btn-primary">Xóa trang</button>
+                        <button id="btnGoFilter" class="btn-primary" style="margin-right: 15px;">Tìm kiếm</button>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+
+                <div class="space-6"></div>
+                <div id="divForward" style="border: 1px solid #c5d0dc; padding: 15px">
+                    <div class="form-group">
+                        <div class="col-sm-4"></div>
+                        <div class="col-sm-1" style="width: 9%;">
+                            Vùng
+                        </div>
+                        <div class="col-sm-3" style="width: 24%;">
+                            @Html.DropDownList("BranchId", lstBranches, new { @style = "width: 100%;" })
+                        </div>
+                        <div class="col-sm-1">
+                            TVTS
+                        </div>
+                        <div class="col-sm-3">
+                            @Html.DropDownList("UserId", lstUsers, new { @style = "width: 100%;" })
+                        </div>
+                    </div>
+                    <div class="row" style="float: right">
+                        <button id="btnDelete" class="btn-primary">Xóa Contact</button>
+                        <button id="btnForward" class="btn-primary" style="margin-right: 15px;">Chuyển TVTS</button>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            }
+
+            <div class="space-6"></div>
+            <table id="grid-table"></table>
+            <div id="grid-pager"></div>
+
+            <!-- PAGE CONTENT ENDS -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+
+<script type="text/javascript">
+    var grid_selector = "#grid-table";
+    var groupType = '@ViewBag.GroupType';
+    var employeeTypeId = '@((int)EmployeeType.Consultant)';
+    var url = 'admin/api/contact/filtersearchmanager?name={0}&mobile={1}&email={2}&employeeTypeId=' + employeeTypeId;
+    var heades = ['Id', 'Họ và tên', 'Điện thoại', 'Level', 'Ngày', 'Sáng/Chiều', 'Giờ', 'Nội dung cuộc gọi gần nhất','Ngày gọi gần nhất', 'Trạng thái chăm sóc', 'Tổng số cuộc gọi', 'TVTS', 'Ngày phân contact', 'Kiểu nguồn', 'Xem', '<input type="checkbox" id="chkSelectAll" onclick="fixCheckBoxGrid(event)" />'];
+    var model = [
+        { name: 'Id', index: 'Id', editable: false, sorttype: 'string', editoptions: { disabled: true }, width: '0px' },
+        { name: 'Fullname', index: 'Fullname', editable: false, width: '90px', sorttype: 'string' },
+        { name: 'Mobile1', index: 'Mobile1', editable: false, width: '80px', sorttype: 'string' },
+        { name: 'LevelId', index: 'LevelId', editable: false, width: '40px', sorttype: 'string', align: 'center', formatter: levelFomatter },
+        { name: 'AppointmentConsultantDate', index: 'AppointmentConsultantDate', editable: false, width: '80px', align: 'center', formatter: 'date', formatoptions: { srcformat: 'Y-m-dTH:i:s', newformat: 'd/m/Y' } },
+        { name: 'AppointmentConsultantAmPm', index: 'AppointmentConsultantAmPm', editable: false, width: '60px', align: 'center', formatter: stringFormatter },
+        { name: 'AppointmentConsultantTime', index: 'AppointmentConsultantTime', editable: false, width: '50px', align: 'center', formatter: 'date', formatoptions: { srcformat: 'Y-m-dTH:i:s', newformat: 'H:i' } },
+        { name: 'CallInfoConsultant', index: 'CallInfoConsultant', editable: false, width: '180px', sorttype: 'string', align: 'left' },
+        { name: 'CallConsultantDate', index: 'CallConsultantDate', editable: false, width: '100px', sorttype: 'string', align: 'left' },
+        { name: 'StatusCareConsultantId', index: 'StatusCareConsultantId', editable: false, width: '120px', formatter: statusCareFomatter },
+        { name: 'CallAmount', index: 'CallAmount', editable: false, width: '50px', align: 'center' },
+        { name: 'UserConsultantId', index: 'UserConsultantId', editable: false, width: '90px', formatter: userFomatter },
+        { name: 'HandoverConsultantDate', index: 'HandoverConsultantDate', editable: false, formatter: 'date', formatoptions: { newformat: 'd/m/Y' }, width: '80px' },
+        { name: 'TypeId', index: 'TypeId', editable: false, formatter: sourceTypeFomatter },
+        {
+            name: 'Function', index: 'Function', editable: false, width: '55px', align: 'center', formatter: "dynamicLink",
+            formatoptions: {
+                cellValue: function (cellValue, rowId, rowData, options) {
+                    return '<div style="color:#34810c;margin:5px;"><a style="cursor: pointer;" onclick="return openDialog(' + rowData.Id + ')"><img style="width:16px; height:16px;" src="../../../../Images/edit-16.png"/></a></div>';
+                }
+            }
+        },
+        { name: 'chkSelect', index: 'chkSelect', editable: false, edittype: 'checkbox', align: 'center', width: '40px', editoptions: { value: "True:False" }, formatter: checkboxFomatter, formatoptions: { disabled: false } }
+    ];
+
+    $(document).ready(function () {
+        initForm();
+
+        $(window).keydown(function (e) {
+            if (e.keyCode == 13) {
+                e.preventDefault();
+                $("#btnGoFilter").click();
+            }
+        });
+
+        $("#btnGoFilter").click(function (e) {
+            e.preventDefault();
+
+            // Param
+            var name = $('#txtName').val();
+            var email = $('#txtEmail').val();
+            var mobile = $('#txtMobile').val();
+            if (name.length == 0 && email.length == 0 && mobile.length == 0) {
+                alertError("Nội dung tìm kiếm không phù hợp.");
+                return;
+            }
+
+            if (!validateEmail(email)) {
+                alertError("Email tìm kiếm không đúng định dạng.");
+                return;
+            }
+
+            var newUrl = '/' + url.format(name, mobile, email);
+            //alert(newUrl);
+            // Format Url
+            alertHide();
+
+            jQuery(grid_selector).jqGrid().setGridParam({ url: newUrl }).trigger("reloadGrid");
+
+        });
+        $("#btnClearFilter").click(function (e) {
+            e.preventDefault();
+
+            // Param
+            $('#txtName').val('');
+            $('#txtEmail').val('');
+            $('#txtMobile').val('');
+        });
+        $("#btnForward").click(function (e) {
+            e.preventDefault();
+
+            // Param
+            var ids = '';
+            var items = $("#grid-table td input");
+            for (var i = 0; i < items.length; i++) {
+                if ($(items[i]).is(':checked')) {
+                    ids += ids.length == 0
+                        ? $('#grid-table').jqGrid('getCell', i + 1, 'Id')
+                        : ',' + $('#grid-table').jqGrid('getCell', i + 1, 'Id');
+                }
+            }
+            if (ids.length == 0) {
+                alertError('Bạn chưa chọn contact để Chuyển giao, vui lòng chọn!');
+                return;
+            }
+            var targetBranchId = $('#BranchId').val();
+            if (targetBranchId == 0) {
+                alertError('Bạn chưa chọn vùng cần chuyền giao, vui lòng chọn!');
+                return;
+            }
+            var targetUserId = $('#UserId').val();
+            if (targetUserId == 0) {
+                alertError('Bạn chưa chọn TVTS cần chuyền giao, vui lòng chọn!');
+                return;
+            }
+            var handoverDate = $('#HandoverDate').val().replaceAll('/', '');
+            var r = confirm("Có phải bạn muốn chuyển contact đã chọn sang cho TVTS khác?");
+            if (r == true) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/admin/api/contact/Forward',
+                    data: {
+                        ids: ids,
+                        handoverDate: handoverDate,
+                        targetUserId: targetUserId,
+                        targetBranchId: targetBranchId,
+                        employeeTypeId: employeeTypeId,
+                    },
+                    beforeSend: function () {
+                        alertProcess();
+                    },
+                    success: function (response) {
+                        alertSuccess("Chuyển giao thành công " + response + " contacts");
+                        $("#btnGoFilter").click();
+                    },
+                    error: function (request, status, ex) {
+                        alertError("Hệ thống bị lỗi, Chuyển giao không thành công.");
+                    }
+                });
+            }
+        });
+        $("#btnDelete").click(function (e) {
+            e.preventDefault();
+
+            // Param
+            var ids = '';
+            var items = $("#grid-table td input");
+            for (var i = 0; i < items.length; i++) {
+                if ($(items[i]).is(':checked')) {
+                    ids += ids.length == 0
+                        ? $('#grid-table').jqGrid('getCell', i + 1, 'Id')
+                        : ',' + $('#grid-table').jqGrid('getCell', i + 1, 'Id');
+                }
+            }
+            if (ids.length == 0) {
+                alertError('Bạn chưa chọn contact để xóa, vui lòng chọn!');
+                return;
+            }
+
+            var r = confirm("Có phải bạn muốn xóa contact đã chọn?");
+            if (r == true) {
+                var arrId = ids.split(',');
+                for (var i = 0; i < arrId.length; i++) {
+                    var id = arrId[i];
+                    var newUrl = "/admin/api/contact/delete/?id={0}&employeeTypeId={1}".format(id, employeeTypeId);
+                    $.ajax({
+                        type: 'GET',
+                        url: newUrl,
+                        beforeSend: function () {
+                            alertProcess();
+                        },
+                        success: function (data) {
+                            alertSuccess('Xóa contact thành công!');
+                            jQuery(grid_selector).jqGrid().trigger("reloadGrid");
+                        },
+                        error: function (request, status, ex) {
+                            alertError("Xóa contact không thành công!");
+                        }
+                    });
+                }
+            }
+        });
+
+        $("#BranchId").change(function () {
+            var branchId = $("#BranchId").val();
+            loadUser(branchId, 0, employeeTypeId, "UserId");
+        });
+        $("#chkSelectAll").click(function () {
+            checkAll('chkSelectAll', 'checkbox');
+        });
+    });
+
+    function initForm() {
+        var userId = '@((int)UserContext.GetCurrentUser().UserID)';
+        $('#UserId').chosen();
+
+        $('#divForward').css('display', '');
+
+        var branchId = $("#BranchId").val();
+        loadUser(branchId, 0, employeeTypeId, "UserId");
+
+        bindGlobalStatusMaps();
+        setupGridWithoutEdit("#grid-table", "#grid-pager", '', "", "Id", "Danh sách Contact", heades, model);
+        $(grid_selector).jqGrid("setGroupHeaders", {
+            useColSpanStyle: true,
+            groupHeaders: [
+                { startColumnName: "Fullname", numberOfColumns: 3, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;height:40px;"><b>Thông tin Contact</b></td></tr></table>' },
+                { startColumnName: "AppointmentConsultantDate", numberOfColumns: 3, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;"><b>Thông tin lịch hẹn gọi lại</b></td></tr></table>' },
+                { startColumnName: "CallInfoConsultant", numberOfColumns: 2, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;"><b>Tình trạng chăm sóc</b></td></tr></table>' }
+            ]
+        });
+    }
+</script>
+

@@ -1,0 +1,443 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://tempuri.org/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://tempuri.org/">
+      <s:element name="ChangeInterviewInfo">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="information" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ChangeInterviewInfoResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ChangeInterviewInfoResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="CancelInterview">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="information" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="CancelInterviewResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="CancelInterviewResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="UpdateTopicaMark">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="information" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="UpdateTopicaMarkResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="UpdateTopicaMarkResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="Check_duplicate">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="information" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="Check_duplicateResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="Check_duplicateResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="Get_ContactID">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="str_contactid" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="Get_ContactIDResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="Get_ContactIDResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="UpdateSB100">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="information" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="UpdateSB100Response">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="UpdateSB100Result" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="UpdateSB100_topica">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="information" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="UpdateSB100_topicaResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="UpdateSB100_topicaResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="UpdateAcountCasec">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="information" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="UpdateAcountCasecResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="UpdateAcountCasecResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="UpdateTTPhongVan">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="information" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="UpdateTTPhongVanResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="UpdateTTPhongVanResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="UpdateTTPhongVanForVip">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="information" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="UpdateTTPhongVanForVipResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="UpdateTTPhongVanForVipResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="ChangeInterviewInfoSoapIn">
+    <wsdl:part name="parameters" element="tns:ChangeInterviewInfo" />
+  </wsdl:message>
+  <wsdl:message name="ChangeInterviewInfoSoapOut">
+    <wsdl:part name="parameters" element="tns:ChangeInterviewInfoResponse" />
+  </wsdl:message>
+  <wsdl:message name="CancelInterviewSoapIn">
+    <wsdl:part name="parameters" element="tns:CancelInterview" />
+  </wsdl:message>
+  <wsdl:message name="CancelInterviewSoapOut">
+    <wsdl:part name="parameters" element="tns:CancelInterviewResponse" />
+  </wsdl:message>
+  <wsdl:message name="UpdateTopicaMarkSoapIn">
+    <wsdl:part name="parameters" element="tns:UpdateTopicaMark" />
+  </wsdl:message>
+  <wsdl:message name="UpdateTopicaMarkSoapOut">
+    <wsdl:part name="parameters" element="tns:UpdateTopicaMarkResponse" />
+  </wsdl:message>
+  <wsdl:message name="Check_duplicateSoapIn">
+    <wsdl:part name="parameters" element="tns:Check_duplicate" />
+  </wsdl:message>
+  <wsdl:message name="Check_duplicateSoapOut">
+    <wsdl:part name="parameters" element="tns:Check_duplicateResponse" />
+  </wsdl:message>
+  <wsdl:message name="Get_ContactIDSoapIn">
+    <wsdl:part name="parameters" element="tns:Get_ContactID" />
+  </wsdl:message>
+  <wsdl:message name="Get_ContactIDSoapOut">
+    <wsdl:part name="parameters" element="tns:Get_ContactIDResponse" />
+  </wsdl:message>
+  <wsdl:message name="UpdateSB100SoapIn">
+    <wsdl:part name="parameters" element="tns:UpdateSB100" />
+  </wsdl:message>
+  <wsdl:message name="UpdateSB100SoapOut">
+    <wsdl:part name="parameters" element="tns:UpdateSB100Response" />
+  </wsdl:message>
+  <wsdl:message name="UpdateSB100_topicaSoapIn">
+    <wsdl:part name="parameters" element="tns:UpdateSB100_topica" />
+  </wsdl:message>
+  <wsdl:message name="UpdateSB100_topicaSoapOut">
+    <wsdl:part name="parameters" element="tns:UpdateSB100_topicaResponse" />
+  </wsdl:message>
+  <wsdl:message name="UpdateAcountCasecSoapIn">
+    <wsdl:part name="parameters" element="tns:UpdateAcountCasec" />
+  </wsdl:message>
+  <wsdl:message name="UpdateAcountCasecSoapOut">
+    <wsdl:part name="parameters" element="tns:UpdateAcountCasecResponse" />
+  </wsdl:message>
+  <wsdl:message name="UpdateTTPhongVanSoapIn">
+    <wsdl:part name="parameters" element="tns:UpdateTTPhongVan" />
+  </wsdl:message>
+  <wsdl:message name="UpdateTTPhongVanSoapOut">
+    <wsdl:part name="parameters" element="tns:UpdateTTPhongVanResponse" />
+  </wsdl:message>
+  <wsdl:message name="UpdateTTPhongVanForVipSoapIn">
+    <wsdl:part name="parameters" element="tns:UpdateTTPhongVanForVip" />
+  </wsdl:message>
+  <wsdl:message name="UpdateTTPhongVanForVipSoapOut">
+    <wsdl:part name="parameters" element="tns:UpdateTTPhongVanForVipResponse" />
+  </wsdl:message>
+  <wsdl:portType name="WsCRMSoap">
+    <wsdl:operation name="ChangeInterviewInfo">
+      <wsdl:input message="tns:ChangeInterviewInfoSoapIn" />
+      <wsdl:output message="tns:ChangeInterviewInfoSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="CancelInterview">
+      <wsdl:input message="tns:CancelInterviewSoapIn" />
+      <wsdl:output message="tns:CancelInterviewSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="UpdateTopicaMark">
+      <wsdl:input message="tns:UpdateTopicaMarkSoapIn" />
+      <wsdl:output message="tns:UpdateTopicaMarkSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="Check_duplicate">
+      <wsdl:input message="tns:Check_duplicateSoapIn" />
+      <wsdl:output message="tns:Check_duplicateSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="Get_ContactID">
+      <wsdl:input message="tns:Get_ContactIDSoapIn" />
+      <wsdl:output message="tns:Get_ContactIDSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="UpdateSB100">
+      <wsdl:input message="tns:UpdateSB100SoapIn" />
+      <wsdl:output message="tns:UpdateSB100SoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="UpdateSB100_topica">
+      <wsdl:input message="tns:UpdateSB100_topicaSoapIn" />
+      <wsdl:output message="tns:UpdateSB100_topicaSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="UpdateAcountCasec">
+      <wsdl:input message="tns:UpdateAcountCasecSoapIn" />
+      <wsdl:output message="tns:UpdateAcountCasecSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="UpdateTTPhongVan">
+      <wsdl:input message="tns:UpdateTTPhongVanSoapIn" />
+      <wsdl:output message="tns:UpdateTTPhongVanSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="UpdateTTPhongVanForVip">
+      <wsdl:input message="tns:UpdateTTPhongVanForVipSoapIn" />
+      <wsdl:output message="tns:UpdateTTPhongVanForVipSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="WsCRMSoap" type="tns:WsCRMSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="ChangeInterviewInfo">
+      <soap:operation soapAction="http://tempuri.org/ChangeInterviewInfo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CancelInterview">
+      <soap:operation soapAction="http://tempuri.org/CancelInterview" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateTopicaMark">
+      <soap:operation soapAction="http://tempuri.org/UpdateTopicaMark" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Check_duplicate">
+      <soap:operation soapAction="http://tempuri.org/Check_duplicate" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Get_ContactID">
+      <soap:operation soapAction="http://tempuri.org/Get_ContactID" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateSB100">
+      <soap:operation soapAction="http://tempuri.org/UpdateSB100" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateSB100_topica">
+      <soap:operation soapAction="http://tempuri.org/UpdateSB100_topica" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateAcountCasec">
+      <soap:operation soapAction="http://tempuri.org/UpdateAcountCasec" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateTTPhongVan">
+      <soap:operation soapAction="http://tempuri.org/UpdateTTPhongVan" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateTTPhongVanForVip">
+      <soap:operation soapAction="http://tempuri.org/UpdateTTPhongVanForVip" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="WsCRMSoap12" type="tns:WsCRMSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="ChangeInterviewInfo">
+      <soap12:operation soapAction="http://tempuri.org/ChangeInterviewInfo" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CancelInterview">
+      <soap12:operation soapAction="http://tempuri.org/CancelInterview" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateTopicaMark">
+      <soap12:operation soapAction="http://tempuri.org/UpdateTopicaMark" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Check_duplicate">
+      <soap12:operation soapAction="http://tempuri.org/Check_duplicate" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Get_ContactID">
+      <soap12:operation soapAction="http://tempuri.org/Get_ContactID" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateSB100">
+      <soap12:operation soapAction="http://tempuri.org/UpdateSB100" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateSB100_topica">
+      <soap12:operation soapAction="http://tempuri.org/UpdateSB100_topica" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateAcountCasec">
+      <soap12:operation soapAction="http://tempuri.org/UpdateAcountCasec" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateTTPhongVan">
+      <soap12:operation soapAction="http://tempuri.org/UpdateTTPhongVan" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateTTPhongVanForVip">
+      <soap12:operation soapAction="http://tempuri.org/UpdateTTPhongVanForVip" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="WsCRM">
+    <wsdl:port name="WsCRMSoap" binding="tns:WsCRMSoap">
+      <soap:address location="http://crmnative.topica.vn:8089/WsCRM.asmx" />
+    </wsdl:port>
+    <wsdl:port name="WsCRMSoap12" binding="tns:WsCRMSoap12">
+      <soap12:address location="http://crmnative.topica.vn:8089/WsCRM.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,130 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{50300414-5F2E-42F2-9E5C-1F3343445FE6}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>TamoCRM.Persitence</RootNamespace>
+    <AssemblyName>TamoCRM.Persitence</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.ApplicationBlocks.Data">
+      <HintPath>..\..\packages\Microsoft.ApplicationBlocks.Data\Microsoft.ApplicationBlocks.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="StackExchange.Redis">
+      <HintPath>..\..\packages\StackExchange.Redis.1.0.223\lib\StackExchange.Redis.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CheckDuplicate\CheckDuplicateSqlProvider.cs" />
+    <Compile Include="SqlDataProvider.AppointmentInterview.cs" />
+    <Compile Include="SqlDataProvider.Bank.cs" />
+    <Compile Include="SqlDataProvider.Catalog.cs" />
+    <Compile Include="SqlDataProvider.CC3ContactReport.cs" />
+    <Compile Include="SqlDataProvider.Country.cs" />
+    <Compile Include="SqlDataProvider.EstimateOwner.cs" />
+    <Compile Include="SqlDataProvider.LogFixMoney.cs" />
+    <Compile Include="SqlDataProvider.Package.cs" />
+    <Compile Include="SqlDataProvider.PaymentType.cs" />
+    <Compile Include="SqlDataProvider.TeacherType.cs" />
+    <Compile Include="SqlDataProvider.Email.cs" />
+    <Compile Include="SqlDataProvider.FailedAdvisor.cs" />
+    <Compile Include="SqlDataProvider.FeeMoneyType.cs" />
+    <Compile Include="SqlDataProvider.Container.cs" />
+    <Compile Include="SqlDataProvider.Quality.cs" />
+    <Compile Include="SqlDataProvider.Product.cs" />
+    <Compile Include="SqlDataProvider.LogHandoverAdvisor.cs" />
+    <Compile Include="SqlDataProvider.MoneyLogs.cs" />
+    <Compile Include="SqlDataProvider.PricePackageListed.cs" />
+    <Compile Include="SqlDataProvider.StatusCare.cs" />
+    <Compile Include="SqlDataProvider.TemplateAds.cs" />
+    <Compile Include="SqlDataProvider.TestResult.cs" />
+    <Compile Include="SqlDataProvider.CasecAccount.cs" />
+    <Compile Include="SqlDataProvider.LevelTester.cs" />
+    <Compile Include="SqlDataProvider.TimeSlots.cs" />
+    <Compile Include="SqlDataProvider.TopicaAccount.cs" />
+    <Compile Include="SqlDataProvider.UserDraft.cs" />
+    <Compile Include="SqlDataProvider.WebServiceConfig.cs" />
+    <Compile Include="SqlDataProvider.Table.cs" />
+    <Compile Include="SqlDataProvider.ContactDuplicate.cs" />
+    <Compile Include="SqlDataProvider.ContactAllInfo.cs" />
+    <Compile Include="SqlDataProvider.Logs.cs" />
+    <Compile Include="SqlDataProvider.MissedCall.cs" />
+    <Compile Include="SqlDataProvider.Report.cs" />
+    <Compile Include="SqlDataProvider.Activity.cs" />
+    <Compile Include="SqlDataProvider.Group.cs" />
+    <Compile Include="SqlDataProvider.StatusMap.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SqlDataProvider.Branch.cs" />
+    <Compile Include="SqlDataProvider.CallHistory.cs" />
+    <Compile Include="SqlDataProvider.Channel.cs" />
+    <Compile Include="SqlDataProvider.Collector.cs" />
+    <Compile Include="SqlDataProvider.Contact.cs" />
+    <Compile Include="SqlDataProvider.ContactLevelInfo.cs" />
+    <Compile Include="SqlDataProvider.ContactTmp.cs" />
+    <Compile Include="SqlDataProvider.cs" />
+    <Compile Include="SqlDataProvider.EducationLevel.cs" />
+    <Compile Include="SqlDataProvider.Function.cs" />
+    <Compile Include="SqlDataProvider.ImportExcel.cs" />
+    <Compile Include="SqlDataProvider.Level.cs" />
+    <Compile Include="SqlDataProvider.Phone.cs" />
+    <Compile Include="SqlDataProvider.Source.cs" />
+    <Compile Include="SqlDataProvider.SourceType.cs" />
+    <Compile Include="SqlDataProvider.UserRole.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TamoCRM.Core\TamoCRM.Core.csproj">
+      <Project>{2a57a174-daeb-45a5-8864-861a25f5f443}</Project>
+      <Name>TamoCRM.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TamoCRM.Domain\TamoCRM.Domain.csproj">
+      <Project>{e7e8faa8-e51a-4925-a62d-0e9bcc99d091}</Project>
+      <Name>TamoCRM.Domain</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Data\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

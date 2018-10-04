@@ -1,0 +1,105 @@
+﻿@using TamoCRM.Domain.Channels
+@using TamoCRM.Domain.Schools
+@model TamoCRM.Web.Mvc.Areas.Admin.Models.Contacts.GoFilterSearchModel
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+@{
+    var schools = ViewBag.Schools;
+    ((List<SchoolInfo>)schools).RemoveAll(c => c.SchoolId == 0);
+    ((List<SchoolInfo>)schools).Insert(0, new SchoolInfo { SchoolId = 0, Name = "Tất cả" });
+    var lstSchools = new SelectList(schools, "SchoolId", "Name");
+    
+    var channels = ViewBag.channelCCs;
+    ((List<ChannelInfo>)channels).RemoveAll(c => c.ChannelId == 0);
+    ((List<ChannelInfo>)channels).Insert(0, new ChannelInfo { ChannelId = 0, Name = "Tất cả" });
+    var lstChannels = new SelectList(channels, "ChannelId", "Name");
+}
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed'); } catch (e) { }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Contact</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>Đã đưa đội lọc CC
+        </h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            @using (Ajax.BeginForm("GoFilterCCL0", "ImportExcel", new AjaxOptions { HttpMethod = "POST" }, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "uploadexcelform" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-group">     
+                    <label class="col-sm-1" for="form-field-3">Trường </label>
+                    <div class="col-sm-2">
+                        @Html.DropDownListFor(x => x.SchoolId, lstSchools, new { @class = "form-control" })
+                    </div>               
+                    <label class="col-sm-1 control-label no-padding-right" for="form-field-2">Kênh </label>
+                    <div class="col-sm-5">
+                        @Html.DropDownListFor(x => x.ChannelId, lstChannels, new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="space-4"></div>
+                <div class="form-group">
+                    <div class="col-sm-12">
+                        <button id="btnSearch" type="button" class="btn-import btn-primary" value="Import">Tìm</button>
+                    </div>
+                </div>
+            }
+            <table id="grid-table"></table>
+
+            <div id="grid-pager"></div>
+
+
+            <!-- PAGE CONTENT ENDS -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+<!-- /.page-content -->
+
+<!-- inline scripts related to this page -->
+
+<script type="text/javascript">
+    var grid_selector = "#grid-table";
+    var heades = ['Id', 'Họ tên', 'Người lấy', 'Kênh'];
+    var model = [
+			{ name: 'Id', index: 'ContactId', editable: true, sorttype: 'int', editoptions: { disabled: 'true' }, width: 50 },
+			{ name: 'Fullname', index: 'Fullname', editable: true, sorttype: 'string' },
+            { name: 'CollectorName', index: 'CollectorName', editable: true, sorttype: 'string' },
+            { name: 'ChannelName', index: 'ChannelName', editable: true, sorttype: 'string' }
+
+    ];
+    $(document).ready(function () {
+        $('#SchoolId').chosen();
+        $('#ChannelId').chosen();
+        $(".chzn-select-deselect").chosen({ allow_single_deselect: true });
+        
+        setupGridWithoutEdit("#grid-table", "#grid-pager", "admin/contactfilter/GetForFilterTeam?branchId=@TamoCRM.Web.Framework.Users.UserContext.GetDefaultBranch()&collectorId=0&channelId=" + $("#ChannelId").val() + "&importId=0&levelId=0&sourceTypeId=@TamoCRM.Domain.SourceTypes.SourceTypeIds.CC&schoolId=" + $("#SchoolId").val() + "&statusId=0", "", "ContactId", "Contacts", heades, model);
+        $("#btnSearch").click(function (e) {
+            e.preventDefault();
+            var newUrl = "/admin/contactfilter/GetForFilterTeam?branchId=@TamoCRM.Web.Framework.Users.UserContext.GetDefaultBranch()&collectorId=0&channelId=" + $("#ChannelId").val() + "&importId=0&levelId=0&sourceTypeId=@TamoCRM.Domain.SourceTypes.SourceTypeIds.CC&schoolId=" + $("#SchoolId").val() + "&statusId=0";
+            jQuery(grid_selector).jqGrid().setGridParam({ url: newUrl }).trigger("reloadGrid");
+        });
+    });
+</script>
+

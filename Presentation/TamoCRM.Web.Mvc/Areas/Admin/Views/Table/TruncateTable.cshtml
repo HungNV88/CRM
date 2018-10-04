@@ -1,0 +1,84 @@
+﻿@using MvcCheckBoxList.Model
+@model TamoCRM.Web.Mvc.Areas.Admin.Models.Tables.TableModel
+
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .styled_checkbox {
+        margin: 3px;
+        cursor: pointer;
+        padding: 0 10px 0 2px;
+    }
+
+    .styled_list {
+        margin-left: 25px;
+        padding: 3px 5px 3px 5px;
+    }
+</style>
+
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        } catch (e) { }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Table</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>Danh sách tables</h1>
+    </div>
+    <div class="row">
+        <div class="form-group">
+            <div class="col-sm-12" id="alert">
+            </div>
+        </div>
+        <div class="col-xs-12">
+            <!-- /.page-header -->
+            @using (Html.BeginForm("TruncateTable", "Table", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <input type="submit" class="btn btn-sm btn-primary" value="Truncate" onclick="return submitForm();" />
+                    <br />
+                    <br />
+                    @Html.CheckBoxListFor(x => x.PostedTable.Name, x => x.AllTables.OrderBy(c => c.Name), x => x.Name, x => x.Name, x => x.SelectedTable, new { @class = "styled_checkbox" }, new HtmlListInfo(HtmlTag.table, 4, new { @class = "styled_list" }), null, x => x.Name)
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function submitForm() {
+        var r = confirm("Có phải bạn muốn truncate các table đã chọn?");
+        if (r == true) {
+            alertProcess();
+            return true;
+        }
+        return false;
+    }
+
+    var message = '@ViewBag.Message';
+    if (message == null || message == '') {
+        alertHide();
+    }
+    else {
+        alertSuccess(message);
+    }
+</script>

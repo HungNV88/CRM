@@ -1,0 +1,142 @@
+﻿@using TamoCRM.Domain.Channels
+@using TamoCRM.Domain.Collectors
+@using TamoCRM.Domain.ImportExcels
+@using TamoCRM.Core
+@model TamoCRM.Web.Mvc.Areas.Admin.Models.Contacts.ContactSearchModel
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+@{
+    var collectors = ViewBag.Collectors;
+    ((List<CollectorInfo>)collectors).RemoveAll(c => c.CollectorId == 0);
+    ((List<CollectorInfo>)collectors).Insert(0, new CollectorInfo { CollectorId = 0, Name = "Tất cả" });
+    var lstCollectors = new SelectList(collectors, "CollectorId", "Name");
+
+    var channels = ViewBag.channelMOs;
+    ((List<ChannelInfo>)channels).RemoveAll(c => c.ChannelId == 0);
+    ((List<ChannelInfo>)channels).Insert(0, new ChannelInfo { ChannelId = 0, Name = "Tất cả" });
+    var lstChannels = new SelectList(channels, "ChannelId", "Name");
+
+    var importExcels = ViewBag.ImportExcelMOs;
+    ((List<ImportExcelInfo>)importExcels).RemoveAll(c => c.ImportId == 0);
+    ((List<ImportExcelInfo>)importExcels).Insert(0, new ImportExcelInfo { ImportId = 0, FilePath = "Tất cả" });
+    var lstImportExcels = new SelectList(importExcels, "ImportId", "FilePath");
+}
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        } catch (e) { }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Contact</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>Danh sách contact bị trùng khi import					
+        </h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            @using (Ajax.BeginForm("DuplicateMo", "Import", new AjaxOptions { HttpMethod = "POST" }, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "frmDuplicateMo" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <label class="col-sm-1 control-label no-padding-right" for="form-field-3">File </label>
+                    <div class="col-sm-4">
+                        @Html.DropDownList("ImportId", lstImportExcels, new { @class = "form-control" })
+                    </div>
+                </div>
+
+                <div class="space-4"></div>
+                <div class="form-group">
+                    <label class="col-sm-2">Ngày import</label>
+                    <div class="col-sm-2">
+                        @Html.TextBox("ImportDate", string.Empty, new { @style = "width: 90%;" })
+                    </div>
+                    <div class="col-sm-8">
+                        <button id="btnSearch" type="button" class="btn-import btn-primary" value="Import" style="float: right; width: 80px;">Tìm</button>
+                        <button id="btnGetExcel" type="button" class="btn-import btn-primary" value="Excel" style="float: right; width: 80px;">Xuất excel</button>
+                    </div>
+                </div>
+            }
+            <table id="grid-table"></table>
+            <div id="mydiv">
+                <iframe id="frame" style="width: 100%; height: 400px; border: none;"></iframe>
+            </div>
+            <div id="grid-pager"></div>
+
+
+            <!-- PAGE CONTENT ENDS -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+<!-- /.page-content -->
+
+<!-- inline scripts related to this page -->
+
+<script type="text/javascript">
+    var grid_selector = "#grid-table";
+    var heades = ['Id','Họ tên', 'Email','Điện thoại', 'Thông tin bị trùng', 'Địa chỉ', 'Ngày đăng ký','Ngày gọi gần nhất','Landing Page','TVTS'];
+    var model = [
+            { name: 'Id', index: 'Id', width: 40, editable: true, sorttype: 'string' },
+			{ name: 'Fullname', index: 'Fullname', width: 60, editable: true, sorttype: 'string' },
+            { name: 'Email', index: 'Email', width: 80, editable: true, sorttype: 'string' },
+            { name: 'Mobile', index: 'Mobile', width: 60, editable: true, sorttype: 'string' },
+            { name: 'DuplicateInfo', index: 'DuplicateInfo', width: 80, editable: true, sorttype: 'string' },
+            { name: 'Address', index: 'Address', width: 40, editable: true, sorttype: 'string' },
+            { name: 'RegisteredDate', index: 'RegisteredDate', width: 60, editable: true, sorttype: 'int', editoptions: { disabled: 'true' } },
+            { name: 'CallConsultantDate', index: 'CallConsultantDate', width: 60, editable: true, sorttype: 'int', editoptions: { disabled: 'true' } },
+            { name: 'Landingpage', index: 'Landingpage', width: 30, editable: true, sorttype: 'string' },
+            { name: 'UserName', index: 'UserName', width: 40, editable: true, sorttype: 'string' }
+    ];
+    $(document).ready(function () {
+        $('#ImportId').chosen();
+    
+        $(".chzn-select-deselect").chosen({ allow_single_deselect: true });
+
+        $('#ImportDate').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly: true, endDate: "+0d" });
+        var importDate = $("#ImportDate").val().replaceAll('/', '');
+        var importId = $('#ImportId').chosen().val();
+
+        setupGridWithoutEdit("#grid-table", "#grid-pager", "admin/api/contact/get?action=duplicatemo&branchId=@TamoCRM.Web.Framework.Users.UserContext.GetDefaultBranch()" + "&importDate=" + importDate + "&importId=" + importId, "", "ContactId", "Contacts", heades, model);
+
+        $("#btnSearch").click(function (e) {
+            e.preventDefault();
+            
+            var importDate = $("#ImportDate").val().replaceAll('/', '');
+            var importId = $('#ImportId').chosen().val();
+          
+            var newUrl = "/admin/api/contact/get?action=duplicatemo&branchId=@TamoCRM.Web.Framework.Users.UserContext.GetDefaultBranch()" + "&importDate=" + importDate + "&importId=" + importId;
+            jQuery(grid_selector).jqGrid().setGridParam({ url: newUrl }).trigger("reloadGrid");
+        });
+      
+        $("#btnGetExcel").click(function (e) {
+            e.preventDefault();
+
+            var importDate = $("#ImportDate").val().replaceAll('/', '');
+            var importId = $('#ImportId').chosen().val();
+            
+            var newUrl = "/admin/report/showbc55?branchId=@TamoCRM.Web.Framework.Users.UserContext.GetDefaultBranch()" + "&importDate=" + importDate + "&importId=" + importId;
+            $("#frame").attr("src", newUrl);
+        });
+    });
+
+</script>
+

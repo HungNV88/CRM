@@ -1,0 +1,265 @@
+﻿@using TamoCRM.Domain.EducationLevels
+@using TamoCRM.Domain.Schools
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+@{
+    var lstEducationLevels = ViewBag.EducationLevels;
+    var lstSchools = ViewBag.Schools;
+}
+<style type="text/css">
+    .center {
+        text-align: center;
+    }
+
+    .acceptl2-form tr td {
+        padding: 0 !important;
+    }
+
+        .acceptl2-form tr td input[type=text] {
+            border: none;
+            background: transparent;
+            width: 103px;
+            height: 31px;
+            padding: 0 !important;
+        }
+
+            .acceptl2-form tr td input[type=text]:focus {
+                background: yellow;
+            }
+
+        .acceptl2-form tr td select {
+            border: none !important;
+        }
+
+            .acceptl2-form tr td select:focus {
+                background: yellow;
+            }
+
+    .txtDatePicker {
+        width: 80px !important;
+    }
+
+    .txtDatePicker {
+        text-align: center;
+    }
+</style>
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        } catch (e) { }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Contact</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>Nghiệm thu L2+ từ CTV								
+        </h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div id="spiner"></div>
+        </div>
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            @using (Ajax.BeginForm("AcceptContactL2FromCollaborators", "ContactFilter", new AjaxOptions { HttpMethod = "POST" }, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "frmAcceptContactL2" }))
+            {
+                @Html.AntiForgeryToken()
+                <input type="submit" class="btn-primary" value="Nghiệm thu" id="btnAccept" />
+                <input type="button" class="btn-primary" value="Làm trắng form" id="btnReset" />
+                <p></p>
+                <table border="1" class="table table-striped table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px; text-align: center;">Trạng thái</th>
+                            <th style="text-align: center;">Họ tên</th>
+                            <th style="text-align: center;">Điện thoại</th>
+                            <th style="text-align: center;">Email</th>
+                            <th style="text-align: center;">Nơi sống</th>
+                            <th style="text-align: center;">Tốt nghiệp</th>
+                            <th style="text-align: center;">Trường tốt nghiệp</th>
+                            <th style="text-align: center;">Ngành tốt nghiệp</th>
+                            <th style="width: 40px; text-align: center;">Đã từng học liên thông, ĐH, VB2</th>
+                            <th style="text-align: center;">Trường đăng ký</th>
+                            <th style="text-align: center;">Ngành đăng ký</th>
+                            <th style="text-align: center;">Ghi chú</th>
+                            <th style="text-align: center;">Ngày gọi</th>
+                            <th style="text-align: center;">Tên CTV</th>
+                            <th style="text-align: center;">Đã đi làm?</th>
+                        </tr>
+                    </thead>
+                    <tbody class="acceptl2-form">
+                        @for (var i = 1; i <= 20; i++)
+                        {
+                            <tr>
+                                <td id="@(i)_tdStatus" class="center"></td>
+                                <td>
+                                    <input tabindex="@(i + 1000)" type="text" id="@(i)_Fullname" name="@(i)_Fullname" /></td>
+                                <td>
+                                    <input tabindex="@(i + 20 + 1000)" type="text" id="@(i)_Mobile" name="@(i)_Mobile" /></td>
+                                <td>
+                                    <input tabindex="@(i + 40 + 1000)" type="text" id="@(i)_Email" name="@(i)_Email" /></td>
+                                <td>
+                                    <input tabindex="@(i + 60 + 1000)" type="text" id="@(i)_Location" name="@(i)_Location" /></td>
+                                <td>
+
+                                    <select tabindex="@(i + 80 + 1000)" id="@(i)_EducationLevelId" name="@(i)_EducationLevelId">
+                                        @foreach (EducationLevelInfo info in lstEducationLevels)
+                                        {
+                                            <option value="@info.EducationLevelId">@info.Name</option>
+                                        }
+                                    </select>
+                                </td>
+                                <td>
+                                    <input tabindex="@(i + 100 + 1000)" type="text" id="@(i)_EducationSchool" name="@(i)_EducationSchool" /></td>
+                                <td>
+                                    <input tabindex="@(i + 120 + 1000)" type="text" id="@(i)_MajorGrad" name="@(i)_MajorGrad" /></td>
+                                <td style="text-align: center;">
+                                    <input tabindex="@(i + 140 + 1000)" type="checkbox" id="@(i)_HaveLearnTransfer" name="@(i)_HaveLearnTransfer" style="text-align: center;" /></td>
+                                <td>
+
+                                    <select tabindex="@(i + 160 + 1000)" id="@(i)_SchoolId" name="@(i)_SchoolId">
+                                        @foreach (SchoolInfo info in lstSchools)
+                                        {
+                                            <option value="@info.SchoolId">@info.Name</option>
+                                        }
+                                    </select>
+                                </td>
+                                <td>
+                                    <input tabindex="@(i + 180 + 1000)" type="text" id="@(i)_Major" name="@(i)_Major" /></td>
+                                <td>
+                                    <input tabindex="@(i + 200 + 1000)" type="text" id="@(i)_Notes" name="@(i)_Notes" /></td>
+                                <td class="center">
+                                    <input tabindex="@(i + 220 + 1000)" type="text" id="@(i)_CallDate" name="@(i)_CallDate" class="txtDatePicker" /></td>
+                                <td>
+                                    <input tabindex="@(i + 240 + 1000)" type="text" id="@(i)_Collaborator" name="@(i)_Collaborator" /></td>
+                                <td style="text-align: center;">
+                                    <input tabindex="@(i + 260 + 1000)" type="checkbox" id="@(i)_HaveJob" name="@(i)_HaveJob" style="text-align: center;" /></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            <!-- PAGE CONTENT ENDS -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+<!-- /.page-content -->
+
+<!-- inline scripts related to this page -->
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("form").bind("keypress", function (e) {
+            if (e.keyCode == 13) {
+                return false;
+            }
+        });
+        
+        setTimeout(function () {
+            $(".txtDatePicker").datepicker({ format: 'dd/mm/yyyy', autoclose: true });
+        }, 0);
+        $("#btnReset").click(function (e) {
+            e.preventDefault();
+            $(".acceptl2-form tr td input").val("");
+            for (var i = 1; i <= 20; i++) {
+                $("#" + (i) + "_tdStatus").html('');
+            }
+        });
+        $("#1_Collaborator").change(function (e) {
+            e.preventDefault();
+            for (var i = 1; i < 20; i++) {
+                $("#" + i + "_Collaborator").val($(this).val());
+            }
+            $("#1_CallDate").focus();
+        });
+        $("#1_CallDate").change(function (e) {
+            e.preventDefault();
+            for (var i = 1; i < 20; i++) {
+                $("#" + i + "_CallDate").val($(this).val());
+            }
+        });
+        $("#1_Major").change(function (e) {
+            e.preventDefault();
+            for (var i = 1; i < 20; i++) {
+                $("#" + i + "_Major").val($(this).val());
+            }
+        });
+        $("#1_Location").change(function (e) {
+            e.preventDefault();
+            for (var i = 1; i < 20; i++) {
+                $("#" + i + "_Location").val($(this).val());
+            }
+        });
+        $("#1_SchoolId").change(function (e) {
+            e.preventDefault();
+            for (var i = 1; i < 20; i++) {
+                $("#" + i + "_SchoolId").val($(this).val());
+            }
+        });
+        $('#frmAcceptContactL2').ajaxForm({
+            beforeSend: function (xhr, opts) {
+                var r = confirm("Bạn có chắc chắn muốn nghiệm thu L2 không?");
+                if (r == true) {
+                    $("#spiner").removeClass("alert");
+                    $("#spiner").removeClass("alert-block");
+                    $("#spiner").removeClass("alert-danger");
+                    $("#spiner").removeClass("alert-success");
+                    $("#spiner").html("<i class='icon-spinner icon-spin orange bigger-125'></i>Đang xử lý...");
+                    return true;
+                }
+                else {
+                    xhr.abort();
+                    return false;
+                }
+            },
+            success: function (data) {
+                $("#spiner").addClass("alert alert-block alert-success");
+                var htmlError = '';
+                var countSuccess = 0;
+                if (data == null || data.length == 0) {
+                    $("#spiner").html("Không có contact nào được nghiệm thu");
+                    return;
+                }
+                
+                for (var i = 0; i < data.length; i++) {
+                    var icon = '';
+                    if (data[i].Status == 0) {
+                        countSuccess += 1;
+                        icon = "<i class='icon-ok'></i>";
+                    }
+                    else {
+                        icon = "<i class='icon-remove'></i>";
+                        htmlError += '(' + i + ') ' + data[i].StatusText + "<br />";
+                    }
+                    $("#" + (i + 1) + "_tdStatus").html(icon);
+                }
+                var htmlMessage = "Đã nghiệm thu thành công " + countSuccess + " contacts. Kiểm tra cột trạng thái để biết chi tiết";
+                if (htmlError.length > 0) htmlMessage += "<br />" + htmlError;
+                $("#spiner").html(htmlMessage);
+            },
+            complete: function (xhr) {
+
+            }
+        });
+    });
+
+
+</script>

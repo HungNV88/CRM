@@ -1,0 +1,73 @@
+﻿@model TamoCRM.Web.Mvc.Areas.Admin.Models.Contacts.ContactCreateModel
+
+@{
+    ViewBag.Title = "Contact tái sử dụng";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        }
+        catch (e) {
+
+        }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Contact</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>Contact tái sử dụng</h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            
+            <div class="space-6"></div>
+            <table id="grid-table"></table>
+            <div id="grid-pager"></div>
+
+            <!-- PAGE CONTENT ENDS -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+
+<script type="text/javascript">
+    var url = 'admin/api/contact/filterreuse?branchId={0}';
+    var grid_selector = "#grid-table";
+    var heades = ['Id', 'Họ và tên', 'Nơi ở', 'Sđt', 'Email', 'Trường TN', 'Ngành TN', 'Level', 'Trạng thái', 'Ngày gọi', 'Ngày tái sử dụng'];
+    var model = [
+        { name: 'Id', index: 'Id', editable: false, sorttype: 'string', editoptions: { disabled: true }, width: '0px' },
+        { name: 'Fullname', index: 'Fullname', editable: false, sorttype: 'string' },
+        { name: 'LocationId', index: 'LocationId', editable: true, sorttype: 'string', formatter: locationFomatter },
+        { name: 'Mobile', index: 'Mobile', editable: false, sorttype: 'string' },
+        { name: 'Email', index: 'Email', editable: false, sorttype: 'string' },
+        { name: 'SchoolGrad', index: 'SchoolGrad', editable: false, sorttype: 'string' },
+        { name: 'MajorGrad', index: 'MajorGrad', editable: false, sorttype: 'string' },
+        { name: 'LevelId', index: 'LevelId', editable: false, sorttype: 'string', formatter: levelFomatter },
+        { name: 'StatusMapId', index: 'StatusMapId', editable: false, formatter: statusMapFomatter },
+        { name: 'CallDate', index: 'CallDate', editable: false, formatter: 'date', formatoptions: { newformat: 'd/m/Y h:m' } },
+        { name: 'ReuseDate', index: 'ReuseDate', editable: false, formatter: 'date', formatoptions: { newformat: 'd/m/Y' } }
+    ];
+    $(document).ready(function () {
+        var branchId = '@ViewBag.BranchId';
+        setupGridWithoutEdit("#grid-table", "#grid-pager", url.format(branchId), "admin/api/contact/edit", "Id", "Danh sách Contact", heades, model);
+    });
+</script>

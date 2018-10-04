@@ -1,0 +1,52 @@
+﻿@model TamoCRM.Web.Mvc.Areas.Admin.Models.InterviewSchedule.InterviewListModel
+@{
+    ViewBag.Title = "Khung giờ phỏng vấn";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutSingle.cshtml";
+}
+<style>
+    .widget-body label {
+        padding-top: 0px;
+    }
+</style>
+
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        } catch (e) { }
+    </script>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1 style="text-align: center;">Khung giờ phỏng vấn
+        </h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="form-group">
+            <div class="col-sm-12" id="alert">
+            </div>
+        </div>
+        <div class="col-xs-12">
+            <div id="mydiv">
+                <iframe id="frame" style="width: 100%; height: 800px; border: none;"></iframe>
+            </div>
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+<script src="/Content/themes/ace/assets/js/jquery.form.js"></script>
+<script src="/Content/themes/ace/assets/js/jquery.validate.min.js"></script>
+<script src="/Content/themes/ace/assets/js/additional-methods.min.js"></script>
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        var url = '@ViewBag.Url';
+        url = url.replace('&amp;', '&');
+        $("#frame").attr("src", url);
+    });
+</script>

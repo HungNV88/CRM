@@ -1,0 +1,380 @@
+﻿@using TamoCRM.Core
+@using TamoCRM.Domain.Groups
+@using TamoCRM.Domain.Majors
+@using TamoCRM.Domain.Schools
+@using TamoCRM.Domain.StatusCare
+@using TamoCRM.Domain.UserRole
+@using TamoCRM.Web.Framework.Users
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+
+    // Group
+    var groups = ViewBag.Groups;
+    if (ViewBag.GroupType != (int)GroupTVTSType.ManagerTVTS)
+    {
+        groups = ((List<GroupInfo>)groups).Where(c => c.LeaderId == UserContext.GetCurrentUser().UserID || c.GroupId == (int)ViewBag.GroupId).ToList();
+    }
+    ((List<GroupInfo>)groups).RemoveAll(c => c.GroupId == 0);
+    if (((List<GroupInfo>)groups).Count > 1)
+    {
+        ((List<GroupInfo>)groups).Insert(0, new GroupInfo { GroupId = 0, Name = "Tất cả" });
+    }
+    var branchId = UserContext.GetDefaultBranch();
+    var lstGroups = new SelectList(((List<GroupInfo>)groups).Where(c => c.BranchId == branchId), "GroupId", "Name");
+
+    // User
+    var users = ViewBag.Users;
+    ((List<UserInfo>)users).RemoveAll(c => c.GroupId == 0);
+    ((List<UserInfo>)users).Insert(0, new UserInfo { UserID = 0, FullName = "Tất cả" });
+    var lstUsers = new SelectList(users, "UserID", "FullName");
+
+    // School
+    var schools = ViewBag.Schools;
+    ((List<SchoolInfo>)schools).RemoveAll(c => c.SchoolId == 0);
+    var lstSchools = schools;
+
+    // Major
+    var majors = ViewBag.Majors;
+    ((List<MajorInfo>)majors).RemoveAll(c => c.MajorId == 0);
+    var lstMajors = majors;
+
+    // StatusCares
+    var statusCares = ViewBag.StatusCares;
+    ((List<StatusCareInfo>)statusCares).RemoveAll(c => c.Id == 0);
+    ((List<StatusCareInfo>)statusCares).Insert(0, new StatusCareInfo { Id = 0, Name = "Tất cả" });
+    var lstStatusCares = new SelectList(statusCares, "Id", "Name");
+
+    // StatusMaps
+    var statusMaps = ViewBag.StatusMaps;
+    var lstStatusMaps = new SelectList(statusMaps, "Id", "Name");
+
+    var lstLevels = ViewBag.Levels;
+    var lstEducationLevels = ViewBag.EducationLevels;
+}
+
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        } catch (e) { }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Danh sách cuộc gọi của đội lọc</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>Danh sách cuộc gọi của đội lọc							
+        </h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="form-group">
+                <div class="col-sm-12" id="alert">
+                </div>
+            </div>
+            <div class="col-xs-12" style="border-bottom: 1px solid #c5d0dc; padding: 0 0 10px 0;">
+                @using (Ajax.BeginForm("FilterHistoryDistributor", "CallHistory", new AjaxOptions { HttpMethod = "POST" }, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "FilterHistory" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="space-4"></div>
+                    <div class="row">
+                        <div class="col-sm-1">
+                            <label class="bolder">CTV gọi</label>
+                        </div>
+                        <div class="col-sm-2">
+                            @Html.DropDownList("UserId", lstUsers, new { @style = "width: 100%" })
+                        </div>
+                        <div class="col-sm-1">
+                            <label class="bolder">Ngày gọi</label>
+                        </div>
+                        <div class="col-sm-2">
+                            @Html.TextBox("CallDate", string.Empty, new { @style = "width: 100%" })
+                        </div>
+                        <div class="col-sm-2" style="width: 18%;">
+                            <label class="bolder">Trạng thái nghiệm thu</label>
+                        </div>
+                        <div class="col-sm-3">
+                            @Html.DropDownList("ddlStatusMap", lstStatusMaps, new { @style = "width: 100%" })
+                        </div>
+                    </div>
+                    <div class="space-6"></div>
+                    <div class="row">
+                        <div class="col-sm-1" style="width: 9%;">
+                            <label class="bolder">Level</label>
+                        </div>
+                        <div class="col-sm-1" style="width: 7.67%;">
+                            <input type="checkbox" id='chkLevels' checked />
+                            <label>Tất cả</label>
+                        </div>
+                        @foreach (var item in lstLevels)
+                        {
+                            <div class="col-sm-1">
+                                <input type="checkbox" name='chkLevels' id='@(item.LevelId)_chkLevel' />
+                                <label for="@(item.LevelId)_chkLevel">@item.Name</label>
+                            </div>
+                        }
+                    </div>
+                    <div class="space-4"></div>
+                    <div class="row">
+                        <div class="col-sm-1" style="width: 9%;">
+                            <label class="bolder">Đối tượng</label>
+                        </div>
+                        <div class="col-sm-1" style="width: 7.67%;">
+                            <input type="checkbox" id='chkEducationLevels' checked />
+                            <label>Tất cả</label>
+                        </div>
+                        @foreach (var item in lstEducationLevels)
+                        {
+                            <div class="col-sm-1">
+                                <input type="checkbox" name='chkEducationLevels' id='@(item.EducationLevelId)_chkEducationLevel' />
+                                <label for="@(item.EducationLevelId)_chkEducationLevel">@item.Name</label>
+                            </div>
+                        }
+                    </div>
+                    <div class="space-4"></div>
+                    <div class="row">
+                        <div class="col-sm-1" style="width: 9%;">
+                            <label class="bolder">Trường</label>
+                        </div>
+                        <div class="col-sm-1" style="width: 7.67%;">
+                            <input type="checkbox" id='chkSchools' checked />
+                            <label>Tất cả</label>
+                        </div>
+                        @foreach (var item in lstSchools)
+                        {
+                            if (@item.Name.Length > 4)
+                            {
+                                <div class="col-sm-2">
+                                    <input type="checkbox" name='chkSchools' id='@(item.SchoolId)_chkSchool' />
+                                    <label for="@(item.SchoolId)_chkSchool">@item.Name</label>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="col-sm-1">
+                                    <input type="checkbox" name='chkSchools' id='@(item.SchoolId)_chkSchool' />
+                                    <label for="@(item.SchoolId)_chkSchool">@item.Name</label>
+                                </div>
+                            }
+                        }
+                    </div>
+                    <div class="space-4"></div>
+                    <div class="row">
+                        <div class="col-sm-1" style="width: 9%;">
+                            <label class="bolder">Ngành</label>
+                        </div>
+                        <div class="col-sm-1" style="width: 7.67%;">
+                            <input type="checkbox" id='chkMajors' checked />
+                            <label>Tất cả</label>
+                        </div>
+                        @foreach (var item in lstMajors)
+                        {
+                            if (@item.Name.Length > 4)
+                            {
+                                <div class="col-sm-2">
+                                    <input type="checkbox" name='chkMajors' id='@(item.MajorId)_chkMajor' />
+                                    <label for="@(item.MajorId)_chkMajor">@item.Name</label>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="col-sm-1">
+                                    <input type="checkbox" name='chkMajors' id='@(item.MajorId)_chkMajor' />
+                                    <label for="@(item.MajorId)_chkMajor">@item.Name</label>
+                                </div>
+                            }
+                        }
+                    </div>                   
+                }
+            </div>
+
+            <button id="btnSubmit" class="btn-primary" style="float: right; margin-right: 10px; margin-top: 10px;">Lọc cuộc gọi</button>
+            <div class="clearfix"></div>
+            <div class="space-6"></div>
+            <table id="grid-table"></table>
+            <div id="grid-pager"></div>
+            <!-- PAGE CONTENT ENDS -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+<!-- /.page-content -->
+
+<!-- inline scripts related to this page -->
+
+<script type="text/javascript">
+    var url = 'admin/api/callhistory/FilterHistory?groupId={0}&userId={1}&handoverDate={2}&callDate={3}&statusMapId={4}&statusCareId={5}&levels={6}&educationlevels={7}&schools={8}&majors={9}';
+    var grid_selector = "#grid-table";
+    var heades = ['Id', 'Họ và tên', 'Level', 'Ngày', 'Sáng/Chiều', 'Giờ', 'Nội dung gọi gần nhất', 'Thời gian gọi', 'Trạng thái chăm sóc', 'Tổng số cuộc gọi', 'Nghe', 'Tải'];
+    var model = [
+        { name: 'CallHistoryId', index: 'CallHistoryId', editable: false, sorttype: 'string', editoptions: { disabled: true }, width: '0px' },
+        {
+            name: 'ContactName', index: 'ContactName', editable: false, width: '100px', align: 'center', formatter: "dynamicLink",
+            formatoptions: {
+                cellValue: function (cellValue, rowId, rowData, options) {
+                    return '<div style="color:#34810c;margin:5px;"><a href="/admin/contactlevelinfo/edit/' + rowData.ContactId + '">' + rowData.ContactName + '</a></div>';
+                }
+            }
+        },
+        { name: 'LevelId', index: 'LevelId', editable: false, width: '40px', sorttype: 'string', align: 'center', formatter: levelFomatter },
+        { name: 'RecallTime', index: 'RecallTime', editable: false, width: '60px', align: 'center', formatter: 'date', formatoptions: { srcformat: 'Y-m-dTH:i:s', newformat: 'd/m/Y' } },
+        { name: 'RecallTimeAmPm', index: 'RecallTime', editable: false, width: '70px', align: 'center', formatter: stringFormatter },
+        { name: 'RecallTimeTime', index: 'RecallTime', editable: false, width: '40px', align: 'center', formatter: 'date', formatoptions: { srcformat: 'Y-m-dTH:i:s', newformat: 'H:i' } },
+        { name: 'CallCenterInfo', index: 'CallCenterInfo', editable: false, width: '150px', sorttype: 'string', align: 'left' },
+        { name: 'CallTime', index: 'CallTime', editable: false, sorttype: 'string', width: '60px', formatter: 'date', formatoptions: { srcformat: 'Y-m-dTH:i:s', newformat: 'd/m/Y H:i' } },
+        { name: 'StatusCareId', index: 'StatusCareId', editable: false, width: '120px', formatter: statusCareFomatter },
+        { name: 'CallAmount', index: 'CallAmount', editable: false, width: '60px', align: 'center' },
+        { name: 'LinkRecord', index: 'LinkRecord', editable: false, align: 'center', width: '100px', formatter: listenFomatter },
+        { name: 'Download', index: 'Download', editable: false, width: '40px', align: 'center', formatter: "dynamicLink",
+            formatoptions: {
+                cellValue: function (cellValue, rowId, rowData, options) {
+                    if (rowData.LinkRecord == null || rowData.LinkRecord.length == 0) {
+                        return '';
+                    }
+                    return '<div style="color:#34810c;margin:5px;"><a href="' + rowData.LinkRecord + '"><img style="width:16px; height:16px;" src="../../../../Images/download-16.png"/></a></div>';
+                }
+            }
+        }
+    ];
+    $(document).ready(function () {
+        loadStatusMap2();
+        $('#CallDate').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly: true, endDate: "+1d" });
+        $('#HandoverDate').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly: true, endDate: "+1d" });
+
+        setupGridWithoutEdit("#grid-table", "#grid-pager", "", "admin/api/callhistory/edit", "CallHistoryId", "Danh sách cuộc gọi", heades, model);
+        $(grid_selector).jqGrid("setGroupHeaders", {
+            useColSpanStyle: true,
+            groupHeaders: [
+                { startColumnName: "ContactName", numberOfColumns: 2, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;height:40px;"><b>Thông tin Contact</b></td></tr></table>' },
+                { startColumnName: "AppointmentDate", numberOfColumns: 3, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;"><b>Thông tin lịch hẹn gọi lại</b></td></tr></table>' },
+                { startColumnName: "CallInfo", numberOfColumns: 4, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;"><b>Tình trạng chăm sóc</b></td></tr></table>' },
+                { startColumnName: "LinkRecord", numberOfColumns: 2, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;"><b>Chức năng</b></td></tr></table>' }
+            ]
+        });
+        
+        loadUserByGroupId();
+    });
+    
+    $("#btnSubmit").click(function (e) {
+        e.preventDefault();
+
+        // Param
+        var userId = $('#UserId').val();
+        var groupId = $('#GroupId').val();
+        var callDate = $('#CallDate').val();
+        var statusMapId = $('#ddlStatusMap').val();
+        var handoverDate = $('#HandoverDate').val();
+        var statusCareId = $('#ddlStatusCare').val();
+        var levels = $('#chkLevels').is(':checked') ? '' : buildParamLevels();
+        var majors = $('#chkMajors').is(':checked') ? '' : buildParamMajors();
+        var schools = $('#chkSchools').is(':checked') ? '' : buildParamSchools();
+        var educationLevels = $('#chkEducationLevels').is(':checked') ? '' : buildParamEducationLevels();
+
+        // Format Url
+        var newUrl = '/' + url.format(groupId, userId, handoverDate, callDate, statusMapId, statusCareId, levels, educationLevels, schools, majors);
+        jQuery(grid_selector).jqGrid().setGridParam({ url: newUrl }).trigger("reloadGrid");
+    });
+    
+    // Group
+    $("#GroupId").change(function () {
+        loadUserByGroupId();
+    });
+    
+    // StatusCare
+    $("#ddlStatusCare").change(function () {
+        loadStatusMap2();
+    });
+
+    $('#chkLevels').change(function () {
+        if ($('#chkLevels').is(':checked')) {
+            var elements = document.getElementsByName('chkLevels');
+            for (var i = 0; i < elements.length; i++) {
+                $(elements[i]).attr('checked', false);
+            }
+        }
+    });
+    $('input[name="chkLevels"]').change(function () {
+        if ($(this).is(':checked')) $('#chkLevels').attr('checked', false);
+    });
+
+    $('#chkEducationLevels').change(function () {
+        if ($('#chkEducationLevels').is(':checked')) {
+            var elements = document.getElementsByName('chkEducationLevels');
+            for (var i = 0; i < elements.length; i++) {
+                $(elements[i]).attr('checked', false);
+            }
+        }
+    });
+    $('input[name="chkEducationLevels"]').change(function () {
+        if ($(this).is(':checked')) $('#chkEducationLevels').attr('checked', false);
+    });
+
+    $('#chkSchools').change(function () {
+        if ($('#chkSchools').is(':checked')) {
+            var elements = document.getElementsByName('chkSchools');
+            for (var i = 0; i < elements.length; i++) {
+                $(elements[i]).attr('checked', false);
+            }
+        }
+    });
+    $('input[name="chkSchools"]').change(function () {
+        if ($(this).is(':checked')) $('#chkSchools').attr('checked', false);
+    });
+
+    $('#chkMajors').change(function () {
+        if ($('#chkMajors').is(':checked')) {
+            var elements = document.getElementsByName('chkMajors');
+            for (var i = 0; i < elements.length; i++) {
+                $(elements[i]).attr('checked', false);
+            }
+        }
+    });
+    $('input[name="chkMajors"]').change(function () {
+        if ($(this).is(':checked')) $('#chkMajors').attr('checked', false);
+    });
+    
+    var prevCellCallAmount = { cellId: undefined, value: undefined };
+    var prevCellContactName = { cellId: undefined, value: undefined };
+    function arrtSetting(rowId, val, rawObject, cm) {
+        var result;
+        var prevCellVal = null;
+        if (cm.name == 'ContactName')
+            prevCellVal = prevCellContactName;
+        else if (cm.name == 'CallAmount')
+            prevCellVal = prevCellCallAmount;
+
+        val = rawObject.ContactId;
+        if (prevCellVal != null) {
+            if (prevCellVal.value == val) {
+                result = ' style="display: none" rowspanid="' + prevCellVal.cellId + '"';
+            } else {
+                var cellId = this.id + '_row_' + rowId + '_' + cm.name;
+
+                result = ' rowspan="1" id="' + cellId + '"';
+                prevCellVal = { cellId: cellId, value: val };
+            }
+            
+            if (cm.name == 'ContactName')
+                prevCellContactName = prevCellVal;
+            else if (cm.name == 'CallAmount')
+                prevCellCallAmount = prevCellVal;
+            return result;
+        }
+        return '';
+    };
+
+</script>

@@ -1,0 +1,199 @@
+﻿@using TamoCRM.Core
+@using TamoCRM.Domain.StatusMap
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+
+    // StatusMaps
+    var statusMaps = ((IEnumerable<StatusMapInfo>)ViewBag.StatusMaps)
+       .Where(c => c.StatusMapType == (int)EmployeeType.Collaborator)
+       .Where(c => c.LevelIdNext <= (int)LevelType.L1)
+       .OrderBy(c => c.StatusCareId).ToList();
+    statusMaps.RemoveAll(c => c.Id == 0);
+    statusMaps.Insert(0, new StatusMapInfo { Id = 0, Name = "Tất cả" });
+    var lstStatusMaps = new SelectList(statusMaps, "Id", "Name");
+}
+
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        } catch (e) { }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Thu hồi contact từ Lọc</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1> Thu hồi contact từ Lọc
+        </h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="form-group">
+                <div class="col-sm-12" id="alert">
+                </div>
+            </div>
+            <div class="col-xs-12" style="padding: 0 0 6px 0;">
+                @using (Ajax.BeginForm("FilterContactRecoveryDistributor", "Contact", new AjaxOptions { HttpMethod = "POST" }, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "FilterHistory" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="space-4"></div>
+                    <div class="row">
+                        <div class="col-sm-2" style="width: 18%">
+                            <label class="bolder">Trạng thái nghiệm thu</label>
+                        </div>
+                        <div class="col-sm-3">
+                            @Html.DropDownList("ddlStatusMap", lstStatusMaps, new { @style = "width: 100%" })
+                        </div>
+                        <div class="col-sm-1" style="width: 10%;">
+                            <label class="bolder">Từ ngày</label>
+                        </div>
+                        <div class="col-sm-2">
+                            @Html.TextBox("FromDate", string.Empty, new { @style = "width: 100%" })
+                        </div>
+                        <div class="col-sm-1" style="width: 10%;">
+                            <label class="bolder">Đến ngày</label>
+                        </div>
+                        <div class="col-sm-2" style="width: 19%;">
+                            @Html.TextBox("ToDate", string.Empty, new { @style = "width: 100%" })
+                        </div>
+                    </div>
+                    <div class="space-6"></div>
+                }
+            </div>
+
+            <div class="space-6"></div>
+            <button id="btnSubmitAll" class="btn-primary" style="float: right; margin-right: 10px;">Thu hồi Tất cả</button>
+            <button id="btnSubmit" class="btn-primary" style="float: right; margin-right: 10px;">Thu hồi Contact</button>
+            <button id="btnGoFilter" class="btn-primary" style="float: right; margin-right: 10px;">Lọc Contact</button>
+            <div class="clearfix"></div>
+
+            <div class="space-6"></div>
+            <table id="grid-table"></table>
+            <div id="grid-pager"></div>
+            <!-- PAGE CONTENT ENDS -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+<!-- /.page-content -->
+
+<!-- inline scripts related to this page -->
+
+<script type="text/javascript">
+    var url = 'admin/api/contact/FilterRecoveryDistributor?statusMapId={0}&fromDate={1}&toDate={2}';
+    var grid_selector = "#grid-table";
+    var heades = ['Id', 'Họ và tên', 'SĐT', 'Email', 'Trạng thái nghiệm thu', 'Nơi sống', 'Ghi chú', 'Ngày phân contact', '<input type="checkbox" id="chkContacts" onclick="fixCheckBoxGrid(event)" />'];
+    var model = [
+        { name: 'Id', index: 'Id', editable: false, sorttype: 'string', width: '0px' },
+        { name: 'Fullname', index: 'Fullname', editable: false, sorttype: 'string', width: '70px' },
+        { name: 'Mobile', index: 'Mobile', editable: false, sorttype: 'string', width: '70px' },
+        { name: 'Email', index: 'Email', editable: false, sorttype: 'string', width: '70px' },
+        { name: 'StatusMapDistributor', index: 'StatusMapDistributor', editable: false, sorttype: 'string', width: '70px' },
+        { name: 'LocationName', index: 'LocationName', editable: false, sorttype: 'string', width: '70px' },
+        { name: 'Notes', index: 'Notes', editable: false, sorttype: 'string', width: '100px' },
+        { name: 'HandoverDateDistributor', index: 'HandoverDateDistributor', editable: false, sorttype: 'string', width: '60px' },
+        { name: 'chkContact', index: 'chkContact', editable: true, edittype: 'checkbox', align: 'center', width: '40px', editoptions: { value: "True:False" }, formatter: checkboxFomatter, formatoptions: { disabled: false } }
+    ];
+    $(document).ready(function () {
+        $('#FromDate').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly: true, endDate: "+1d" });
+        $('#ToDate').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly: true, endDate: "+1d" });
+        setupGridWithoutEdit("#grid-table", "#grid-pager", '', '', "Id", "Danh sách Contact", heades, model);
+    });
+
+    $("#btnGoFilter").click(function (e) {
+        e.preventDefault();
+
+        // Param
+        var statusMapId = $('#ddlStatusMap').val();
+        var toDate = $('#ToDate').val().replaceAll('/', '');
+        var fromDate = $('#FromDate').val().replaceAll('/', '');
+
+        // Format Url
+        var newUrl = '/' + url.format(statusMapId, fromDate, toDate);
+        jQuery(grid_selector).jqGrid().setGridParam({ url: newUrl }).trigger("reloadGrid");
+    });
+    $("#btnSubmit").click(function (e) {
+        e.preventDefault();
+
+        var ids = '';
+        var items = $("#grid-table td input");
+        for (var i = 0; i < items.length; i++) {
+            if ($(items[i]).is(':checked')) {
+                ids += ids.length == 0
+                    ? $('#grid-table').jqGrid('getCell', i + 1, 'Id')
+                    : ',' + $('#grid-table').jqGrid('getCell', i + 1, 'Id');
+            }
+        }
+        if (ids.length == 0) {
+            alertError('Bạn chưa chọn contact để thu hồi, vui lòng chọn!');
+            return;
+        }
+
+        var r = confirm("Có phải bạn muốn thu hồi contact đã chọn?");
+        if (r == true) {
+            $.ajax({
+                type: 'POST',
+                data: { ids: ids },
+                url: '/admin/api/contact/RecoveryDistributor',
+                beforeSend: function () {
+                    alertProcess();
+                },
+                success: function (response) {
+                    alertSuccess("Thu hồi thành công " + response + " contacts");
+                    $("#btnGoFilter").click();
+                },
+                error: function (request, status, ex) {
+                    alertError("Hệ thống bị lỗi, thu hồi không thành công.");
+                }
+            });
+        }
+    });
+    $("#btnSubmitAll").click(function (e) {
+        e.preventDefault();
+
+        // Param
+        var statusMapId = $('#ddlStatusMap').val();
+        var toDate = $('#ToDate').val().replaceAll('/', '');
+        var fromDate = $('#FromDate').val().replaceAll('/', '');
+
+        var items = $("#grid-table td input");
+        if (items.length == 0) {
+            alertError('Bạn chưa lọc contact để thu hồi, vui lòng lọc!');
+            return;
+        }
+
+        var r = confirm("Có phải bạn muốn thu hồi toàn bộ contact?");
+        if (r == true) {
+            $.ajax({
+                type: 'POST',
+                url: '/admin/api/contact/RecoveryDistributorAll',
+                data: { statusMapId: statusMapId, fromDate: fromDate, toDate: toDate },
+                beforeSend: function () {
+                    alertProcess();
+                },
+                success: function (response) {
+                    alertSuccess("Thu hồi thành công " + response + " contacts");
+                    $("#btnGoFilter").click();
+                },
+                error: function (request, status, ex) {
+                    alertError("Hệ thống bị lỗi, thu hồi không thành công.");
+                }
+            });
+        }
+    });
+</script>

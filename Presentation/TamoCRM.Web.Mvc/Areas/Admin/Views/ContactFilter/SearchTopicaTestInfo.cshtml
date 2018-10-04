@@ -1,0 +1,134 @@
+﻿
+@using TamoCRM.Core
+
+@{
+    ViewBag.Title = "Tìm kiếm thông tin bằng tài khoản Topica Test";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        }
+        catch (e) {
+
+        }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Contact</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>@ViewBag.Title</h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            @using (Ajax.BeginForm("SearchTopicaTestInfo", "ContactFilter", new AjaxOptions { HttpMethod = "POST" }, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <div class="col-sm-12" id="alert">
+                    </div>
+                </div>
+                <div style="border: 1px solid #c5d0dc; padding: 15px 20px 0 20px;">
+                    <div class="form-group">
+                        <div class="col-sm-1">
+                            Tài khoản test: 
+                        </div>
+                        <div class="col-sm-3">
+                            <input id="txtAccountTopica" type="text" style="width: 90%;" />
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div class="space-6"></div>
+            <button id="btnGoFilter" class="btn-primary" style="float: right; margin-left: 10px;">Tìm kiếm</button>
+            <button id="btnClearFilter" class="btn-primary" style="float: right;">Xóa trang</button>
+            <div class="clearfix"></div>
+
+            <div class="space-6"></div>
+            <table id="grid-table"></table>
+            <div id="grid-pager"></div>
+
+            <!-- PAGE CONTENT ENDS -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+
+<script type="text/javascript">
+    var grid_selector = "#grid-table";
+    var employeeTypeId = '@((int)EmployeeType.Consultant)';
+    var url = 'admin/api/contact/searchtopicatest?accounttopica={0}';
+    var heades = ['Id', 'Họ và tên', 'Email', 'Điện thoại','TVTS', 'Tài khoản Topica', 'Mật khẩu'];
+    var model = [
+        { name: 'Id', index: 'Id', editable: false, sorttype: 'string', editoptions: { disabled: true }, width: '0px' },
+        { name: 'Fullname', index: 'Fullname', editable: false, width: '90px', sorttype: 'string' },      
+        { name: 'Email', index: 'Email', editable: false, width: '100px', sorttype: 'string', align: 'center' },
+        { name: 'Mobile1', index: 'Mobile1', editable: false, width: '80px', sorttype: 'string', align: 'center' },             
+        { name: 'UserConsultantId', index: 'UserConsultantId', editable: false, width: '80px', formatter: userFomatter },
+        { name: 'AccountTopica', index: 'AccountTopica', editable: false, width: '80px', sorttype: 'string', align: 'center' },
+        { name: 'PassTopica', index: 'PassTopica', editable: false, width: '80px', sorttype: 'string', align: 'center' }    
+    ];
+
+    $(document).ready(function () {
+        bindGlobalStatusMaps();
+        setupGridWithoutEdit("#grid-table", "#grid-pager", '', '', "Id", "Danh sách Contact", heades, model);
+        $(grid_selector).jqGrid("setGroupHeaders", {
+            useColSpanStyle: true,
+            groupHeaders: [
+                { startColumnName: "Fullname", numberOfColumns: 3, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;height:40px;"><b>Thông tin Contact</b></td></tr></table>' },
+                { startColumnName: "AppointmentDate", numberOfColumns: 3, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;"><b>Thông tin lịch hẹn gọi lại</b></td></tr></table>' },
+                { startColumnName: "AccountTopica", numberOfColumns: 2, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;"><b>Thông tin tài khoản Topica</b></td></tr></table>' }
+            ]
+        });
+
+        $(window).keydown(function (e) {
+            if (e.keyCode == 13) {
+                e.preventDefault();
+                $("#btnGoFilter").click();
+            }
+        });
+
+        $("#btnGoFilter").click(function (e) {
+            e.preventDefault();
+
+            // Param
+            var name = $('#txtAccountTopica').val();
+            alertHide();
+            var newUrl = '/' + url.format(name);
+
+            if (name.length == 0) {
+                alertError("Nội dung tìm kiếm không phù hợp.");
+                return;
+            }
+            
+            jQuery(grid_selector).jqGrid().setGridParam({ url: newUrl }).trigger("reloadGrid");
+
+        });
+        $("#btnClearFilter").click(function (e) {
+            e.preventDefault();
+
+            // Param
+            $('#txtAccountTopica').val('');
+        });
+    });
+</script>
+

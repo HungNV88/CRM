@@ -1,0 +1,503 @@
+﻿@using TamoCRM.Core
+@using TamoCRM.Core.Commons.Extensions
+@using TamoCRM.Domain.Catalogs
+@using TamoCRM.Domain.StatusMap
+@using TamoCRM.Web.Framework
+@using TamoCRM.Domain.SourceTypes
+@using System.Linq;
+@model TamoCRM.Web.Mvc.Areas.Admin.Models.ContactLevelInfos.ContactLevelInfoModel
+@{
+    ViewBag.Title = "Thông tin bàn giao";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutSingle.cshtml";
+}
+
+@{
+    var lstPackageFeeEdus = StoreData.SelectedList<PackageFeeEduInfo>(false);
+    var lstGenders = Util.SelectedList<GenderType>();
+    
+    //Product List
+    var product = ViewBag.Products;
+    var lstProducts = new SelectList(product, "Id", "Name");    
+
+    List<SourceTypeInfo> sourceTypes = ViewBag.SourceTypes;
+    var lstSourceTypes = new SelectList(sourceTypes, "SourceTypeId", "Name");
+}
+
+<style>
+    .widget-body label {
+        padding-top: 0;
+    }
+</style>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>
+            Thông tin bàn giao
+        </h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="form-group">
+            <div class="col-sm-12" id="alert">
+            </div>
+        </div>
+        <div class="col-xs-12">
+            @using (Html.BeginForm("HandoverContact", "HandoverAdvisor", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(x => x.ContactInfo.Id)
+                @Html.HiddenFor(x => x.ContactInfo.LevelId)
+                @Html.HiddenFor(x => x.ContactInfo.StatusId)
+                @Html.HiddenFor(x => x.ContactInfo.CallCount)
+                @Html.HiddenFor(x => x.ContactInfo.HandoverHistoryConsultantId)
+                @Html.HiddenFor(x => x.ContactLevelInfo.HandoverAdvisor)
+                @Html.HiddenFor(x => x.ContactLevelInfo.FeeMoneyType)
+                @Html.HiddenFor(x => x.ContactLevelInfo.PackageWantToLearn)
+                @Html.CheckBox("chkReSchedule", new { @style = "display: none;" })
+                @Html.CheckBoxFor(x => x.ContactLevelInfo.HasSetSb100Hidden, new { @style = "display: none;" })
+                @Html.CheckBoxFor(x => x.ContactLevelInfo.HasLinkSb100Hidden, new { @style = "display: none;" })
+                @Html.CheckBoxFor(x => x.ContactLevelInfo.HasCasecAccountHidden, new { @style = "display: none;" })
+                @Html.CheckBoxFor(x => x.ContactLevelInfo.HasPointTestCasecHidden, new { @style = "display: none;" })
+                @Html.CheckBoxFor(x => x.ContactLevelInfo.HasPointInterviewHidden, new { @style = "display: none;" })
+                @Html.CheckBoxFor(x => x.ContactLevelInfo.HasAppointmentInterviewHidden, new { @style = "display: none;" })                        
+                @Html.CheckBoxFor(x => x.ContactLevelInfo.HasAccPayment, new { @style = "display: none;" })
+                <div class="widget-box" id="divL2">
+                <div class="widget-header">
+                    <h4>Thông tin TVTS bàn giao</h4>
+                </div>
+                <div class="widget-body">
+                    <div class="widget-main">
+                        <div class="row">
+                            <div class="col-xs-2" style="width: 16%;">
+                                <label>Tên TVTS (*)</label>
+                            </div>
+                            <div class="col-xs-3" style="width: 22%;">
+                                <div class="clearfix">
+                                    @Html.TextBoxFor(x => x.ContactInfo.UserName, new { @style = "width: 100%", @readonly = "readonly" })
+                                </div>
+                            </div>
+                            
+                            <div class="col-xs-1" style="width: 11%;">
+                                <label></label>   @*Nội dung chuyển khoản*@
+                            </div>
+                            <div class="col-xs-11" style="width: 22%;">
+                                <div class="clearfix">
+                                    @Html.TextAreaFor(x => x.ContactLevelInfo.TransactionReason, new { @class = "autosize-transition form-control", @readonly = "readonly", @style = "display:none" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-4"></div>
+
+                        <div class="row">
+                            <div class="col-xs-2" style="width: 16%;">
+                                <label>ID TVTS (*)</label>
+                            </div>
+                            <div class="col-xs-3" style="width: 22%;">
+                                <div class="clearfix">
+                                    @Html.TextBoxFor(x => x.ContactInfo.Consultant, new { @style = "width: 100%", @readonly = "readonly" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-4"></div>
+
+                        <div class="row">
+                            <div class="col-xs-2" style="width: 16%;">
+                                <label> Điện thoại TVTS (*) </label> 
+                            </div>
+                            <div class="col-xs-5" style="width: 84%;">
+                                @*@Html.TextBox("DienThoaiTVTS")*@
+                                @Html.TextBoxFor(x => x.PhoneTVTS, new { @style = "width: 100%"})
+                            </div>
+                        </div>
+
+                        <div class="space-4"></div>
+
+                        <div class="row">
+                            <div class="col-xs-2" style="width: 16%;">
+                                Email TVTS (*)
+                            </div>
+                            <div class="col-xs-4" style="width: 84%;">
+                                @*@Html.TextBox("EmailTVTS")*@
+                                @Html.TextBoxFor(x => x.EmailTVTS, new { @style = "width: 100%" })
+                            </div>
+                        </div>
+                    </div> 
+                </div>
+            </div>
+                 <div class="space-6"></div>
+                
+                <div class="widget-box" id="divL1">
+                    <div class="widget-header">
+                        <h4>Thông tin học viên</h4>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="col-xs-1" style="width: 11%;">
+                                    <label>Họ Tên (*)</label>
+                                </div>
+                                <div class="col-xs-5" style="width: 22%;">
+                                    <div class="clearfix">
+                                        @Html.TextBoxFor(x => x.ContactInfo.Fullname, new { @style = "width: 100%", @required = "required", error = "Họ và tên rỗng", @id = "hocvien_ten"})
+                                    </div>
+                                </div>
+                                <div class="col-xs-1" style="width: 11%;">
+                                    <label>Giới tính (*)</label>
+                                </div>
+                                <div class="col-xs-5" style="width: 22%;">
+                                    <div class="clearfix">
+                                        @Html.DropDownListFor(x => x.ContactInfo.Gender, lstGenders, new { @style = "width: 100%"})
+                                    </div>
+                                </div>
+                                <div class="col-xs-1" style="width: 11%;">
+                                    <label>Ngày sinh</label>
+                                </div>
+                                <div class="col-xs-3" style="width: 20%;">
+                                    <div class="clearfix">
+                                        @Html.TextBoxFor(x => x.ContactInfo.Birthday, new { @style = "width: 100%" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="space-4"></div>
+
+                            <div class="row">
+                                <div class="col-xs-1" style="width: 11%;">
+                                    <label>Số điện thoại (*)</label>
+                                </div>
+                                <div class="col-xs-3" style="width: 22%;">
+                                    <div class="clearfix">
+                                        @Html.TextBoxFor(x => x.ContactInfo.Mobile1, new { @style = "width: 100%" })
+                                    </div>
+                                </div>
+                                <div class="col-xs-1" style="width: 11%;">
+                                    <label>Email (*)</label>
+                                </div>
+                                <div class="col-xs-3" style="width: 22%;">
+                                    <div class="clearfix">
+                                        @Html.TextBoxFor(x => x.ContactInfo.Email, new { @style = "width: 100%", @type = "email", error = "Email không đúng định dạng" })
+                                    </div>
+                                </div>
+                                <div class="col-xs-1" style="width: 11%;">
+                                    <label>Địa chỉ học viên</label>
+                                </div>
+                                <div class="col-xs-3" style="width: 20%;">
+                                    <div class="clearfix">
+                                        @Html.TextBoxFor(x => x.ContactInfo.Address, new { @style = "width: 100%" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="space-4"></div>
+
+                            <div class="row">
+                                <div class="col-xs-1" style="width: 11%;">
+                                    <label>Nghề nghiệp</label>
+                                </div>
+                                <div class="col-xs-5" style="width: 22%;">
+                                    <div class="clearfix">
+                                        @Html.TextBoxFor(x => x.ContactInfo.Job, new { @style = "width: 100%" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="space-4"></div>
+
+                            <div class="row">
+                                <div class="col-xs-1" style="width: 11%;">
+                                    <label>Contact ID (*)</label>
+                                </div>
+                                <div class="col-xs-3" style="width: 22%;">
+                                    <div class="clearfix">
+                                        @Html.TextBoxFor(x => x.ContactInfo.Code, new { @style = "width: 100%", @readonly = "readonly" })
+                                    </div>
+                                </div>
+                                <div class="col-xs-1" style="width: 11%;">
+                                    Level học viên
+                                </div>
+                                <div class="col-xs-3" style="width: 22%;">
+                                    @Html.TextBoxFor(x => x.ContactInfo.LevelId, new { @style = "width: 100%", @readonly = "readonly" })
+                                </div>
+                            </div>
+
+                            <div class="space-4"></div>
+                            
+                            <div class="row">
+                                <div class="col-xs-1" style="width: 11%;">
+                                    <label>Tổng điểm Casec</label>
+                                </div>
+                                <div class="col-xs-3" style="width: 22%;">
+                                    <div class="clearfix">
+                                        @Html.TextBoxFor(x => x.TestResultCasecInfo.TotalCasec, new { @style = "width: 100%" })
+                                    </div>
+                                </div>
+                                <div class="col-xs-1" style="width: 11%;">
+                                    <label>Tổng điểm Test Topica</label>
+                                </div>
+                                <div class="col-xs-11" style="width: 22%;">
+                                    <div class="clearfix">
+                                        @Html.TextBoxFor(x => x.TestResultTopicaInfo.TotalTopica, new { @style = "width: 100%"})
+                                    </div>
+                                </div>
+                                <div class="col-xs-1" style="width: 11%;">
+                                    <label>Tổng điếm phỏng vấn</label>
+                                </div>
+                                <div class="col-xs-11" style="width: 22%;">
+                                    <div class="clearfix">
+                                        @Html.TextBoxFor(x => x.TestResultInterviewInfo.TotalInterview, new { @style = "width: 100%"})
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="space-4"></div>
+
+                            <div class="row">
+                                <div class="col-xs-1" style="width: 11%;">
+                                    <label>LinkSB100</label>
+                                </div>
+                                <div class="col-xs-3" style="width: 22%;">
+                                    <div class="clearfix">
+                                        @Html.TextBoxFor(x => x.TestResultLinkSb100Info.LinkSb100, new { @style = "width: 100%" })
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-1" style="width: 11%;">
+                                    <label>Trình độ đầu vào</label>
+                                </div>
+                                <div class="col-xs-11" style="width: 22%;">
+                                    <div class="clearfix">
+                                        @Html.DropDownList("LevelStudyAdvisor", Util.SelectedList<LevelStudyAdvisor>(), new { @style = "width: 100%" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="space-4"></div>
+
+                           <div class="row">
+                               <div class="col-xs-1" style="width: 11%;">
+                                   <label>Hình thức thanh toán</label>
+                               </div>
+                               <div class="col-xs-5" style="width: 22%;">
+                                   <div class="clearfix">
+                                       @Html.DropDownList("KieuThanhToan", Util.SelectedList<AppointmentType>())
+                                   </div>
+                               </div>
+
+                               <div class="col-xs-1" style="width: 11%;">
+                                   <label>Nguồn contact</label>
+                               </div>
+                               <div class="col-xs-11" style="width: 22%;">
+                                   <div class="clearfix">
+                                       @Html.DropDownListFor(x => x.ContactInfo.TypeId, lstSourceTypes, new { @style = "width: 100%", @readonly = "readonly", @disabled = "disabled" })
+                                   </div>
+                               </div>
+                           </div>
+
+                            <div class="space-4"></div>
+
+                            <div class="row">
+                                <div class="col-xs-1" style="width: 11%;">
+                                    @Html.CheckBoxFor(x => x.ContactLevelInfo.HasTestTechnical, @Html.CheckBoxFor(x => x.ContactLevelInfo.HasTestTechnical, new { @style = "width: 100%" }))
+                                </div>
+                                <div class="col-xs-3" style="width: 22%;">
+                                    <div class="clearfix">
+                                        <label> Đã test kỹ thuật chưa? </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="space-4"></div>
+
+                        </div>
+                    </div>
+                </div> 
+                
+                <div class="space-6"></div>
+                
+                <div class="widget-box" id="divL3">
+                <div class="widget-header">
+                    <h4>Thông tin gói học</h4>
+                </div>
+                <div class="widget-body">
+                    <div class="widget-main">
+                        
+                            <div class="row">
+                                <div class="col-xs-4" style="width: 20%;">
+                                    <label>Tên sản phẩm</label>
+                                </div>
+                                <div class="col-xs-3" style="width: 22%;">
+                                    <div class="clearfix">
+                                        @Html.DropDownListFor(x => x.ContactInfo.ProductSaleId, lstProducts, new { @style = "width: 100%", @disabled = "disabled" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-4"></div>
+                            <div class="row">
+                                <div class="col-xs-4" style="width: 20%;">
+                                    <label>Loại tài khoản</label>
+                                </div>
+                                <div class="col-xs-11" style="width: 22%;">
+                                    <div class="clearfix">
+                                        @Html.DropDownListFor(x => x.ContactLevelInfo.FeePackageType, lstPackageFeeEdus, new { @style = "width: 100%", @disabled = "disabled" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-4"></div>
+                            <div class="row">
+                                <div class="col-xs-4" style="width: 20%;">
+                                    <label>Thời gian học (đơn vị ngày)</label>
+                                </div>
+                                <div class="col-xs-3" style="width: 22%;">
+                                    <div class="clearfix">
+                                        @Html.TextBoxFor(x => x.ContactLevelInfo.LearnNumberDay, new { @style = "width: 100%" })
+                                    </div>
+                                </div>
+                            </div>
+                        <div class="space-4"></div>
+                        <div class="row">
+                            <div class="col-xs-4" style="width: 20%;">
+                                <label> Giá niêm yết </label>
+                            </div>
+                            <div class="col-xs-11" style="width: 22%;">
+                                @Html.TextBoxFor(x => x.ContactLevelInfo.PricePackageListedId, new { @style = "width: 100%", @readonly = "readonly", @class = "feeEdu_format", @unit = "VNĐ", @type = "hidden" })
+                                
+                            </div>
+                        </div>
+                        <div class="space-4"></div>
+                        <div class="row">
+                            <div class="col-xs-4" style="width: 20%;">
+                                <label>Tổng số tiền phải đóng: </label>
+                            </div>
+                            <div class="col-xs-2" style="width: 17%;">
+                                <div class="clearfix">
+                                    @Html.TextBoxFor(x => x.ContactLevelInfo.PackagePriceSale, new { @style = "width: 100%", @readonly = "readonly", @class = "priceSale_format", @unit = "VNĐ", @type = "hidden" })
+                                </div>
+                            </div> 
+                        </div>
+                        
+                        <div class="space-4"></div>
+
+                        <div class="row">
+                            <div class="col-xs-1" style="width: 20%;">
+                                <label>Tổng số tiền đã đóng</label>
+                            </div>
+                            <div class="col-xs-3" style="width: 22%;">
+                                <div class="clearfix">
+                                    @Html.TextBoxFor(x => x.ContactLevelInfo.FeeEdu, new { @style = "width: 100%", @readonly = "readonly", @class = "feeEdu_format", @unit = "VNĐ", @type = "hidden" })
+                                </div>
+                            </div>
+                            <div class="col-xs-3" style="width: 18%;">
+                                <label>Tổng số tiền còn thiếu</label>
+                            </div>
+                            <div class="col-xs-3" style="width: 22%;">
+                                <div class="clearfix">
+                                    @Html.TextBoxFor(x => x.ContactLevelInfo.FeeEduYet, new { @style = "width: 100%", @readonly = "readonly", @class = "feeEdu_format", @unit = "VNĐ", @type = "hidden" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-4"></div>
+
+                        <div class="row">
+                            <div class="col-xs-1" style="width: 20%;">
+                                <label>Ngày muốn học (*)</label>
+                            </div>
+                            <div class="col-xs-11" style="width: 60.33%;">
+                                @Html.TextBox("time_want_to_learn", string.Empty, new { @class = "input-small" })
+                                <span class="input-append bootstrap-timepicker">
+                                    @Html.TextBoxFor(x => x.Time24hWantToLearn, string.Empty, new { @class = "input-small" })
+                                    <span class="add-on"><i class="icon-time"></i></span>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="space-4"></div>
+
+                        <div class="row">
+                            <div class="col-xs-1" style="width: 20%;">
+                                <label>Đặc điểm học viên (*)</label>
+                            </div>
+                            <div class="col-xs-9" style="width: 66.33%;">
+                                @Html.TextAreaFor(x => x.ContactLevelInfo.DacDiemHocVien, new { @class = "autosize-transition form-control" })
+                            </div>
+                        </div>
+                       
+                    </div> 
+                </div>
+            </div>
+                <div class="space-6"></div>
+                <button id="btnSubmit" type="submit" class="btn-primary" style="float: right; width: 100px;" onclick="return submitForm();">Bàn giao</button>
+                <div class="clearfix"></div>               
+            }
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+<script src="/Content/themes/ace/assets/js/jquery.form.js"></script>
+<script src="/Content/themes/ace/assets/js/jquery.validate.min.js"></script>
+<script src="/Content/themes/ace/assets/js/additional-methods.min.js"></script>
+<script src="~/Scripts/jquery.number.js"></script>
+
+<script type="text/javascript">
+    var message = '@ViewBag.Message';
+    if (message == null || message == '') {
+        $("#alert").removeClass();
+        $("#alert").html('');
+    }
+    else {
+        $("#alert").addClass("alert alert-block alert-success");
+        $("#alert").html(message);
+        if ('@ViewBag.Close' == '1')
+            window.close();
+    }
+
+    
+    $(document).ready(function () {
+        $(document).on("keyup", "input.feeEdu_format", convert_number);
+        $(document).on("keyup", "input.priceSale_format", convert_number);
+
+        $("input.feeEdu_format").each(function () {
+            var value = $.number($(this).val(), 0, ",", ".");
+            $(this).after('<div class="e_convert_num_value" style="font-weight: bold; color: rgb(129, 12, 21); display: block;">' + value + ' VND</div>');
+        })
+        $("input.priceSale_format").each(function () {
+            var value = $.number($(this).val(), 0, ",", ".");
+            $(this).after('<div class="e_convert_num_value" style="font-weight: bold; color: rgb(129, 12, 21); display: block;">' + value + ' VND</div>'); 
+        })
+        
+        $('#time_want_to_learn').datepicker({ format: 'yyyy-mm-dd', autoclose: true, dateonly: true, todayHighlight: "true", orientation: "top" });
+        $('#ContactInfo_Birthday').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly: true, endDate: "+0d", todayHighlight: "true" });
+        $('#Time24hWantToLearn').timepicker({ minuteStep: 5, disableFocus: true, showSeconds: true, showMeridian: false, todayHighlight: "true", defaultTime: false });
+    })
+
+    function convert_number() {
+
+        var soure_obj = $(this);
+        if (!soure_obj.hasClass('e_not_number')) {
+            var unit = $(this).attr('unit');
+            var val_obj = soure_obj.val();
+            var val_convert = $.number(val_obj, 0, ",", ".");
+            var e_convert_num_value = soure_obj.siblings('.e_convert_num_value');
+            if (!e_convert_num_value.length) {
+                soure_obj.after('<div class="e_convert_num_value" style="font-weight:bold;color:#34810c"></div>')
+            }
+            if (unit == undefined) {
+                unit = '';
+            }
+
+            e_convert_num_value.html(val_convert + ' ' + unit);
+            if (!parseInt(val_convert)) {
+                e_convert_num_value.hide();
+            } else {
+                e_convert_num_value.show();
+            }
+        }
+    }
+</script>
+
+
+

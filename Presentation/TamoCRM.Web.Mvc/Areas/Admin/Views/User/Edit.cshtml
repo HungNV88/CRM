@@ -1,0 +1,345 @@
+﻿@using MvcCheckBoxList.Model
+@using TamoCRM.Core
+@model TamoCRM.Web.Mvc.Areas.Admin.Models.Users.UserModel
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .styled_checkbox {
+        cursor: pointer;
+        border-radius: 5px;
+        margin: 3px;
+        padding: 0 10px 0 2px;
+    }
+
+    .styled_list {
+        margin-left: 25px;
+        padding: 3px 5px 3px 5px;
+    }
+</style>
+
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        } catch (e) { }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Người dùng</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>Sửa thông tin người dùng</h1>
+    </div>
+    <div class="row">
+        <div class="form-group">
+            <div class="col-sm-12" id="alert">
+            </div>
+        </div>
+        <!-- /.page-header -->
+        @using (Html.BeginForm("Edit", "User", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            <div class="col-xs-12">
+                <div id="user-profile-1" class="user-profile row">
+                    <div class="col-xs-12 col-sm-3 center">
+                        <div>
+                            <span class="profile-picture">
+                                <img id="avatar" class="editable img-responsive editable-click editable-empty" alt="Alex's Avatar" src="/Images/avatars/profile-pic.jpg" />
+                            </span>
+
+                            <div class="space-4"></div>
+
+                            <div class="width-80 label label-info label-xlg arrowed-in arrowed-in-right">
+                                <div class="inline position-relative">
+                                    <a href="#" class="user-title-label dropdown-toggle" data-toggle="dropdown">
+                                        <i class="icon-circle light-green middle"></i>
+                                        &nbsp;
+                                    <span class="white">@Model.UserInfo.FullName</span>
+                                    </a>
+
+                                    <ul class="align-left dropdown-menu dropdown-caret dropdown-lighter">
+                                        <li class="dropdown-header">Change Status </li>
+
+                                        <li>
+                                            <a href="#">
+                                                <i class="icon-circle green"></i>
+                                                &nbsp;
+                                            <span class="green">Available</span>
+                                            </a>
+                                        </li>
+
+                                        <li>
+                                            <a href="#">
+                                                <i class="icon-circle red"></i>
+                                                &nbsp;
+                                            <span class="red">Busy</span>
+                                            </a>
+                                        </li>
+
+                                        <li>
+                                            <a href="#">
+                                                <i class="icon-circle grey"></i>
+                                                &nbsp;
+                                            <span class="grey">Invisible</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xs-12 col-sm-9">
+                        <div class="profile-user-info profile-user-info-striped">
+                            <div class="profile-info-row">
+                                <div class="profile-info-name">Tên đăng nhập </div>
+
+                                <div class="profile-info-value">
+                                    @Model.UserInfo.UserName
+                                </div>
+                            </div>
+                            <div class="profile-info-row">
+                                <div class="profile-info-name">Họ và tên </div>
+
+                                <div class="profile-info-value">
+                                    @Html.TextBoxFor(x => x.UserInfo.FullName, new { @Value = Model.UserInfo.FullName })
+                                </div>
+                            </div>
+                            <div class="profile-info-row">
+                                <div class="profile-info-name">Email </div>
+
+                                <div class="profile-info-value">
+                                    @Html.TextBoxFor(x => x.UserInfo.Email, new { @Value = Model.UserInfo.Email })
+                                </div>
+                            </div>
+                            <div class="profile-info-row">
+                                <div class="profile-info-name">Di động</div>
+
+                                <div class="profile-info-value">
+                                    @Html.TextBoxFor(x => x.UserInfo.Mobile, new { @Value = Model.UserInfo.Mobile })
+                                </div>
+                            </div>
+                            <div class="profile-info-row">
+                                <div class="profile-info-name">Station</div>
+
+                                <div class="profile-info-value">
+                                    @Html.TextBoxFor(x => x.UserInfo.StationId, new { @Value = Model.UserInfo.StationId })
+                                </div>
+                            </div>
+                            <div class="profile-info-row">
+                                <div class="profile-info-name">Thông tin thêm</div>
+
+                                <div class="profile-info-value">
+                                    @Html.TextBoxFor(x => x.UserInfo.Description, new { @Value = Model.UserInfo.Description })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-20"></div>
+
+                        <div class="widget-box transparent">
+                            <div class="widget-header widget-header-small">
+                                <h4 class="blue smaller">
+                                    <i class="icon-rss orange"></i>
+                                    Nhóm người dùng
+                                </h4>
+                            </div>
+
+                            <div class="widget-body">
+                                <div class="widget-main padding-8">
+                                    @Html.CheckBoxListFor(x => x.PostedRole.Id, x => x.AllRole.OrderBy(c => c.Name), role => role.RoleID, role => role.Name, x => x.SelectedRole, new { @class = "styled_checkbox" }, new HtmlListInfo(HtmlTag.table, 5, new { @class = "styled_list" }), null, x => x.RoleID)
+                                </div>
+                            </div>
+                        </div>
+                        <div class="widget-box transparent">
+                            <div class="widget-header widget-header-small">
+                                <h4 class="blue smaller">
+                                    <i class="icon-rss orange"></i>
+                                    Chi nhánh
+                                </h4>
+                            </div>
+
+                            <div class="widget-body">
+                                <div class="widget-main padding-8">
+                                    @Html.CheckBoxListFor(x => x.PostedBranch.Id, x => x.AllBranch, branch => branch.BranchId, branch => branch.Name, x => x.SelectedBranch, new { @class = "styled_checkbox" }, new HtmlListInfo(HtmlTag.table, 5, new { @class = "styled_list" }), null, x => x.BranchId)
+                                </div>
+                            </div>
+                        </div>
+                        <div class="widget-box transparent">
+                            <div class="widget-box transparent" style="display: none;">
+                                <div class="widget-header widget-header-small">
+                                    <h4 class="blue smaller">
+                                        @Html.CheckBoxFor(x => x.UserInfo.IsCollector)
+                                        <label for="UserInfo_IsCollector">Thuộc nhóm CTV</label>
+                                    </h4>
+                                </div>
+                            </div>
+                            <div class="widget-header widget-header-small">
+                                <h4 class="blue smaller">
+                                    @Html.CheckBoxFor(x => x.UserInfo.IsCollaborator)
+                                    <label for="UserInfo_IsCollaborator">Thuộc nhóm Lọc</label>
+                                </h4>
+                            </div>
+                            <div class="widget-body" id="divCollaborator">
+                                <div class="widget-main padding-8">
+                                    @Html.CheckBoxListFor(x => x.PostedGroupCollaborator.Id, x => x.AllGroupCollaborators, x => x.GroupId, x => x.Name, x => x.SelectedGroupCollaborators, new { @class = "styled_checkbox" }, new HtmlListInfo(HtmlTag.table, 4, new { @class = "styled_list" }), null, x => x.GroupId)
+                                    <hr style="margin: 8px 20px 8px 20px;" />
+                                    @Html.CheckBoxListFor(x => x.PostedGroupCollaboratorType.Id, x => x.AllGroupCollaboratorTypes, x => x.Id, x => x.Name, x => x.SelectedGroupCollaboratorTypes, new { @class = "styled_checkbox", @type = "radio" }, new HtmlListInfo(HtmlTag.table, 4, new { @class = "styled_list" }), null, x => x.Id)
+                                    <hr style="margin: 8px 20px 8px 20px;" />
+                                    <label style="font-weight: bold; margin-left: 25px; margin-right: 10px;">Chỉ tiêu</label>
+                                    @Html.TextBoxFor(x => x.UserInfo.NormsCollaborator, new { type = "number", min = "0", max = "1000" })
+                                </div>
+                                <div class="widget-body">
+                                    <div class="widget-main padding-8">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="widget-header widget-header-small">
+                                <h4 class="blue smaller">
+                                    @Html.CheckBoxFor(x => x.UserInfo.IsConsultant)
+                                    <label for="UserInfo_IsConsultant">Thuộc nhóm TVTS</label>
+                                </h4>
+                            </div>
+                            <div class="widget-body" id="divConsultant">
+                                <div class="widget-main padding-8">
+                                    @Html.CheckBoxListFor(x => x.PostedGroupConsultant.Id, x => x.AllGroupConsultants, x => x.GroupId, x => x.Name, x => x.SelectedGroupConsultants, new { @class = "styled_checkbox" }, new HtmlListInfo(HtmlTag.table, 4, new { @class = "styled_list" }), null, x => x.GroupId)
+                                    <hr style="margin: 8px 20px 8px 20px;" />
+                                    @Html.CheckBoxListFor(x => x.PostedGroupConsultantType.Id, x => x.AllGroupConsultantTypes, x => x.Id, x => x.Name, x => x.SelectedGroupConsultantTypes, new { @class = "styled_checkbox", @type = "radio" }, new HtmlListInfo(HtmlTag.table, 4, new { @class = "styled_list" }), null, x => x.Id)
+                                    <hr style="margin: 8px 20px 8px 20px;" />
+                                    <label style="font-weight: bold; margin-left: 25px; margin-right: 10px;">Chỉ tiêu</label>
+                                    @Html.TextBoxFor(x => x.UserInfo.NormsConsultant, new { type = "number", min = "0", max = "1000" })
+                                </div>
+                                <div class="widget-body">
+                                    <div class="widget-main padding-8">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="center">
+                            @if (Model.UserInfo.Status == (int)StatusUserType.Nomal)
+                            {
+                                <input type="button" class="btn btn-sm btn-primary" value="Khóa tài khoản" name="btnsaveuser" id="btnLockUser" onclick=" return lockUser('lock'); " />
+                            }
+                            else
+                            {
+                                <input type="button" class="btn btn-sm btn-primary" value="Mở tài khoản" name="btnsaveuser" id="btnOpenUser" onclick="return lockUser('open');" />
+                            }
+                            <input type="submit" class="btn btn-sm btn-primary" value="Cập nhật" name="btnsaveuser" id="btnsaveuser" onclick="return submitForm();" />
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        }
+        <!-- /.row -->
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var groupCollaboratorLength = $('input:checked[name="PostedGroupCollaborator.Id"]').length;
+        if (groupCollaboratorLength > 0) {
+            $('#divCollaborator').css('display', '');
+        } else {
+            $('#divCollaborator').css('display', 'none');
+        }
+        $("#UserInfo_IsCollaborator").click(function (e) {
+            if ($("#UserInfo_IsCollaborator").is(':checked')) {
+                $('#divCollaborator').css('display', '');
+            } else {
+                $('#divCollaborator').css('display', 'none');
+            }
+        });
+
+        var groupConsultantLength = $('input:checked[name="PostedGroupConsultant.Id"]').length;
+        if (groupConsultantLength > 0) {
+            $('#divConsultant').css('display', '');
+        } else {
+            $('#divConsultant').css('display', 'none');
+        }
+        $("#UserInfo_IsConsultant").click(function (e) {
+            if ($("#UserInfo_IsConsultant").is(':checked')) {
+                $('#divConsultant').css('display', '');
+            } else {
+                $('#divConsultant').css('display', 'none');
+            }
+        });
+    });
+
+    function lockUser(status) {
+        var r = confirm("Có phải bạn muốn " + (status == 'lock' ? "khóa" : "mở") + " tài khoản này?");
+        if (r == true) {
+            var id = '@Model.UserInfo.UserID';
+            var url = status == 'lock'
+                ? '/admin/api/user/LockUser'
+                : '/admin/api/user/OpenUser';
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: { id: id },
+                beforeSend: function () {
+                    alertProcess();
+                },
+                success: function (data) {
+                    alertSuccess(data);
+                },
+                error: function (request, status, ex) {
+                    alertError("Hệ thống bị lỗi, khóa tài khoản không thành công.");
+                }
+            });
+        }
+    }
+
+    function submitForm() {
+        if ($('#UserInfo_UserName').val() == '') {
+            alertError("Tên đăng nhập không được rỗng, vui lòng thử lại");
+            $('#UserInfo_UserName').focus();
+            return false;
+        }
+        if ($('#UserInfo_Password').val() == '') {
+            alertError("Mật khẩu không được rỗng, vui lòng thử lại");
+            $('#UserInfo_Password').focus();
+            return false;
+        }
+        if ($('#UserInfo_ConfirmPassword').val() == '') {
+            alertError("Xác nhận mật khẩu không được rỗng, vui lòng thử lại");
+            $('#UserInfo_ConfirmPassword').focus();
+            return false;
+        }
+        if ($('#UserInfo_FullName').val() == '') {
+            alertError("Họ và tên không được rỗng, vui lòng thử lại");
+            $('#UserInfo_FullName').focus();
+            return false;
+        }
+        if ($('#UserInfo_Password').val() != $('#UserInfo_ConfirmPassword').val()) {
+            alertError("Mật khẩu và xác nhận mật khẩu phải giống nhau, vui lòng thử lại");
+            $('#UserInfo_ConfirmPassword').focus();
+            $('#UserInfo_ConfirmPassword').val('');
+            return false;
+        }
+        alertProcess();
+        return true;
+    }
+
+    var message = '@ViewBag.Message';
+    if (message == null || message == '') {
+        alertHide();
+    }
+    else {
+        alertSuccess(message);
+    }
+</script>

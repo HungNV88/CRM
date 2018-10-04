@@ -1,0 +1,226 @@
+﻿@using TamoCRM.Core
+@using TamoCRM.Domain.Catalogs
+@using TamoCRM.Web.Framework
+@using TamoCRM.Domain.SourceTypes
+@model TamoCRM.Web.Mvc.Areas.Admin.Models.Contacts.ContactAddModel
+@{
+    ViewBag.Title = "Thêm Contact";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+@{
+    var lstGenders = Util.SelectedList<GenderType>();
+    
+    //Product List
+    var product = ViewBag.Products;
+    ((List<ProductInfo>)product).RemoveAll(c => c.Id == 0);
+    ((List<ProductInfo>)product).Insert(0, new ProductInfo { Id = 0, Name = "Tất cả" });
+    var lstProducts = new SelectList(product, "Id", "Name");
+
+    var sourceTypes = StoreData.ListSourceType.Where(c => c.IsShowConsultant).ToList();
+    ((List<SourceTypeInfo>)sourceTypes).Insert(0, new SourceTypeInfo { SourceTypeId = 0, Name = "- Chọn nguồn -" });
+    var lstSourceTypes = new SelectList(sourceTypes, "SourceTypeId", "Name");
+}
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        } catch (e) {
+        }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Contact</li>
+    </ul>
+</div>
+<div class="page-content">
+    <div class="page-header">
+        <h1>Thêm contact								
+        </h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="col-xs-12">
+            <span class="label label-success arrowed" id="spMessage"></span>
+        </div>
+        <div class="col-xs-12">
+            @using (Html.BeginForm("CreateTvts", "Contact", FormMethod.Post, new { @id = "CreateContact" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <div class="col-sm-12" id="alert">
+                    </div>
+                </div>
+                <div style="border: 1px solid #c5d0dc; padding: 25px;">
+                    <div class="row">
+                        <div class="col-xs-2">
+                            Họ và tên
+                        </div>
+                        <div class="col-xs-4">
+                            <div class="clearfix">
+                                @Html.TextBoxFor(x => x.ContactInfo.Fullname, new { @style = "width: 90%", @required = "required", error = "Họ và tên rỗng" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-4"></div>
+                    <div class="row">
+                        <div class="col-xs-2">
+                            Nguồn
+                        </div>
+                        <div class="col-xs-4">
+                            @Html.DropDownListFor(x => x.ContactInfo.TypeId, lstSourceTypes, new { style = "width: 90%" })
+                        </div>
+                        <div class="col-xs-2">
+                            Định bán
+                        </div>
+                        <div class="col-xs-4">
+                            @Html.DropDownListFor(x => x.ContactInfo.ProductSellId, lstProducts, new { style = "width: 100%" })
+                        </div>
+                    </div>
+                    <div class="space-4"></div>
+                    <div class="row">
+                        <div class="col-xs-2">
+                            Số điện thoại 1
+                        </div>
+                        <div class="col-xs-4">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="icon-phone"></i>
+                                </span>@Html.TextBoxFor(x => x.ContactInfo.Mobile1, new { @style = "width: 88.5%", @required = "", error = "Số điện thoại rỗng hoặc không đúng định dạng" })
+                            </div>
+                        </div>
+                        <div class="col-xs-2">
+                            Số điện thoại 2
+                        </div>
+                        <div class="col-xs-4">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="icon-phone"></i>
+                                </span>@Html.TextBoxFor(x => x.ContactInfo.Mobile2, new { @style = "width: 100%" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-4"></div>
+                    <div class="row">
+                        <div class="col-xs-2">
+                            Email 1
+                        </div>
+                        <div class="col-xs-4">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="icon-envelope" style="width: 11px;"></i>
+                                </span>
+                                @Html.TextBoxFor(x => x.ContactInfo.Email, new { style = "width: 88.5%" })
+                            </div>
+                        </div>
+                        <div class="col-xs-2">
+                            Email 2
+                        </div>
+                        <div class="col-xs-4">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="icon-envelope" style="width: 11px;"></i>
+                                </span>
+                                @Html.TextBoxFor(x => x.ContactInfo.Email2, new { @style = "width: 100%" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-4"></div>
+                    <div class="row">
+                        <div class="col-xs-2">
+                            Giới tính  
+                        </div>
+                        <div class="col-xs-4">
+                            @Html.DropDownListFor(x => x.ContactInfo.Gender, lstGenders, new { style = "width: 90%" })
+                        </div>
+                        <div class="col-xs-2">
+                            Ngày sinh
+                        </div>
+                        <div class="col-xs-4">@Html.EditorFor(x => x.Birthday, new { @style = "width: 100%", @pattern = "\\d{2}/\\d{2}/\\d{4})", error = "Ngày sinh không đúng định dạng" })
+                        </div>
+                    </div>
+                    <div class="space-4"></div>
+                    <div class="row">
+                        <div class="col-xs-2">
+                            <label>Địa chỉ liên hệ</label>
+                        </div>
+                        <div class="col-xs-10">
+                            @Html.TextBoxFor(x => x.ContactInfo.Address, new { @style = "width: 100%" })
+                        </div>
+                    </div>
+                    <div class="space-4"></div>
+                    <div class="row">
+                        <div class="col-xs-2">
+                            Ghi chú
+                        </div>
+                        <div class="col-xs-10">
+                            @Html.TextAreaFor(x => x.ContactInfo.Notes, new { @class = "autosize-transition form-control" })
+                        </div>
+                    </div>
+                    <div class="space-4"></div>
+                </div>
+                <div class="space-6"></div>
+                <button id="btnSubmit" class="btn-primary" style="float: right; width: 150px;" type="submit" onclick="return submitForm();">Thêm mới Contact</button>
+                <div class="clearfix"></div>
+            }
+        </div>
+    </div>
+</div>
+<script src="/Content/themes/ace/assets/js/jquery.form.js"></script>
+<script src="/Content/themes/ace/assets/js/jquery.validate.min.js"></script>
+<script src="/Content/themes/ace/assets/js/additional-methods.min.js"></script>
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#Birthday').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly: true, endDate: "+0d" });
+        customValidate();
+        
+        // Change disable
+        $("#ContactLevelInfo_HaveJob").change(function () {
+            if ($(this).is(':checked'))
+                $("#ContactLevelInfo_JobTitle").removeAttr("disabled");
+            else
+                $("#ContactLevelInfo_JobTitle").attr("disabled", "disabled");
+        });
+    });
+
+    function submitForm() {
+        if (!checkDuplicate()) return false;
+        return true;
+    }
+    
+    function resetForm() {
+        $('#ContactInfo_ProductSellId').val(0);
+        $('#ContactInfo_Fullname').val('');
+        $('#ContactInfo_Birthday').val('');
+        $('#ContactInfo_Address').val('');
+        $('#ContactInfo_Mobile1').val('');
+        $('#ContactInfo_Mobile2').val('');
+        $('#ContactInfo_Email2').val('');
+        $('#ContactInfo_Email').val('');
+        $('#ContactInfo_Notes').val('');
+    }
+    
+    var message = '@ViewBag.Message';
+    if (message == null || message == '') {
+        $('#btnSubmit').removeAttr('disabled');
+        alertHide();
+    }
+    else {
+        $("#alert").addClass("alert alert-block alert-success");
+        $("#alert").html($("#alert").html(message).text());
+        $('#btnSubmit').removeAttr('disabled');
+        if (message.indexOf('vui lòng thử lại') < 0) resetForm();
+    }
+    
+    
+</script>

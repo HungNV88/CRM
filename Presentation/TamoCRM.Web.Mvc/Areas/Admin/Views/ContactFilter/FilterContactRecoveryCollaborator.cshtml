@@ -1,0 +1,450 @@
+﻿@using TamoCRM.Core
+@using TamoCRM.Domain.Catalogs
+@using TamoCRM.Domain.Groups
+@using TamoCRM.Domain.SourceTypes;
+@using TamoCRM.Domain.StatusMap
+@using TamoCRM.Web.Framework
+
+@model TamoCRM.Web.Mvc.Areas.Admin.Models.Contacts.ContactCreateModel
+
+@{
+    ViewBag.Title = "Thu hồi Contact từ Lọc";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+@{
+    var StatusMaps = ViewBag.StatusMaps;
+    var lstStatusMaps = new SelectList(StatusMaps, "Id", "Name");
+    var lstSourceType = StoreData.SelectedList<SourceTypeInfo>();
+
+    var StatusCares = ViewBag.StatusCares;
+    ((List<StatusCareInfo>)StatusCares).RemoveAll(c => c.Id == 0);
+    ((List<StatusCareInfo>)StatusCares).Insert(0, new StatusCareInfo { Id = 0, Name = "Tất cả" });
+    var lstStatusCares = new SelectList(StatusCares, "Id", "Name");
+
+    // Group
+    var groups = ViewBag.Groups;
+    ((List<GroupInfo>)groups).RemoveAll(c => c.GroupId == 0);
+    ((List<GroupInfo>)groups).Insert(0, new GroupInfo { GroupId = 0, Name = "Tất cả", EmployeeTypeId = (int)EmployeeType.Collaborator });
+    var lstGroups = new SelectList(((List<GroupInfo>)groups).Where(c => c.EmployeeTypeId == (int)EmployeeType.Collaborator), "GroupId", "Name");
+}
+
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        }
+        catch (e) {
+
+        }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Contact</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>@ViewBag.Title</h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            @using (Ajax.BeginForm("FilterContactRecoveryCollaborator", "Contact", new AjaxOptions { HttpMethod = "GET" }, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "filter_contact_recovery_form" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <div class="col-sm-12" id="alert">
+                    </div>
+                </div>
+                <div style="border: 1px solid #c5d0dc; padding: 15px;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <div class="col-sm-7">
+                            <div>
+                                <input type="radio" id="chkContactNew" name="contacts" checked="checked" />
+                                <label for="chkContactNew" class="bolder">Contact mới</label>
+                            </div>
+                            <div class="space-4"></div>
+                            <div>
+                                <input type="radio" id="chkContactOld" name="contacts" />
+                                <label for="chkContactOld" class="bolder">Contact cũ</label>
+                            </div>
+                            <div id="divLevels" style="display: none;">
+                                @foreach (var item in StoreData.ListLevel.Where(c => c.LevelId <= 3))
+                                {
+                                    <div class="col-sm-3">
+                                        <input type="checkbox" name="chkLevels" id='@(item.LevelId)_chkLevel' />
+                                        <label for="@(item.LevelId)_chkLevel">@item.Name</label>
+                                    </div>
+                                }
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="space-6"></div>
+                            <div class="col-sm-4" style="padding-left: 0;">
+                                <label class="bolder">Nguồn</label>
+                            </div>
+                            <div class="col-sm-5">
+                                @Html.DropDownListFor(x => x.TypeId, lstSourceType, new { @class = "form-control", @style = "width: 180px;" })
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="space-6"></div>
+                            <div>
+                                <div class="col-sm-4" style="padding-left: 0;">
+                                    <label class="bolder">Trạng thái chăm sóc</label>
+                                </div>
+                                <div class="col-sm-4">
+                                    @Html.DropDownList("ddlStatusCare", lstStatusCares, new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="space-6"></div>
+                            <div>
+                                <div class="col-sm-4" style="padding-left: 0;">
+                                    <label class="bolder">Trạng thái gọi</label>
+                                </div>
+                                <div class="col-sm-4">
+                                    @Html.DropDownList("ddlStatusMap", lstStatusMaps, new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="space-6"></div>
+                            <br />
+                            <hr style="width: 50%;" />
+                            <div>
+                                <div class="col-sm-5" style="padding-left: 0;">
+                                    <label class="bolder">Ngày bàn giao</label>
+                                </div>
+                                <div class="col-sm-3">
+                                    @Html.TextBox("HandoverFromDate", string.Empty, new { @style = "width: 100%;" })
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="space-6"></div>
+                            <div>
+                                <div class="col-sm-5" style="padding-left: 0;">
+                                    <label class="bolder">Đến ngày</label>
+                                </div>
+                                <div class="col-sm-3">
+                                    @Html.TextBox("HandoverToDate", string.Empty, new { @style = "width: 100%;" })
+                                </div>
+                            </div>
+                            <br />
+                            <hr style="width: 50%;" />
+                            <div class="clearfix"></div>
+                            <div class="space-6"></div>
+                            <div id="divCallDateRecently" style="display: none;">
+                                <div>
+                                    <div class="col-sm-5" style="padding-left: 0;">
+                                        <label class="bolder">Ngày gọi gần nhất</label>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        @Html.TextBox("CallFromDate", string.Empty, new { @style = "width: 100%;" })
+                                    </div>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="space-6"></div>
+                                <div>
+                                    <div class="col-sm-5" style="padding-left: 0;">
+                                        <label class="bolder">Đến ngày</label>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        @Html.TextBox("CallToDate", string.Empty, new { @style = "width: 100%;" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <label class="bolder" style="margin-top: 5px;">Nhóm Lọc</label>
+                                </div>
+                                <div class="col-sm-8">
+                                    @Html.DropDownList("GroupId", lstGroups, new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="space-4"></div>
+                            <div class="row" id="divUser"></div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div class="space-6"></div>
+            <button id="btnSubmitAll" class="btn-primary" style="float: right; margin-right: 10px; width: 120px;">Thu hồi Tất cả</button>
+            <button id="btnSubmit" class="btn-primary" style="float: right; margin-right: 10px; width: 120px;">Thu hồi Contact</button>
+            <button id="btnGoFilter" class="btn-primary" style="float: right; margin-right: 10px; width: 100px;">Lọc Contact</button>
+            <div class="clearfix"></div>
+
+            <div class="space-6"></div>
+            <table id="grid-table"></table>
+            <div id="grid-pager"></div>
+
+
+            <!-- PAGE CONTENT ENDS -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+
+<script type="text/javascript">
+    var grid_selector = "#grid-table";
+    var employeeTypeId = '@((int)EmployeeType.Collaborator)';
+    //var url = 'admin/api/contact/FilterRecovery?userIds={0}&levelIds={1}&statusMapId={2}&statusCareId={3}&day={4}&todayType={5}&employeeTypeId=' + employeeTypeId;
+    var url = 'admin/api/contact/FilterRecovery?userIds={0}&levelIds={1}&statusMapId={2}&statusCareId={3}&todayType={4}&handoverFromDate={5}&handoverToDate={6}&callFromDate={7}&callToDate={8}&sourceType={9}&employeeTypeId=' + employeeTypeId;
+    var heades = ['Id', 'Họ và tên', 'SĐT', 'Email', 'Trạng thái chăm sóc', 'Trạng thái gọi', 'Level', 'Nơi sống', 'Ghi chú', 'Ngày tìm nguồn', 'Ngày phân contact', '<input type="checkbox" id="chkContacts" onclick="fixCheckBoxGrid(event)" />'];
+    var model = [
+        { name: 'Id', index: 'Id', editable: false, sorttype: 'string', width: '0px' },
+        { name: 'Fullname', index: 'Fullname', editable: false, sorttype: 'string', width: '70px' },
+        { name: 'Mobile', index: 'Mobile', editable: false, sorttype: 'string', width: '70px' },
+        { name: 'Email', index: 'Email', editable: false, sorttype: 'string', width: '70px' },
+        { name: 'StatusCare', index: 'StatusCare', editable: false, sorttype: 'string', width: '70px' },
+        { name: 'StatusMap', index: 'StatusMap', editable: false, sorttype: 'string', width: '70px' },
+        { name: 'Level', index: 'Level', editable: false, sorttype: 'string', width: '50px' },
+        { name: 'LocationName', index: 'LocationName', editable: false, sorttype: 'string', width: '70px' },
+        { name: 'Notes', index: 'Notes', editable: false, sorttype: 'string', width: '100px' },
+        { name: 'RegisteredDate', index: 'RegisteredDate', editable: false, sorttype: 'string', width: '60px' },
+        { name: 'HandoverDate', index: 'HandoverDate', editable: false, sorttype: 'string', width: '60px' },
+        { name: 'chkContact', index: 'chkContact', editable: true, edittype: 'checkbox', align: 'center', width: '40px', editoptions: { value: "True:False" }, formatter: checkboxFomatter, formatoptions: { disabled: false } }
+    ];
+
+    $(document).ready(function () {
+        initForm();
+
+        $('#CallToDate').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly: true, endDate: "+0d" });
+        $('#CallFromDate').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly: true, endDate: "+0d" });
+        $('#HandoverToDate').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly: true, endDate: "+0d" });
+        $('#HandoverFromDate').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly: true, endDate: "+0d" });
+
+        $('#GroupId').change(function(e) {
+            loadUser();
+        });
+
+        $("#btnGoFilter").click(function (e) {
+            e.preventDefault();
+
+            // Param
+            var todayType = getTodayType();
+            var userIds = buildParamUsers();
+            var levelIds = buildParamLevels();
+            var statusMapId = $('#ddlStatusMap').val();
+            var statusCareId = $('#ddlStatusCare').val();
+            var day = $('#ddlDay').val(); if (day === undefined || day == 0) day = 0;
+            var callToDate = $('#CallToDate').val().replaceAll('/', '');
+            var callFromDate = $('#CallFromDate').val().replaceAll('/', '');
+            var handoverToDate = $('#HandoverToDate').val().replaceAll('/', '');
+            var handoverFromDate = $('#HandoverFromDate').val().replaceAll('/', '');
+            var sourceType = $("#TypeId").val();
+            // Format Url
+            var newUrl = '/' + url.format(userIds, levelIds, statusMapId, statusCareId, todayType, handoverFromDate, handoverToDate, callFromDate, callToDate, sourceType);
+
+            jQuery(grid_selector).jqGrid().setGridParam({ url: newUrl }).trigger("reloadGrid");
+        });
+        $("#btnSubmit").click(function (e) {
+            e.preventDefault();
+
+            var ids = '';
+            var items = $("#grid-table td input");
+            for (var i = 0; i < items.length; i++) {
+                if ($(items[i]).is(':checked')) {
+                    ids += ids.length == 0
+                        ? $('#grid-table').jqGrid('getCell', i + 1, 'Id')
+                        : ',' + $('#grid-table').jqGrid('getCell', i + 1, 'Id');
+                }
+            }
+            if (ids.length == 0) {
+                alertError('Bạn chưa chọn contact để thu hồi, vui lòng chọn!');
+                return;
+            }
+
+            var r = confirm("Có phải bạn muốn thu hồi contact đã chọn?");
+            if (r == true) {
+                $.ajax({
+                    type: 'POST',
+                    data: {
+                        ids: ids,
+                        employeeTypeId: employeeTypeId
+                    },
+                    url: '/admin/api/contact/recovery',
+                    success: function (response) {
+                        alertSuccess("Thu hồi thành công " + response + " contacts");
+                        $("#btnGoFilter").click();
+                    },
+                    error: function (request, status, ex) {
+                        alertError("Hệ thống bị lỗi, thu hồi không thành công.");
+                    }
+                });
+            }
+        });
+        $("#btnSubmitAll").click(function (e) {
+            e.preventDefault();
+
+            // Param
+            var todayType = getTodayType();
+            var userIds = buildParamUsers();
+            var levelIds = buildParamLevels();
+            var statusMapId = $('#ddlStatusMap').val();
+            var statusCareId = $('#ddlStatusCare').val();
+            var day = $('#ddlDay').val(); if (day === undefined || day == 0) day = 0;
+            //Thêm ngày 12/01/2016
+            var callToDate = $('#CallToDate').val().replaceAll('/', '');
+            var callFromDate = $('#CallFromDate').val().replaceAll('/', '');
+            var handoverToDate = $('#HandoverToDate').val().replaceAll('/', '');
+            var handoverFromDate = $('#HandoverFromDate').val().replaceAll('/', '');
+
+            var items = $("#grid-table td input");
+            if (items.length == 0) {
+                alertError('Bạn chưa lọc contact để thu hồi, vui lòng lọc!');
+                return;
+            }
+
+            var r = confirm("Có phải bạn muốn thu hồi toàn bộ contact?");
+            if (r == true) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/admin/api/contact/RecoveryAll',
+                    data: {
+                        day: day,
+                        userIds: userIds,
+                        levelIds: levelIds,
+                        todayType: todayType,
+                        statusMapId: statusMapId,
+                        statusCareId: statusCareId,
+                        employeeTypeId: employeeTypeId,
+                        callToDate: callToDate,
+                        callFromDate: callFromDate,
+                        handoverToDate: handoverToDate,
+                        handoverFromDate: handoverFromDate
+                    },
+                    beforeSend: function () {
+                        alertProcess();
+                    },
+                    success: function (response) {
+                        alertSuccess("Thu hồi thành công " + response + " contacts");
+                        $("#btnGoFilter").click();
+                    },
+                    error: function (request, status, ex) {
+                        alertError("Hệ thống bị lỗi, thu hồi không thành công.");
+                    }
+                });
+            }
+        });
+
+
+
+        $('#chkContactOld').change(function () {
+            var elements = document.getElementsByName('chkLevels');
+            for (var i = 0; i < elements.length; i++) {
+                $(elements[i]).prop('checked', $('#chkContactOld').is(":checked"));
+            }
+
+            if ($('#chkContactOld').is(":checked")) {
+                $('#divLevels').css('display', '');
+                $('#divCallDateRecently').css('display', '');
+            }
+            else {
+                $('#divLevels').css('display', 'none');
+                $('#divCallDateRecently').css('display', 'none');
+            }
+        });
+        $('#chkContactNew').change(function () {
+            var elements = document.getElementsByName('chkLevels');
+            for (var i = 0; i < elements.length; i++) {
+                $(elements[i]).prop('checked', $('#chkContactOld').is(":checked"));
+            }
+
+            if ($('#chkContactOld').is(":checked")) {
+                $('#divLevels').css('display', '');
+                //$('#divCallDateRecently').css('display', '');
+            }
+            else {
+                $('#divLevels').css('display', 'none');
+                //$('#divCallDateRecently').css('display', 'none');
+            }
+        });
+        $("#chkContacts").click(function () {
+            checkAll('chkContacts', 'checkbox');
+        });
+        $("#ddlStatusCare").change(function () {
+            loadStatusMap(employeeTypeId);
+        });
+    });
+    
+
+    function initForm() {
+        loadUser();
+        $('#ddlDay').val('7');
+        loadStatusMap(employeeTypeId);
+        setupGridWithoutEdit("#grid-table", "#grid-pager", '', '', "Id", "Danh sách Contact", heades, model);
+    }
+    
+    function loadUser() {
+        $('#divUser').html('');
+        var groupId = $('#GroupId').val();
+        $.ajax({
+            type: 'GET',
+            url: '/admin/api/user/GetNorms',
+            data: {
+                groupId: groupId,
+                employeeTypeId: employeeTypeId
+            },
+            success: function (data) {
+                if (data != null && data.length > 0) {
+                    var html = '<table border="1" class="table table-striped table-bordered table-hover" style="margin-bottom: 0; height: 250px; overflow-y: auto; display: block;">' +
+                        '<thead>' +
+                        '<tr>' +
+                        '<td class="col-sm-1" style="font-weight: bold">Nhóm</td>' +
+                        '<td class="col-sm-3" style="font-weight: bold">Họ và tên</td>' +
+                        '<td class="center col-sm-1" style="font-weight: bold">' +
+                        '<input type="checkbox" id="chkUsers" onclick="checkAll(\'chkUsers\', \'chkUser\')" /></td>' +
+                        '</tr>' +
+                        '</thead>' +
+                        '<tbody>';
+                    for (var i = 0; i < data.length; i++) {
+                        var item = data[i];
+                        html += '<tr>' +
+                            '<td class="col-sm-1"><label>' + item.GroupName + '</label></td>' +
+                            '<td class="col-sm-3"><label>' + item.FullName + '</label></td>' +
+                            '<td class="center col-sm-1"><input type="checkbox" name="chkUser" id="' + item.UserID + '_chkUser" /></td>' +
+                            '</tr>';
+                    }
+                    html += '</tbody></table>';
+                    $('#divUser').html(html);
+                }
+            }
+        });
+
+    }
+
+    $('#chkLevels').change(function () {
+        alert("test");
+        if ($('#chkLevels').is(':checked')) {
+            var elements = document.getElementsByName('chkLevels');
+            for (var i = 0; i < elements.length; i++) {
+                $(elements[i]).attr('checked', false);
+            }
+            var levelIds = $('#chkLevels').is(':checked') ? '' : buildParamLevels();
+
+        }
+    });
+    $('input[name="chkLevels"]').change(function () {
+        $('#chkLevels').attr('checked', false);
+        var levelIds = $('#chkLevels').is(':checked') ? '' : buildParamLevels();
+
+    });
+
+    function getTodayType() {
+        return $('#chkContactNew').is(':checked') ? '@((int)TodayType.New)' : '@((int)TodayType.Appointment)';
+    }
+</script>

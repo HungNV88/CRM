@@ -1,0 +1,178 @@
+﻿@using TamoCRM.Domain.UserRole
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+
+    // User
+    var users = ((List<UserInfo>)ViewBag.Users).Where(c => c.IsCollaborator).ToList();
+    if (users.Any())
+    {
+        users.Insert(0, new UserInfo { UserID = 0, FullName = "Tất cả" });
+    }
+    var lstUsers = new SelectList(users.Select(c => new { UserID = c.UserID, FullName = c.FullName }).Distinct(), "UserID", "FullName");
+
+    var lstCampains = new SelectList(ViewBag.Campains, "Id", "Name");
+    var lstAppointmentCallTypes = new SelectList(ViewBag.AppointmentCallTypes, "Id", "Name");
+}
+<link href="~/Scripts/autocomplete/jquery.scombobox.min.css" rel="stylesheet" />
+<script src="~/Scripts/autocomplete/jquery.scombobox.js"></script>
+
+<style type="text/css">
+    .acceptl1-table thead tr {
+        height: 47px;
+    }
+
+    .acceptl1-table tbody tr td {
+        vertical-align: middle !important;
+    }
+</style>
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        } catch (e) { }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Contact</a>
+        </li>
+        <li class="active">Danh sách Contact có hẹn</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>Danh sách Contact có hẹn						
+        </h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div id="spiner"></div>
+        </div>
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            @using (Ajax.BeginForm("FilterContactAppointment", "ContactFilter", new AjaxOptions { HttpMethod = "POST" }, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "frmAcceptContactL1" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="row" style="margin-left: 30px;">
+                    <div class="col-xs-1" style="width: 5%;">
+                        CTV
+                    </div>
+                    <div class="col-xs-3">
+                        <div class="clearfix">
+                            @Html.DropDownList("UserId", lstUsers, new { @style = "width: 100%" })
+                        </div>
+                    </div>
+                    <div class="col-xs-1">
+                        Trạng thái
+                    </div>
+                    <div class="col-xs-3">
+                        <div class="clearfix">
+                            @Html.DropDownList("AppointmentCallType", lstAppointmentCallTypes, new { @style = "width: 100%" })
+                        </div>
+                    </div>
+                    <div class="col-xs-1">
+                        Campain
+                    </div>
+                    <div class="col-xs-3">
+                        <div class="clearfix">
+                            @Html.DropDownList("CampainId", lstCampains, new { @style = "width: 100%" })
+                        </div>
+                    </div>
+                </div>
+                <div class="space-6"></div>
+                <div class="row" style="margin-left: 30px;">
+                    <div class="col-xs-1" style="width: 5%;">
+                        &nbsp;
+                    </div>
+                    <div class="col-xs-3">
+                        &nbsp;
+                    </div>
+                    <div class="col-xs-1" style="width: 8.5%;">
+                        Từ ngày
+                    </div>
+                    <div class="col-xs-3">
+                        <div class="clearfix">
+                            @Html.TextBox("StartDate", string.Empty, new { @style = "width: 100%" })
+                        </div>
+                    </div>
+                    <div class="col-xs-1" style="width: 8.5%;">
+                        Đến ngày
+                    </div>
+                    <div class="col-xs-3">
+                        <div class="clearfix">
+                            @Html.TextBox("EndDate", string.Empty, new { @style = "width: 95.5%" })
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="space-2"></div>
+                <button id="btnSubmit" class="btn-primary" style="margin-bottom: 10px; float: right;">Lọc Contact</button>
+                <div class="clearfix"></div>
+                <div class="space-4"></div>
+                <div class="row">
+                    <div class="col-xs-12">
+                        <table id="grid-table"></table>
+                        <div id="grid-pager"></div>
+                    </div>
+                </div>
+            }
+            <!-- PAGE CONTENT ENDS -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+
+<script type="text/javascript">
+    var url = 'admin/api/CollaboratorAppointment/FilterAppointment?collaboratorId={0}&statusAppointmentId={1}&campainId={2}&startDate={3}&endDate={4}';
+    var grid_selector = "#grid-table";
+    var heades = ['Id', 'Họ và tên', 'Level', 'Thời gian hẹn', 'Thời gian gọi', 'Nội dung cuộc gọi', 'Trạng thái nghiệm thu', 'Trạng thại gọi', 'Campain', 'CTV'];
+    var model = [
+        { name: 'Id', index: 'Id', editable: false, sorttype: 'string', editoptions: { disabled: true }, width: '0px' },
+        {
+            name: 'ContactName', index: 'ContactName', editable: false, width: '100px', align: 'center', formatter: "dynamicLink",
+            formatoptions: {
+                cellValue: function (cellValue, rowId, rowData, options) {
+                    return '<div style="color:#34810c;margin:5px;"><a href="/admin/contactlevelinfo/edit/' + rowData.ContactId + '">' + rowData.ContactName + '</a></div>';
+                }
+            }
+        },
+        { name: 'LevelId', index: 'LevelId', editable: false, width: '40px', sorttype: 'string', align: 'center', formatter: levelFomatter },
+        { name: 'AppointmentDate', index: 'AppointmentDate', editable: false, width: '70px', align: 'center', formatter: 'date', formatoptions: { srcformat: 'Y-m-dTH:i:s', newformat: 'd/m/Y H:i' } },
+        { name: 'CalledDate', index: 'CalledDate', editable: false, width: '70px', align: 'center', formatter: 'date', formatoptions: { srcformat: 'Y-m-dTH:i:s', newformat: 'd/m/Y H:i' } },
+        { name: 'Description', index: 'Description', editable: false, width: '150px', sorttype: 'string', align: 'left' },
+        { name: 'StatusMapDistributorId', StatusMapDistributorId: 'CallTime', editable: false, sorttype: 'string', width: '60px', formatter: statusMapFomatter },
+        { name: 'StatusAppointmentId', index: 'StatusAppointmentId', editable: false, width: '60px', formatter: statusCareFomatter },
+        { name: 'CampainId', index: 'CampainId', editable: false, width: '120px', formatter: statusCareFomatter },
+        { name: 'CollaboratorId', index: 'CollaboratorId', editable: false, width: '120px', formatter: userFomatter }
+    ];
+
+    $(document).ready(function () {
+        $('#CampainId').scombobox({ reassignId: false });
+        setupGridWithoutEdit("#grid-table", "#grid-pager", '', '', "Id", "Danh sách Contact có hẹn", heades, model);
+    });
+    
+    $("#btnSubmit").click(function (e) {
+        e.preventDefault();
+
+        // Param
+        var endDate = $('#EndDate').val();
+        var startDate = $('#StartDate').val();
+        var campainId = $('#CampainId').val();
+        var collaboratorId = $('#UserId').val();
+        var statusAppointmentId = $('#AppointmentCallType').val();
+
+        // Format Url
+        var newUrl = '/' + url.format(collaboratorId, statusAppointmentId, campainId, startDate, endDate);
+        jQuery(grid_selector).jqGrid().setGridParam({ url: newUrl }).trigger("reloadGrid");
+    });
+</script>
+

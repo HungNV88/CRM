@@ -1,0 +1,87 @@
+﻿@using TamoCRM.Core
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        } catch (e) { }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Lọc contact</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>Danh sách contacts L2 (Nguồn Collector)
+        </h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+
+            <table id="grid-table"></table>
+
+            <div id="grid-pager"></div>
+
+
+            <!-- PAGE CONTENT ENDS -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+<!-- /.page-content -->
+
+<!-- inline scripts related to this page -->
+
+<script type="text/javascript">
+    var grid_selector = "#grid-table";
+    var heades = ['Id', 'Họ tên', 'SĐT', 'Email', 'Trường tốt nghiệp', 'Ngành tốt nghiệp', 'Nơi sống', 'Đã đi làm', 'Đã từng học liên thông, ĐH, VB2', 'Trường đăng ký', 'Ngành đăng ký', 'Ngày đăng ký', 'Ghi chú', 'CTV gọi'];
+    var model = [
+        { name: 'Id', index: 'ContactId', editable: false, sorttype: 'string', editoptions: { disabled: true }, width: '0px' },
+        { name: 'Fullname', index: 'Fullname', editable: true, sorttype: 'string' },
+        { name: 'Mobile', index: 'Mobile', editable: false, sorttype: 'string' },
+        { name: 'Email', index: 'Email', editable: false, sorttype: 'string' },
+        { name: 'SchoolGrad', index: 'SchoolGrad', editable: false, sorttype: 'string' },
+        { name: 'MajorGrad', index: 'MajorGrad', editable: false, sorttype: 'string' },
+        { name: 'Address', index: 'Address', editable: true, sorttype: 'string', formatter: locationFomatter },
+        { name: 'HaveJob', index: 'HaveJob', editable: false, align: 'center', formatter: haveJobFormatter },
+        { name: 'HaveLearn', index: 'HaveLearn', editable: false, align: 'center', formatter: haveLearnFormatter },
+        { name: 'SchoolId', index: 'SchoolId', editable: true, sorttype: 'string', formatter: schoolFomatter },
+        { name: 'MajorId', index: 'MajorId', editable: true, sorttype: 'string', formatter: majorFomatter },
+        { name: 'RegisteredDate', index: 'RegisteredDate', editable: false, formatter: 'date', formatoptions: { newformat: 'd/m/Y' } },
+        { name: 'Notes', index: 'Notes', editable: true, sorttype: 'string' },
+        { name: 'CollaboratorName', index: 'CollaboratorName', editable: true, sorttype: 'string' }
+    ];
+    $(document).ready(function () {
+        setupGridWithoutEdit("#grid-table", "#grid-pager", "admin/contactfilter/GetForFilterTeam?branchId=@TamoCRM.Web.Framework.Users.UserContext.GetDefaultBranch()&collectorId=0&channelId=0&importId=0&levelId=@((int)LevelType.L2)&sourceTypeId=@TamoCRM.Domain.SourceTypes.SourceTypeIds.CC&schoolId=0&statusId=0", "", "ContactId", "Contacts", heades, model);
+        $(grid_selector).jqGrid("setGroupHeaders", {
+            useColSpanStyle: true,
+            groupHeaders: [
+                { startColumnName: "Fullname", numberOfColumns: 3, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;height:40px;"><b>Thông tin Contacts</b></td></tr></table>' },
+                { startColumnName: "SchoolGrad", numberOfColumns: 5, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;"><b>Thông tin Level 2</b></td></tr></table>' },
+                { startColumnName: "SchoolId", numberOfColumns: 4, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;"><b>Thông tin đăng ký học</b></td></tr></table>' }
+            ]
+        });
+        $("#btnSearch").click(function (e) {
+            e.preventDefault();
+            var newUrl = "/admin/contactfilter/GetForFilterTeam?branchId=@TamoCRM.Web.Framework.Users.UserContext.GetDefaultBranch()&collectorId=0&channelId=0&importId=0&levelId=@((int)LevelType.L2)&sourceTypeId=@TamoCRM.Domain.SourceTypes.SourceTypeIds.CC&schoolId=0&statusId=0";
+            jQuery(grid_selector).jqGrid().setGridParam({ url: newUrl }).trigger("reloadGrid");
+        });
+    });
+</script>
+

@@ -1,0 +1,88 @@
+﻿@using TamoCRM.Core
+@model TamoCRM.Web.Mvc.Areas.Admin.Models.Contacts.ContactCreateModel
+
+@{
+    ViewBag.Title = "Contact đã bị xóa";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        }
+        catch (e) {
+
+        }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Contact</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>@ViewBag.Title</h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            @using (Ajax.BeginForm("FilterContactDeleted", "Contact", new AjaxOptions { HttpMethod = "POST" }, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "filter_contact_duplicate_consultant" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <div class="col-sm-12" id="alert">
+                    </div>
+                </div>
+            }
+
+            <div class="space-6"></div>
+            <table id="grid-table"></table>
+            <div id="grid-pager"></div>
+
+            <!-- PAGE CONTENT ENDS -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+
+<script type="text/javascript">
+    var grid_selector = "#grid-table";
+    var employeeTypeId = '@((int)EmployeeType.Consultant)';
+    var url = 'admin/api/contact/FilterDeleted?employeeTypeId=' + employeeTypeId;
+    var heades = ['Id', 'Họ và tên', 'Level', 'Email', 'Điện thoại', 'Trạng thái chăm sóc', 'Người xóa', 'Ngày xóa', 'TVTS'];
+    var model = [
+        { name: 'Id', index: 'Id', editable: false, sorttype: 'string', editoptions: { disabled: true }, width: '0px' },
+        { name: 'FullName', index: 'FullName', editable: false, width: '90px', sorttype: 'string' },
+        { name: 'LevelName', index: 'LevelName', editable: false, width: '40px', sorttype: 'string', align: 'center', formatter: stringFormatter },
+        { name: 'Email', index: 'Email', editable: false, width: '70px', sorttype: 'string', align: 'center' },
+        { name: 'Mobile', index: 'Mobile', editable: false, width: '70px', sorttype: 'string', align: 'center' },
+        { name: 'StatusMapName', index: 'StatusMapName', editable: false, width: '100px', formatter: stringFormatter },
+        { name: 'DeletedName', index: 'DeletedTime', editable: false, width: '60px', align: 'center', formatter: stringFormatter },
+        { name: 'DeletedTime', index: 'DeletedTime', editable: false, width: '60px', align: 'center', formatter: stringFormatter },
+        { name: 'UserName', index: 'UserName', editable: false, width: '80px', sorttype: 'string' }
+    ];
+    $(document).ready(function () {
+        setupGridWithoutEdit("#grid-table", "#grid-pager", url, '', "Id", "Danh sách Contact bị xóa", heades, model);
+
+        $(grid_selector).jqGrid("setGroupHeaders", {
+            useColSpanStyle: true,
+            groupHeaders: [
+                { startColumnName: "Fullname", numberOfColumns: 4, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;height:40px;"><b>Thông tin Contact</b></td></tr></table>' },
+                { startColumnName: "DeletedBy", numberOfColumns: 2, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;"><b>Thông tin xóa</b></td></tr></table>' }
+            ]
+        });
+    });
+</script>

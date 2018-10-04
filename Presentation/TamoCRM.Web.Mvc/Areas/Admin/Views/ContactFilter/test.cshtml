@@ -1,0 +1,56 @@
+﻿@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        } catch (e) { }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Kiểu nguồn</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>
+            Danh sách contact
+        </h1>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <table id="grid-table"></table>
+            <div id="grid-pager"></div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var grid_selector = "#grid-table";
+    var heades = ['ContactId', 'Tên', 'Email'];
+    var model = [          
+			{ name: 'Id', index: 'Id', editable: true, sorttype: 'int', editoptions: { disabled: 'true', width: 50 }, width: 50 },
+			{ name: 'Fullname', index: 'Fullname', editable: true, sorttype: 'string' },
+			{ name: 'Email', index: 'Email', editable: true, sorttype: 'string' },
+			//{ name: 'Description', index: 'Description', editable: true, sorttype: 'string' },
+            //{ name: 'IsCheckDuplicate', index: 'IsCheckDuplicate', editable: true, edittype: 'checkbox', editoptions: { value: "True:False" }, formatter: "checkbox" },
+            //{ name: 'IsCheckUpdate', index: 'IsCheckUpdate', editable: true, edittype: 'checkbox', editoptions: { value: "True:False" }, formatter: "checkbox" },
+            //{ name: 'IsShowHotLine', index: 'IsShowHotLine', editable: true, edittype: 'checkbox', editoptions: { value: "True:False" }, formatter: "checkbox" },
+            //{ name: 'IsShowConsultant', index: 'IsShowConsultant', editable: true, edittype: 'checkbox', editoptions: { value: "True:False" }, formatter: "checkbox" }
+    ];
+    $(document).ready(function () {
+        setupGrid("#grid-table", "#grid-pager", "admin/api/sourcetype/getTest", "admin/api/sourcetype/edit", "SourceTypeId", "Danh sách", heades, model);
+    });
+</script>

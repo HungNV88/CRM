@@ -1,0 +1,35 @@
+﻿@{
+}
+<li class="light-blue" id="li-countdulicate" style="border: none; margin-left: 0px; ">
+    <a href="/Admin/ContactFilter/FilterContactDuplicateConsultant">
+        <i id="icon-dulicatecontacts" class=""></i>Trùng
+        <span id="lblAmountCount" class="badge badge-important"></span>
+    </a>
+</li>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#li-countdulicate').css('display', 'none');
+        $.ajax({
+            type: 'GET',
+            url: "/admin/api/Contact/GetCountContactDulicate",
+            success: function (data) {
+                if (data != null) {
+                    $('#lblAmountCount').html(data);
+                    $('#lblMessageDulicateCts').html(data);
+                    $('#li-countdulicate').css('display', 'block');
+                } else {
+                    $('#lblAmountCount').html('');
+                    $('#notify-content').html('');
+                    $('#li-countdulicate').css('display', 'none');
+                }
+            },
+            error: function (request, status, ex) {
+                $('#lblAmountCount').html('');
+                $('#notify-content').html('');
+                $('#li-countdulicate').css('display', 'none');
+            }
+        });
+    });
+</script>
+
+

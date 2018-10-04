@@ -1,0 +1,67 @@
+﻿@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        } catch (e) { }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">LandingPage</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>Quản lý LandingPage							
+        </h1>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <table id="grid-table"></table>
+            <div id="grid-pager"></div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var grid_pager = "#grid-pager";
+    var grid_selector = "#grid-table";
+    var heades = ['Thao tác', 'Id', 'Tên'];
+    var model = [
+            {
+                name: 'act', index: '', width: 80, fixed: true, sortable: false, resize: false,
+                formatter: 'actions',
+                formatoptions: {
+                    keys: true,
+                    delOptions: {
+                        recreateForm: true, beforeShowForm: beforeDeleteCallback, delData: {
+                            Id: function () {
+                                var sel_id = $(grid_selector).jqGrid('getGridParam', 'selrow');
+                                var value = $(grid_selector).jqGrid('getCell', sel_id, 'Id');
+                                return value;
+
+                            }
+                        }
+                    },
+                }
+            },
+			{ name: 'Id', index: 'Id', width: '0px', editable: true, sorttype: 'int', editoptions: { disabled: 'false' } },           
+			{ name: 'Name', index: 'Name', editable: true, sorttype: 'string', align: 'left' }
+    ];
+
+    $(document).ready(function () {
+        setupGrid(grid_selector, grid_pager, "admin/api/LandingPage/Get", "admin/api/LandingPage/Edit", "Id", "Danh sách LandingPage", heades, model);
+    });
+</script>

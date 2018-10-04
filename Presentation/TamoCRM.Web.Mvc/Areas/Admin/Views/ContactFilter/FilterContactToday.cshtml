@@ -1,0 +1,458 @@
+﻿@using TamoCRM.Core
+@using TamoCRM.Core.Commons.Utilities
+@using TamoCRM.Domain.Levels
+@using TamoCRM.Web.Framework.Users
+
+@model TamoCRM.Web.Mvc.Areas.Admin.Models.Contacts.ContactCreateModel
+
+@{
+    ViewBag.Title = "Lịch làm việc";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+
+    var lstLevels = ViewBag.Levels;
+    var lstLableLevels = (List<LevelInfo>)ViewBag.LevelWithContactCount;
+}
+
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        }
+        catch (e) {
+
+        }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Contact</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>Lịch làm việc</h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            @using (Ajax.BeginForm("FilterContactToday", "Contact", new AjaxOptions { HttpMethod = "POST" }, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "filter_contact_today_form" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <div class="col-sm-12" id="alert">
+                    </div>
+                </div>
+                <hr />
+                <div id="wait" style="position:absolute;left:50%;"><img src='http://www.w3schools.com/jquery/demo_wait.gif' width="64" height="64" /><br>Hệ thống đang tính toán, vui lòng chờ..</div>
+                <div class="row" style="text-align: center; margin: 0 1px;" id="divStatictsToday"></div>
+               
+                @*<button id="showTodo">Hiển thị lịch làm việc</button>*@
+
+                <hr />
+                <div class="row">
+                    <div class="col-sm-3" style="font-weight: bold;">
+                        Ngày hẹn
+                    </div>
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-8" style="font-weight: bold;">
+                        Điều kiện lọc
+                    </div>
+                </div>
+                <div class="space-4"></div>
+                <div class="row">
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <div class="col-sm-4">Từ ngày</div>
+                            <div class="col-sm-6">
+                                <input id="FromDate" name="FromDate" type="text" value="@DateTime.Now.ToString("dd/MM/yyyy")">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-4">Đến ngày</div>
+                            <div class="col-sm-6">
+                                <input id="ToDate" name="ToDate" type="text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-8">
+                        <div style="border: 1px solid #c5d0dc; padding: 6px 0 6px 20px;">
+                            <div class="form-group" style="margin-bottom: 5px;">
+                                <div class="col-sm-2">
+                                    <input type="radio" id="rdbAll" name="pkfrom" checked />
+                                    <label for="rdbAll">Tất cả</label>
+                                </div>
+                                <div class="col-sm-2">
+                                    <input type="radio" id="rdbNew" name="pkfrom" />
+                                    <label for="rdbNew">Mới</label>
+                                </div>
+                                <div class="col-sm-2">
+                                    <input type="radio" id="rdbAppointment" name="pkfrom" />
+                                    <label for="rdbAppointment">Có hẹn</label>
+                                </div>
+                            </div>
+                            <div id="divLevels" class="form-group" style="margin-bottom: 0; display: none;">
+                                @foreach (var item in lstLevels)
+                                {
+                                    <div class="col-sm-1" style="width: 10%;">
+                                        <input type="checkbox" name='@(item.LevelId)_chkLevel' id='@(item.LevelId)_chkLevel' />
+                                        <label for="@(item.LevelId)_chkLevel">@item.Name</label>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="row">
+                    <div class="col-sm-1">
+                        <label class="bolder">Level</label>
+                    </div>
+                    <div class="col-sm-1" style="width: 11%;">
+                        <label>Tất cả (@lstLableLevels.Sum(c => c.ContactCount))</label>
+                    </div>
+                    @foreach (var item in lstLableLevels)
+                    {
+                        <div class="col-sm-1" style="width: 8.6%;">
+                            <label id=@item.Name style="cursor: pointer">@item.Name (<a>@item.ContactCount</a>)</label>
+                        </div>
+                    }
+                </div>
+            }
+
+            <div class="space-6"></div>
+            <button id="btnGoFilter" class="btn-primary" style="float: right; width: 100px;">Lọc Contact</button>
+            <div class="clearfix"></div>
+
+            <div class="space-6"></div>
+            <table id="grid-table"></table>
+            <div id="grid-pager"></div>
+
+            <!-- PAGE CONTENT ENDS -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+
+<script type="text/javascript">
+    var employeeTypeId = '@((int)EmployeeType.Consultant)';
+    var url = 'admin/api/contact/filtertoday?from={0}&to={1}&type={2}&levels={3}&employeeTypeId=' + employeeTypeId;
+    var grid_selector = "#grid-table";
+    var heades = ['Id', 'Họ và tên', 'Level', 'Email', 'Điện thoại', 'Ngày', 'Sáng/Chiều', 'Giờ', 'Nội dung cuộc gọi gần nhất', 'Ngày gọi', 'Trạng thái chăm sóc', 'Tổng số cuộc gọi', 'Chức năng'];
+    var model = [
+        { name: 'Id', index: 'Id', editable: false, sorttype: 'string', editoptions: { disabled: true }, width: '0px' },
+        { name: 'Fullname', index: 'Fullname', editable: false, width: '90px', sorttype: 'string' },
+        { name: 'LevelId', index: 'LevelId', editable: false, width: '40px', sorttype: 'string', align: 'center', formatter: levelFomatter },
+        { name: 'Email', index: 'Email', editable: false, width: '140px', sorttype: 'string', align: 'center' },
+        { name: 'Mobile1', index: 'Mobile1', editable: false, width: '80px', sorttype: 'string', align: 'center' },
+        { name: 'AppointmentConsultantDate', index: 'AppointmentConsultantDate', editable: false, width: '80px', align: 'center', formatter: 'date', formatoptions: { srcformat: 'Y-m-dTH:i:s', newformat: 'd/m/Y' } },
+        { name: 'AppointmentConsultantAmPm', index: 'AppointmentConsultantAmPm', editable: false, width: '50px', align: 'center', formatter: stringFormatter },
+        { name: 'AppointmentConsultantTimeString', index: 'AppointmentConsultantTimeString', editable: false, width: '40px', align: 'center', formatter: stringFormatter },
+        { name: 'CallInfoConsultant', index: 'CallInfoConsultant', editable: false, width: '180px', sorttype: 'string', align: 'left' },
+        { name: 'CallConsultantDate', index: 'CallConsultantDate', editable: false, width: '70px', align: 'center', formatter: 'date', formatoptions: { srcformat: 'Y-m-dTH:i:s', newformat: 'd/m/Y' } },
+        { name: 'StatusCareConsultantId', index: 'StatusCareConsultantId', editable: false, width: '120px', formatter: statusCareFomatter },
+        { name: 'CallAmount', index: 'CallAmount', editable: false, width: '40px', align: 'center' },
+        {
+            name: 'Function', index: 'Function', editable: false, width: '40px', align: 'center', formatter: "dynamicLink",
+            formatoptions: {
+                cellValue: function (cellValue, rowId, rowData, options) {
+                    var groupType = '@ViewBag.GroupType';
+                    if (groupType == '@((int)GroupConsultantType.ManagerConsultant)') {
+                        return '<div style="color:#34810c;margin:5px; float:left;"><a style="cursor: pointer;" onclick="return openDialog(' + rowData.Id + ')"><img style="width:16px; height:16px;" src="../../../../Images/edit-16.png"/></a></div>';
+                            //'<div style="color:#34810c;margin:5px; float:left;"><a href="" onclick="return deleteClick(' + rowData.Id + ');">   <img style="width:16px; height:16px;" src="../../../../Images/delete-16.png"/></a></div>' +
+                            //'<div style="clear: both;"></div>';
+                    } else {
+                        return '<div style="color:#34810c;margin:5px;"><a style="cursor: pointer;" onclick="return openDialog(' + rowData.Id + ')"><img style="width:16px; height:16px;" src="../../../../Images/edit-16.png"/></a></div>';
+                    }
+                }
+            }
+        }
+    ];
+
+        function deleteClick(id) {
+            var r = confirm("Có phải bạn muốn xóa contact này?");
+            if (r == true) {
+                var newUrl = "/admin/api/contact/delete/{0}".format(id);
+                $.ajax({
+                    type: 'GET',
+                    url: newUrl,
+                    success: function (data) {
+                        jQuery(grid_selector).jqGrid().trigger("reloadGrid");
+                    },
+                    error: function (request, status, ex) {
+                        alertError("Xóa contact không thành công.");
+                    }
+                });
+            }
+            return false;
+        }
+        $(document).ready(function () {
+            $("#ToDate").datepicker({ format: 'dd/mm/yyyy', autoclose: true });
+            $("#FromDate").datepicker({ format: 'dd/mm/yyyy', autoclose: true });
+            var newUrl = url.format('', '', '@((int)TodayType.NewAndAppointment)', '');
+            loadStatictsToday();
+
+            setupGridWithHeight("#grid-table", "#grid-pager", newUrl, "admin/api/contact/edit", "Id", "Danh sách Contact", heades, model, 'GET', '100%');
+            $(grid_selector).jqGrid("setGroupHeaders", {
+                useColSpanStyle: true,
+                groupHeaders: [
+                    { startColumnName: "Fullname", numberOfColumns: 4, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;height:40px;"><b>Thông tin Contact</b></td></tr></table>' },
+                    { startColumnName: "AppointmentConsultantDate", numberOfColumns: 3, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;"><b>Thông tin lịch hẹn gọi lại</b></td></tr></table>' },
+                    { startColumnName: "CallInfoConsultant", numberOfColumns: 2, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;"><b>Tình trạng chăm sóc</b></td></tr></table>' }
+                ]
+            });
+
+            $.ajax({
+                url: '/admin/LogLoad/SaveEndLoadDashBoard',
+                type: 'GET',
+                data: {
+                    time: Date.now,
+                    contactid: 0,
+                    name: "END_LOAD_LICH_LAM_VIEC_TVTS",
+                    createdby: '@ViewBag.UserId',
+                    timebegin: '@ViewBag.TimeBegin',
+                    session: '@ViewBag.SessionLog',
+
+                },
+                success: function () {
+
+                }
+            });
+
+            //$("#showTodo").click(function (e) {
+            //    e.preventDefault();
+            //    $("#wait").css("display", "");
+            //    loadStatictsToday();
+            //    $("#showTodo").hide();
+            //});
+
+            $("#btnGoFilter").click(function (e) {           
+                e.preventDefault();
+                // Param
+                var fromDate = $('#FromDate').val() === undefined ? '' : $('#FromDate').val().replaceAll('/', '');
+                var toDate = $('#ToDate').val() === undefined ? '' : $('#ToDate').val().replaceAll('/', '');
+                var todayType = $('#rdbAll').is(':checked') ? '@((int)TodayType.All)' : $('#rdbNew').is(':checked') ? '@((int)TodayType.New)' : '@((int)TodayType.Appointment)';
+                var levels = todayType == '@((int)TodayType.Appointment)' ? buildParamLevels() : '';
+                var check = 1;
+                // Format Url
+                var newUrl = '/' + url.format(fromDate, toDate, todayType, levels);
+                jQuery(grid_selector).jqGrid().setGridParam({ url: newUrl, page: 1 }).trigger("reloadGrid");
+            });
+
+            $('#aExists').click(function (e) {
+                $('#rdbAll').click();
+                
+                var fromDate = '@DateTime.Now.AddMonths(-1).AddDays(-1).ToString("dd/MM/yyyy")';
+                $('#FromDate').val(fromDate);
+
+                var toDate = '@DateTime.Now.Date.AddSeconds(-1).ToString("dd/MM/yyyy")';
+                $('#ToDate').val(toDate);
+                
+                // Format Url
+                var newUrl = '/admin/api/contact/FilterTodayOneMonth?employeeTypeId=' + employeeTypeId;
+               
+                jQuery(grid_selector).jqGrid().setGridParam({ url: newUrl,page: 1 }).trigger("reloadGrid");
+                
+            });
+
+            $('#L1').click(function (e) {
+                LoadListContactById(1);
+            });
+            $('#L2').click(function (e) {
+                LoadListContactById(2);
+            });
+            $('#L3').click(function (e) {
+                LoadListContactById(3);
+            });
+            $('#L4').click(function (e) {
+                LoadListContactById(4);
+            });
+            $('#L5').click(function (e) {
+                LoadListContactById(5);
+            });
+            $('#L6').click(function (e) {
+                LoadListContactById(6);
+            });
+            $('#L7').click(function (e) {
+                LoadListContactById(7);
+            });
+            $('#L8').click(function (e) {
+                LoadListContactById(8);
+            });
+               
+            function LoadListContactById(level)
+            {
+                // Param
+                var levels = level;
+                var date = '@DateTime.Now.ToString("dd/MM/yyyy")';
+                var todayType = '@((int)TodayType.AllByLevels)';
+
+                $('#rdbAll').click();             
+
+                // Param
+                var toDate = '';
+                var fromDate = '';
+
+                // Format Url
+                var newUrl = '/' + url.format(fromDate, toDate, todayType, levels);
+                jQuery(grid_selector).jqGrid().setGridParam({ url: newUrl, page: 1 }).trigger("reloadGrid");
+            }
+
+            $('#aNotComplete').click(function (e) {
+                
+                // Param
+                var levels = '';
+                var date = '@DateTime.Now.ToString("dd/MM/yyyy")';
+                var todayType = '@((int)TodayType.NewAndAppointment)';
+
+                $('#rdbAll').click();
+                $('#ToDate').val(date);
+                $('#FromDate').val(date);
+
+                // Param
+                var toDate = date.replaceAll('/', '');
+                var fromDate = date.replaceAll('/', '');
+                
+                // Format Url
+                var newUrl = '/' + url.format(fromDate, toDate, todayType, levels);
+                jQuery(grid_selector).jqGrid().setGridParam({ url: newUrl, page: 1}).trigger("reloadGrid");
+            });
+            $("#rdbNew").click(function (e) {
+                $('#divLevels').css('display', 'none');
+            });
+            $("#rdbAll").click(function (e) {
+                $('#divLevels').css('display', 'none');
+                
+            });
+            $("#rdbAppointment").click(function (e) {
+                $('#divLevels').css('display', '');             
+            });
+        });
+
+        function loadStatictsToday() {
+            $('#divStatictsToday').html('');
+            //var userIds = $('#UserId').val();
+            var userIds = parseInt(@UserContext.GetCurrentUser().UserID.ToString());
+            if (userIds == 0) userIds = $('#GroupId').val() != 0 ? getIds('UserId') : '';
+            $.ajax({
+                type: 'GET',
+                url: '/admin/api/contact/FilterStatictsToday',
+                data: {
+                    userIds: userIds,
+                    employeeTypeId: employeeTypeId,
+                },
+                beforeSend: function()
+                {
+                    
+                },
+                success: function (data) {
+                    
+                    var html = '';
+                    html += '<table style="width: 100%; border: 1px solid #eee; border-collapse: collapse;" border="1">' +
+                        '<tr style="height: 35px;">' +
+                        '<td rowspan="4" style="text-align: center; width: 20%; font-weight: bold;">Khối lượng công việc</td>' +
+                        '<td rowspan="2" style="text-align: center; width: 16%; font-weight: bold;">Số lượng phải gọi</td>' +
+                        '<td colspan="2" style="text-align: center; width: 16%; font-weight: bold;">Số lượng đã gọi</td>' +
+                        '<td rowspan="2" style="text-align: center; width: 16%; font-weight: bold;">Số lượng chưa gọi</td>' +
+                        '<td rowspan="2" style="text-align: center; width: 16%; font-weight: bold;">Số lượng tồn trước đó</td>' +
+                        '</tr>' +
+                        '<tr style="height: 30px;">' +
+                        '<td style="text-align: center; font-weight: bold; color: darkslategrey;">Trong lịch</td>' +
+                        '<td style="text-align: center; font-weight: bold; color: darkslategrey;">Ngoài lịch</td>' +
+                        '</tr>' +
+                        '<tr>' +
+                        '<td style="text-align: center; width: 16%;">(1)</td>' +
+                        '<td style="text-align: center; width: 16%;">(2)</td>' +
+                        '<td style="text-align: center; width: 16%;">(3)</td>' +
+                        '<td style="text-align: center; width: 16%;">(4) = (1) - (2)</td>' +
+                        '<td style="text-align: center; width: 16%;">(5)</td>' +
+                        '</tr>' +
+                        '<tr>' +
+                        '<td style="text-align: center; font-weight: bold; color: darkslategrey;">' +
+                        '<h3>' + data.HandoverCount + '</h3>' +
+                        '</td>' +
+                        '<td style="text-align: center; font-weight: bold; color: darkslategrey;">' +
+                        '<h3>' + (parseInt(data.HandoverCount) - parseInt(data.NotCompleteCount)).toString() + '</h3>' +
+                        '</td>' +
+                        '<td style="text-align: center; font-weight: bold; color: darkslategrey;">' +
+                        '<h3>' + data.CompleteOutCount + '</h3>' +
+                        '</td>' +
+                        '<td style="text-align: center; font-weight: bold; color: darkslategrey;">' +
+                        '<h3><a id="aNotComplete" style="cursor: pointer;">' + data.NotCompleteCount + '</a></h3>' +
+                        '</td>' +
+                        '<td style="text-align: center; font-weight: bold; color: darkslategrey;">' +
+                        '<h3><a id="aExists" style="cursor: pointer;">' + data.TotalExists + '</a></h3>' +
+                        '</td>' +
+                        '</tr>' +
+                        '</table>';
+
+                    $("#wait").css("display", "none");
+
+                    $('#divStatictsToday').html(html);
+
+                    $('#aExists').click(function (e) {
+                        $('#rdbAll').click();
+
+                        var fromDate = '@DateTime.Now.AddMonths(-1).AddDays(-1).ToString("dd/MM/yyyy")';
+                        $('#FromDate').val(fromDate);
+
+                        var toDate = '@DateTime.Now.Date.AddSeconds(-1).ToString("dd/MM/yyyy")';
+                        $('#ToDate').val(toDate);
+
+                        //var userIds = $('#UserId').val();
+                        if (userIds == 0) userIds = $('#GroupId').val() != 0 ? getIds('UserId') : '';
+
+                        // Format Url
+                        var newUrl = '/admin/api/contact/FilterTodayOneMonthManager?userIds=' + userIds + '&employeeTypeId=' + employeeTypeId;
+                        jQuery(grid_selector).jqGrid().setGridParam({ url: newUrl, page: 1 }).trigger("reloadGrid");
+                    });
+
+                    $('#aNotComplete').click(function (e) {
+                        // Param
+                        var levels = '';
+                        var date = '@DateTime.Now.ToString("dd/MM/yyyy")';
+                        var todayType = '@((int)TodayType.NewAndAppointment)';
+
+                        $('#rdbAll').click();
+                        $('#ToDate').val(date);
+                        $('#FromDate').val(date);
+                        reloadGrid(todayType, levels);
+                    });
+                },
+                error: function (request, status, ex) {
+                    $("#wait").css("display", "none");
+                    alertError("Chức năng Lịch làm việc đang bị quá tải truy cập. BẠN HÃY SỬ DỤNG CHỨC NĂNG Danh sách Contact để thay thế tạm thời.");
+                }
+            });
+        }
+
+    function reloadGrid(todayType, levels) {
+        if (todayType == null)
+            todayType = $('#rdbAll').is(':checked') ? '@((int)TodayType.All)' : $('#rdbNew').is(':checked') ? '@((int)TodayType.New)' : '@((int)TodayType.Appointment)';
+
+        // Param
+        var fromDate = $('#FromDate').val() === undefined ? '' : $('#FromDate').val().replaceAll('/', '');
+        var toDate = $('#ToDate').val() === undefined ? '' : $('#ToDate').val().replaceAll('/', '');
+        if (levels == null)
+            levels = todayType == '@((int)TodayType.Appointment)' ? buildParamLevels() : '';
+        var userIds = $('#UserId').val();
+
+        if (userIds == 0) userIds = $('#GroupId').val() != 0 ? getIds('UserId') : '';
+
+        // Format Url
+        var newUrl = '/' + url.format(fromDate, toDate, todayType, levels, userIds);
+
+        jQuery(grid_selector).jqGrid().setGridParam({ url: newUrl }).trigger("reloadGrid");
+    }
+</script>

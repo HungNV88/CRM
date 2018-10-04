@@ -1,0 +1,295 @@
+﻿@using TamoCRM.Core
+@using TamoCRM.Domain.Channels
+@using TamoCRM.Domain.ImportExcels
+@using TamoCRM.Domain.Schools
+@using TamoCRM.Web.Framework
+@model TamoCRM.Web.Mvc.Areas.Admin.Models.Contacts.ContactCreateModel
+
+@{
+    ViewBag.Title = "Danh sách contact cho đội nhập";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+
+    var channels = ViewBag.ChannelCCs;
+    ((List<ChannelInfo>)channels).RemoveAll(c => c.ChannelId == 0);
+    ((List<ChannelInfo>)channels).Insert(0, new ChannelInfo { ChannelId = 0, Name = "Tất cả" });
+    var lstChannels = new SelectList(channels, "ChannelId", "Name");
+
+    var importExcels = ViewBag.ImportExcels;
+    ((List<ImportExcelInfo>)importExcels).RemoveAll(c => c.ImportId == 0);
+    ((List<ImportExcelInfo>)importExcels).Insert(0, new ImportExcelInfo { ImportId = 0, FilePath = "Tất cả" });
+    var lstImportExcels = new SelectList(importExcels, "ImportId", "FilePath");
+
+    var schools = ViewBag.Schools;
+    ((List<SchoolInfo>)schools).RemoveAll(c => c.SchoolId == 0);
+    ((List<SchoolInfo>)schools).Insert(0, new SchoolInfo { SchoolId = 0, Name = "Tất cả" });
+    var lstSchools = new SelectList(schools, "SchoolId", "Name");
+
+    var lstStatusConnectTypes = new SelectList(ViewBag.StatusConnectTypes, "Id", "Name");
+    var lstStatusReturns = StoreData.ListStatusMap
+        .Where(c => c.LevelId == (int) LevelType.L1)
+        .Where(c => c.StatusMapType == (int) EmployeeType.Consultant)
+        .Where(c => c.StatusCareId == (int) StatusCareType.DontCall || c.StatusCareId == (int) StatusCareType.ContinueCareTime);
+    
+}
+<link href="~/Scripts/autocomplete/jquery.scombobox.min.css" rel="stylesheet" />
+<script src="~/Scripts/autocomplete/jquery.scombobox.js"></script>
+
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        }
+        catch (e) {
+
+        }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Danh sách contact</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>Danh sách contact cho đội nhập</h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            @using (Ajax.BeginForm("FilterContactForImporter", "Contact", new AjaxOptions { HttpMethod = "GET" }, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "filter_contact_recovery_form" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <div class="col-sm-12" id="alert">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-1" style="width: 5%;">
+                        Gói
+                    </div>
+                    <div class="col-xs-3">
+                        <div class="clearfix">
+                            @Html.DropDownList("ImportId", lstImportExcels, new { @style = "width: 220px" })
+                        </div>
+                    </div>
+                    <div class="col-xs-1" style="width: 13%;">
+                        Ngày Import
+                    </div>
+                    <div class="col-xs-3">
+                        <div class="clearfix">
+                            @Html.TextBox("StartImportDate", string.Empty, new { @style = "width: 100%" })
+                        </div>
+                    </div>
+                    <div class="col-xs-1" style="width: 10%;">
+                        Đến ngày
+                    </div>
+                    <div class="col-xs-2">
+                        <div class="clearfix">
+                            @Html.TextBox("EndImportDate", string.Empty, new { @style = "width: 100%" })
+                        </div>
+                    </div>
+                </div>
+                <div class="space-6"></div>
+                <div class="row">
+                    <div class="col-xs-1" style="width: 5%;">
+                        Kênh
+                    </div>
+                    <div class="col-xs-3">
+                        <div class="clearfix">
+                            @Html.DropDownList("ChannelId", lstChannels, new { @style = "width: 220px" })
+                        </div>
+                    </div>
+                    <div class="col-xs-1" style="width: 13%;">
+                        Ngày thu thập
+                    </div>
+                    <div class="col-xs-3">
+                        <div class="clearfix">
+                            @Html.TextBox("StartRegisterDate", string.Empty, new { @style = "width: 100%" })
+                        </div>
+                    </div>
+                    <div class="col-xs-1" style="width: 10%;">
+                        Đến ngày
+                    </div>
+                    <div class="col-xs-2">
+                        <div class="clearfix">
+                            @Html.TextBox("EndRegisterDate", string.Empty, new { @style = "width: 100%" })
+                        </div>
+                    </div>
+                </div>
+                <div class="space-6"></div>
+                <div class="row">
+                    <div class="col-xs-1" style="width: 5%;">
+                        Trường
+                    </div>
+                    <div class="col-xs-3">
+                        <div class="clearfix">
+                            @Html.DropDownList("SchoolId", lstSchools, new { @style = "width: 220px" })
+                        </div>
+                    </div>
+                    <div class="col-xs-1" style="width: 13%;">
+                        Trạng thái kết nối
+                    </div>
+                    <div class="col-xs-3">
+                        <div class="clearfix">
+                            @Html.DropDownList("ConnectStatus", lstStatusConnectTypes, new { @style = "width: 100%" })
+                        </div>
+                    </div>
+                    <div class="col-xs-1" style="width: 10%;">
+                        Loại contact
+                    </div>
+                    <div class="col-xs-2">
+                        <input type="radio" name="TodayType" value="@((int)TodayType.New)" id="rdbNew">
+                        Mới&nbsp;&nbsp;
+                        <input type="radio" name="TodayType" value="@((int)TodayType.Appointment)" id="rdbReuse">
+                        Tái sử dụng
+                    </div>
+                </div>
+                <div class="space-6"></div>
+                <div class="row" id="divReuse">
+                    <div class="col-xs-2" style="width: 18%;">
+                        &nbsp;
+                    </div>
+                    <div class="col-xs-6">
+                        &nbsp;
+                    </div>
+                    <div class="col-xs-3" style="border: 1px solid #ccc; margin-left: 5px; padding-top: 5px;">
+                        @foreach (var item in lstStatusReturns)
+                        {
+                            <div class="col-sm-6">
+                                <input type="checkbox" name='chkchkStatusReuses' id='@(item.Id)_chkStatusReuse' value="@item.Id" />
+                                @if (item.Name.ToLower() == "không đúng đối tượng")
+                                {
+                                    <label for="@(item.Id)_chkStatusReuse">KĐĐT</label>
+                                }
+                                else
+                                {
+                                    <label for="@(item.Id)_chkStatusReuse">@item.Name</label>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="space-2"></div>
+                <hr />
+                <div class="space-2"></div>
+                <button id="btnFilterContact" class="btn-primary" style="margin-bottom: 10px; float: right;">Lọc Contact</button>
+                <div class="clearfix"></div>
+                <div class="space-4"></div>
+                <div class="row">
+                    <div class="col-xs-12">
+                        <table id="grid-table"></table>
+                        <div id="grid-pager"></div>
+                    </div>
+                </div>
+            }
+
+            <!-- PAGE CONTENT ENDS -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+
+<script type="text/javascript">
+    var url = 'admin/api/contact/FilterForCollaborator';
+    var grid_selector = "#grid-table";
+    var heades = ['Id', 'Họ và tên', 'SĐT', 'Email', 'Trường tốt nghiệp', 'Ngành đăng ký', 'Level', 'Nơi sống', 'Trường', 'Kênh', 'Ghi chú', 'Ngày Import'];
+    var model = [
+        { name: 'Id', index: 'Id', editable: false, sorttype: 'string', width: '0px' },
+        { name: 'Fullname', index: 'Fullname', editable: false, sorttype: 'string', width: '70px' },
+        { name: 'Mobile', index: 'Mobile', editable: false, sorttype: 'string', width: '70px' },
+        { name: 'Email', index: 'Email', editable: false, sorttype: 'string', width: '70px' },
+        { name: 'SchoolName', index: 'SchoolName', editable: false, sorttype: 'string', width: '70px', formatter: schoolFomatter },
+        { name: 'MajorId', index: 'MajorName', editable: false, sorttype: 'string', width: '70px', formatter: majorFomatter },
+        { name: 'LevelId', index: 'Level', editable: false, sorttype: 'string', width: '50px', formatter: levelFomatter },
+        { name: 'LocationName', index: 'LocationName', editable: false, sorttype: 'string', width: '70px' },
+        { name: 'SchoolId', index: 'School', editable: false, sorttype: 'string', width: '60px', formatter: schoolFomatter },
+        { name: 'ChannelId', index: 'ChannelName', editable: false, sorttype: 'string', width: '70px', formatter: channelFomatter },
+        { name: 'Notes', index: 'Notes', editable: false, sorttype: 'string', width: '100px' },
+        { name: 'ImportedDate', index: 'ImportedDate', editable: false, sorttype: 'string', width: '70px', formatter: 'date', formatoptions: { srcformat: 'Y-m-dTH:i:s', newformat: 'd/m/Y' } }
+    ];
+
+    $(document).ready(function () {
+        $('#ImportId').chosen(); 
+        $('#SchoolId').chosen();
+        $('#ChannelId').chosen();
+        $('#rdbNew').prop('checked', true);
+        $('#divReuse').css('display', 'none');
+        $(".chzn-select-deselect").chosen({ allow_single_deselect: true });
+        $('#EndImportDate').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly: true, endDate: "+0d" });
+        $('#StartImportDate').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly: true, endDate: "+0d" });
+        $('#EndRegisterDate').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly: true, endDate: "+0d" });
+        $('#StartRegisterDate').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly: true, endDate: "+0d" });
+        setupGridWithoutEdit("#grid-table", "#grid-pager", "", "admin/api/contact/edit", "Id", "Danh sách Contact", heades, model);
+
+        $("#btnFilterContact").click(function (e) {
+            e.preventDefault();
+
+            // Param
+            var campainId = 0;
+            var importId = $('#ImportId').val();
+            var schoolId = $('#SchoolId').val();
+            var channelId = $('#ChannelId').val();
+            var connectStatus = $('#ConnectStatus').val();
+            var endImportDate = $('#EndImportDate').val().replaceAll('/', '');
+            var startImportDate = $('#StartImportDate').val().replaceAll('/', '');
+            var endRegisterDate = $('#EndRegisterDate').val().replaceAll('/', '');
+            var startRegisterDate = $('#StartRegisterDate').val().replaceAll('/', '');
+            var todayType = $('#rdbNew').is(':checked') ? $('#rdbNew').val() : $('#rdbReuse').val();
+            var statusMapIds = '';
+            $('#divReuse input[type=checkbox]').each(function () {
+                if ($(this).is(':checked'))
+                    statusMapIds += statusMapIds.length == 0 ? $(this).val() : ',' + $(this).val();
+            });
+            if (statusMapIds == '') {
+                $('#divReuse input[type=checkbox]').each(function () {
+                    statusMapIds += statusMapIds.length == 0 ? $(this).val() : ',' + $(this).val();
+                });
+            }
+
+            // Format Url
+            var newUrl = '/' + url +
+                '?importId=' + importId +
+                '&channelId=' + channelId +
+                '&schoolId=' + schoolId +
+                '&startImportDate=' + startImportDate +
+                '&endImportDate=' + endImportDate +
+                '&startRegisterDate=' + startRegisterDate +
+                '&endRegisterDate=' + endRegisterDate +
+                '&connectStatus=' + connectStatus +
+                '&todayType=' + todayType +
+                '&statusMapIds=' + statusMapIds +
+                '&campainId=' + campainId;
+            jQuery(grid_selector).jqGrid().setGridParam({ url: newUrl }).trigger("reloadGrid");
+        });
+
+        $("#rdbNew").change(function () {
+            if ($("#rdbReuse").is(':checked')) showReuse();
+            else hideReuse();
+        });
+        $("#rdbReuse").change(function () {
+            if ($("#rdbReuse").is(':checked')) showReuse();
+            else hideReuse();
+        });
+    });
+
+    function hideReuse() {
+        $('#divReuse').css('display', 'none');
+        $('#divReuse input[type=checkbox]').each(function () {
+            $(this).prop('checked', false);
+        });
+    }
+    function showReuse() {
+        $('#divReuse').css('display', '');
+    }
+</script>

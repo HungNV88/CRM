@@ -1,0 +1,457 @@
+﻿@using TamoCRM.Core
+@using TamoCRM.Domain.Groups
+@using TamoCRM.Domain.UserRole
+@using TamoCRM.Web.Framework
+@using TamoCRM.Web.Framework.Users
+@using TamoCRM.Domain.StatusMap
+@using TamoCRM.Domain.Catalogs
+
+@model TamoCRM.Web.Mvc.Areas.Admin.Models.Contacts.ContactCreateModel
+
+@{
+    ViewBag.Title = "Lịch làm việc";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+
+    var lstLevels = ViewBag.Levels;
+
+    //Users List
+    var Users = ViewBag.Users;
+    ((List<UserInfo>)Users).RemoveAll(c => c.UserID == 0);
+    ((List<UserInfo>)Users).Insert(0, new UserInfo { UserID = 0, FullName = "Tất Cả" });
+    var lstUsers = new SelectList(Users, "UserID", "FullName");
+    
+    var user = UserContext.GetCurrentUser();
+    // Group
+    var groups = (List<GroupInfo>)ViewBag.Groups;
+    var branchId = UserContext.GetDefaultBranch();
+    if (user.GroupConsultantType != (int)GroupConsultantType.ManagerConsultant)
+    {
+        groups = groups.Where(c => c.LeaderId == UserContext.GetCurrentUser().UserID || c.GroupId == (int)ViewBag.GroupId).ToList();
+    }
+    ((List<GroupInfo>)groups).RemoveAll(c => c.GroupId == 0);
+    if (groups.Count > 1)
+    {
+       ((List<GroupInfo>)groups).Insert(0, new GroupInfo { GroupId = 0, Name = "Tất cả", BranchId = branchId, EmployeeTypeId = (int)EmployeeType.Consultant });
+    }
+    var lstGroups = new SelectList(((List<GroupInfo>)groups).Where(c => c.BranchId == branchId).Where(c => c.EmployeeTypeId == (int)EmployeeType.Consultant), "GroupId", "Name");
+
+    
+}
+
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        }
+        catch (e) {
+
+        }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Contact</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>Lịch làm việc</h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            @using (Ajax.BeginForm("FilterContactTodayManager", "Contact", new AjaxOptions { HttpMethod = "POST" }, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "filter_contact_today_form" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <div class="col-sm-12" id="alert">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-2">
+                        <label class="bolder">Nhóm TVTS</label>
+                    </div>
+                    <div class="col-sm-3">
+                        @Html.DropDownList("GroupId", lstGroups, new { @style = "width: 100%;" })
+                    </div>
+                    <div class="col-sm-2">
+                        <label class="bolder">TVTS</label>
+                    </div>
+                    <div class="col-sm-3">
+                        @Html.DropDownList("UserId", lstUsers, new { @style = "width: 100%;" })
+                    </div>
+                </div>
+                <hr />
+                <div class="row" style="text-align: center; margin: 0 1px;" id="divStatictsToday"></div>
+                <hr />
+                <div class="row">
+                    <div class="col-sm-3" style="font-weight: bold;">
+                        Ngày hẹn
+                    </div>
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-8" style="font-weight: bold;">
+                        Điều kiện lọc
+                    </div>
+                </div>
+                <div class="space-4"></div>
+                <div class="row">
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <div class="col-sm-4">Từ ngày</div>
+                            <div class="col-sm-6">
+                                <input id="FromDate" name="FromDate" type="text" value="@DateTime.Now.ToString("dd/MM/yyyy")">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-4">Đến ngày</div>
+                            <div class="col-sm-6">
+                                <input id="ToDate" name="ToDate" type="text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-8">
+                        <div style="border: 1px solid #c5d0dc; padding: 6px 0 6px 20px;">
+                            <div class="form-group" style="margin-bottom: 5px;">
+                                <div class="col-sm-2">
+                                    <input type="radio" id="rdbAll" name="pkfrom" checked />
+                                    <label for="rdbAll">Tất cả</label>
+                                </div>
+                                <div class="col-sm-2">
+                                    <input type="radio" id="rdbNew" name="pkfrom" />
+                                    <label for="rdbNew">Mới</label>
+                                </div>
+                                <div class="col-sm-2">
+                                    <input type="radio" id="rdbAppointment" name="pkfrom" />
+                                    <label for="rdbAppointment">Có hẹn</label>
+                                </div>
+                            </div>
+                            <div id="divLevels" class="form-group" style="margin-bottom: 0; display: none;">
+                                @foreach (var item in lstLevels)
+                                {
+                                    <div class="col-sm-1" style="width: 10%;">
+                                        <input type="checkbox" name='@(item.LevelId)_chkLevel' id='@(item.LevelId)_chkLevel' />
+                                        <label for="@(item.LevelId)_chkLevel">@item.Name</label>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="row" id="divGroupLevels"></div>
+            }
+
+            <div class="space-6"></div>
+            <button id="btnGoReport" class="btn-primary" style="float: right; width: 100px;">Báo cáo</button>
+            <button id="btnGoFilter" class="btn-primary" style="float: right; width: 100px; margin-right: 10px;">Lọc Contact</button>
+            <div class="clearfix"></div>
+
+            <div class="space-6"></div>
+            <table id="grid-table"></table>
+            <div id="grid-pager"></div>
+
+            <div class="space-6"></div>
+            <div id="mydiv">
+                <iframe id="frame" style="width: 100%; height: 400px; border: none;"></iframe>
+            </div>
+            <!-- PAGE CONTENT ENDS -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+
+<script type="text/javascript">
+    var branchId = '@UserContext.GetDefaultBranch()';
+    var employeeTypeId = '@((int)EmployeeType.Consultant)';
+    var url = 'admin/api/contact/FilterTodayManager?from={0}&to={1}&type={2}&levels={3}&userIds={4}&employeeTypeId=' + employeeTypeId;
+    var grid_selector = "#grid-table";
+    var heades = ['Id', 'Họ và tên', 'Level', 'Email', 'Điện thoại', 'Ngày', 'Sáng/Chiều', 'Giờ', 'Nội dung cuộc gọi gần nhất', 'Ngày gọi', 'Trạng thái chăm sóc', 'Tổng số cuộc gọi','ID TVTS', 'Chức năng'];
+    var model = [
+        { name: 'Id', index: 'Id', editable: false, sorttype: 'string', editoptions: { disabled: true }, width: '0px' },
+        { name: 'Fullname', index: 'Fullname', editable: false, width: '90px', sorttype: 'string' },
+        { name: 'LevelId', index: 'LevelId', editable: false, width: '30px', sorttype: 'string', align: 'center', formatter: levelFomatter },
+        { name: 'Email', index: 'Email', editable: false, width: '140px', sorttype: 'string', align: 'center' },
+        { name: 'Mobile1', index: 'Mobile1', editable: false, width: '80px', sorttype: 'string', align: 'center' },
+        { name: 'AppointmentConsultantDate', index: 'AppointmentConsultantDate', editable: false, width: '80px', align: 'center', formatter: 'date', formatoptions: { srcformat: 'Y-m-dTH:i:s', newformat: 'd/m/Y' } },
+        { name: 'AppointmentConsultantAmPm', index: 'AppointmentConsultantAmPm', editable: false, width: '50px', align: 'center', formatter: stringFormatter },
+        { name: 'AppointmentConsultantTimeString', index: 'AppointmentConsultantTimeString', editable: false, width: '40px', align: 'center', formatter: stringFormatter },
+        { name: 'CallInfoConsultant', index: 'CallInfoConsultant', editable: false, width: '180px', sorttype: 'string', align: 'left' },
+        { name: 'CallConsultantDate', index: 'CallConsultantDate', editable: false, width: '80px', align: 'center', formatter: 'date', formatoptions: { srcformat: 'Y-m-dTH:i:s', newformat: 'd/m/Y' } },
+        { name: 'StatusCareConsultantId', index: 'StatusCareConsultantId', editable: false, width: '100px', formatter: statusCareFomatter },
+        { name: 'CallAmount', index: 'CallAmount', editable: false, width: '40px', align: 'center' },
+        { name: 'UserName', index: 'UserName', editable: false, width: '70px', align: 'center' },
+        {
+            name: 'Function', index: 'Function', editable: false, width: '55px', align: 'center', formatter: "dynamicLink",
+            formatoptions: {
+                cellValue: function (cellValue, rowId, rowData, options) {
+                    var groupType = '@ViewBag.GroupType';
+                    if (groupType == '@((int)GroupConsultantType.ManagerConsultant)') {
+                        return '<div style="color:#34810c;margin:5px; float:left;"><a style="cursor: pointer;" onclick="return openDialog(' + rowData.Id + ')"><img style="width:16px; height:16px;" src="../../../../Images/edit-16.png"/></a></div>' +
+                            //'<div style="color:#34810c;margin:5px; float:left;"><a href="" onclick="return deleteClick(' + rowData.Id + ');">   <img style="width:16px; height:16px;" src="../../../../Images/delete-16.png"/></a></div>' +
+                            '<div style="clear: both;"></div>';
+                    } else {
+                        return '<div style="color:#34810c;margin:5px;"><a style="cursor: pointer;" onclick="return openDialog(' + rowData.Id + ')"><img style="width:16px; height:16px;" src="../../../../Images/edit-16.png"/></a></div>';
+                        
+                    }
+                }
+            }
+        }
+    ];
+
+        function deleteClick(id) {
+            var r = confirm("Có phải bạn muốn xóa contact này?");
+            if (r == true) {
+                var newUrl = "/admin/api/contact/delete/{0}".format(id);
+                $.ajax({
+                    type: 'GET',
+                    url: newUrl,
+                    success: function (data) {
+                        jQuery(grid_selector).jqGrid().trigger("reloadGrid");
+                    },
+                    error: function (request, status, ex) {
+                        alertError("Xóa contact không thành công.");
+                    }
+                });
+            }
+            return false;
+        }
+
+        $(document).ready(function () {
+
+            $('#UserId').chosen();
+
+            $("#ToDate").datepicker({ format: 'dd/mm/yyyy', autoclose: true });
+            $("#FromDate").datepicker({ format: 'dd/mm/yyyy', autoclose: true });
+            
+            var groupId = $("#GroupId").val();
+            $.when(loadUser(branchId, groupId, employeeTypeId, "UserId")).done(function () {
+                loadLevels();
+                loadStatictsToday();
+                
+                var newUrl = url.format('', '', '@((int)TodayType.NewAndAppointment)', '', '6');
+
+                setupGridWithHeight("#grid-table", "#grid-pager", newUrl, "admin/api/contact/edit", "Id", "Danh sách Contact", heades, model, 'GET', '100%');
+                $(grid_selector).jqGrid("setGroupHeaders", {
+                    useColSpanStyle: true,
+                    groupHeaders: [
+                        { startColumnName: "Fullname", numberOfColumns: 4, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;height:40px;"><b>Thông tin Contact</b></td></tr></table>' },
+                        { startColumnName: "AppointmentConsultantDate", numberOfColumns: 3, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;"><b>Thông tin lịch hẹn gọi lại</b></td></tr></table>' },
+                        { startColumnName: "CallInfoConsultant", numberOfColumns: 2, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;"><b>Tình trạng chăm sóc</b></td></tr></table>' }
+                    ]
+                });
+            });
+            
+            $("#btnGoFilter").click(function (e) {
+                e.preventDefault();
+                reloadGrid(null, null);
+            });
+            
+            $("#btnGoReport").click(function (e) {
+                e.preventDefault();
+                var todayType = null;
+                var levels = null;
+                var reportUrl = '/admin/report/showBC49?from={0}&to={1}&type={2}&levels={3}&userIds={4}&employeeTypeId=' + employeeTypeId;
+
+                if (todayType == null)
+                    todayType = $('#rdbAll').is(':checked') ? '@((int)TodayType.All)' : $('#rdbNew').is(':checked') ? '@((int)TodayType.New)' : '@((int)TodayType.Appointment)';
+
+                // Param
+                var fromDate = $('#FromDate').val() === undefined ? '' : $('#FromDate').val().replaceAll('/', '');
+                var toDate = $('#ToDate').val() === undefined ? '' : $('#ToDate').val().replaceAll('/', '');
+                if (levels == null)
+                    levels = todayType == '@((int)TodayType.Appointment)' ? buildParamLevels() : '';
+                var userIds = $('#UserId').val();
+                
+                if (userIds == 0) userIds = $('#GroupId').val() != 0 ? getIds('UserId') : '';
+                
+                // Format Url
+                reportUrl = reportUrl.format(fromDate, toDate, todayType, levels, userIds);
+                
+                $("#frame").attr("src", reportUrl);
+
+            });
+
+            $("#rdbNew").click(function (e) {
+                $('#divLevels').css('display', 'none');
+            });
+            $("#rdbAll").click(function (e) {
+                $('#divLevels').css('display', 'none');
+            });
+            $("#rdbAppointment").click(function (e) {
+                $('#divLevels').css('display', '');
+            });
+        });
+
+        $("#GroupId").change(function () {
+            var groupId = $("#GroupId").val();
+            $.when(loadUser(branchId, groupId, employeeTypeId, "UserId")).done(function () {
+                loadLevels();
+                loadStatictsToday();
+                reloadGrid(null, null);
+            });
+        });
+        $("#UserId").change(function () {
+            loadLevels();
+            loadStatictsToday();
+            reloadGrid(null, null);
+        });
+
+        function loadLevels() {
+            $('#divGroupLevels').html('');
+            var userIds = $('#UserId').val();
+            if (userIds == 0) userIds = $('#GroupId').val() != 0 ? getIds('UserId') : '';
+            $.ajax({
+                type: 'GET',
+                url: '/admin/api/level/GetLevelWithContactCount',
+                data: {
+                    userIds: userIds,
+                    employeeTypeId: employeeTypeId,
+                },
+                success: function (data) {
+                    if (data != null && data.length > 0) {
+                        var total = 0;
+                        for (var i = 0; i < data.length; i++) {
+                            total += parseInt(data[i].ContactCount);
+                        }
+                        var html = '';
+                        html += '<div class="col-sm-2">' +
+                            '<label class="bolder">Level</label>' +
+                            '</div>' +
+                            '<div class="col-sm-1" style="width: 11.3%;">' +
+                            '<label>Tất cả (' + total + ')</label>' +
+                            '</div>';
+                        for (var i = 0; i < data.length; i++) {
+                            var item = data[i];
+                            if (item.LevelId <= 10) {
+                                html += '<div class="col-sm-1" style="width: 9%;">' +
+                                    '<label>' + item.Name + ' (' + item.ContactCount + ')</label>' +
+                                    '</div>';
+                            }
+                        }
+                        $('#divGroupLevels').html(html);
+                    }
+                },
+                error: function (request, status, ex) {
+                    alertError("Hệ thống bị lỗi, không thể tải danh sách level.");
+                }
+            });
+        }
+
+        function loadStatictsToday() {
+            $('#divStatictsToday').html('');
+            var userIds = $('#UserId').val();
+            if (userIds == 0) userIds = $('#GroupId').val() != 0 ? getIds('UserId') : '';
+            $.ajax({
+                type: 'GET',
+                url: '/admin/api/contact/FilterStatictsToday',
+                data: {
+                    userIds: userIds,
+                    employeeTypeId: employeeTypeId,
+                },
+                success: function (data) {
+                    var html = '';
+                    html += '<table style="width: 100%; border: 1px solid #eee; border-collapse: collapse;" border="1">' +
+                        '<tr style="height: 35px;">' +
+                        '<td rowspan="4" style="text-align: center; width: 20%; font-weight: bold;">Khối lượng công việc</td>' +
+                        '<td rowspan="2" style="text-align: center; width: 16%; font-weight: bold;">Số lượng phải gọi</td>' +
+                        '<td colspan="2" style="text-align: center; width: 16%; font-weight: bold;">Số lượng đã gọi</td>' +
+                        '<td rowspan="2" style="text-align: center; width: 16%; font-weight: bold;">Số lượng chưa gọi</td>' +
+                        '<td rowspan="2" style="text-align: center; width: 16%; font-weight: bold;">Số lượng tồn trước đó</td>' +
+                        '</tr>' +
+                        '<tr style="height: 30px;">' +
+                        '<td style="text-align: center; font-weight: bold; color: darkslategrey;">Trong lịch</td>' +
+                        '<td style="text-align: center; font-weight: bold; color: darkslategrey;">Ngoài lịch</td>' +
+                        '</tr>' +
+                        '<tr>' +
+                        '<td style="text-align: center; width: 16%;">(1)</td>' +
+                        '<td style="text-align: center; width: 16%;">(2)</td>' +
+                        '<td style="text-align: center; width: 16%;">(3)</td>' +
+                        '<td style="text-align: center; width: 16%;">(4) = (1) - (2)</td>' +
+                        '<td style="text-align: center; width: 16%;">(5)</td>' +
+                        '</tr>' +
+                        '<tr>' +
+                        '<td style="text-align: center; font-weight: bold; color: darkslategrey;">' +
+                        '<h3>' + data.HandoverCount + '</h3>' +
+                        '</td>' +
+                        '<td style="text-align: center; font-weight: bold; color: darkslategrey;">' +
+                        '<h3>' + (parseInt(data.HandoverCount) - parseInt(data.NotCompleteCount)).toString() + '</h3>' +
+                        '</td>' +
+                        '<td style="text-align: center; font-weight: bold; color: darkslategrey;">' +
+                        '<h3>' + data.CompleteOutCount + '</h3>' +
+                        '</td>' +
+                        '<td style="text-align: center; font-weight: bold; color: darkslategrey;">' +
+                        '<h3><a id="aNotComplete" style="cursor: pointer;">' + data.NotCompleteCount + '</a></h3>' +
+                        '</td>' +
+                        '<td style="text-align: center; font-weight: bold; color: darkslategrey;">' +
+                        '<h3><a id="aExists" style="cursor: pointer;">' + data.TotalExists + '</a></h3>' +
+                        '</td>' +
+                        '</tr>' +
+                        '</table>';
+                    $('#divStatictsToday').html(html);
+
+                    $('#aExists').click(function (e) {
+                        $('#rdbAll').click();
+
+                        var fromDate = '@DateTime.Now.AddMonths(-1).AddDays(-1).ToString("dd/MM/yyyy")';
+                        $('#FromDate').val(fromDate);
+
+                        var toDate = '@DateTime.Now.Date.AddSeconds(-1).ToString("dd/MM/yyyy")';
+                        $('#ToDate').val(toDate);
+
+                        var userIds = $('#UserId').val();
+                        if (userIds == 0) userIds = $('#GroupId').val() != 0 ? getIds('UserId') : '';
+
+                        // Format Url
+                        var newUrl = '/admin/api/contact/FilterTodayOneMonthManager?userIds=' +  userIds + '&employeeTypeId=' + employeeTypeId;
+                        jQuery(grid_selector).jqGrid().setGridParam({ url: newUrl, page: 1 }).trigger("reloadGrid");
+                    });
+
+                    $('#aNotComplete').click(function (e) {
+                        // Param
+                        var levels = '';
+                        var date = '@DateTime.Now.ToString("dd/MM/yyyy")';
+                        var todayType = '@((int)TodayType.NewAndAppointment)';
+
+                        $('#rdbAll').click();
+                        $('#ToDate').val(date);
+                        $('#FromDate').val(date);
+                        reloadGrid(todayType, levels);
+                    });
+                },
+                error: function (request, status, ex) {
+                    alertError("Hệ thống bị lỗi, không thể tải danh sách thống kê.");
+                }
+            });
+        }
+
+        function reloadGrid(todayType, levels) {
+            if (todayType == null)
+                todayType = $('#rdbAll').is(':checked') ? '@((int)TodayType.All)' : $('#rdbNew').is(':checked') ? '@((int)TodayType.New)' : '@((int)TodayType.Appointment)';
+
+            // Param
+            var fromDate = $('#FromDate').val() === undefined ? '' : $('#FromDate').val().replaceAll('/', '');
+            var toDate = $('#ToDate').val() === undefined ? '' : $('#ToDate').val().replaceAll('/', '');
+            if (levels == null)
+                levels = todayType == '@((int)TodayType.Appointment)' ? buildParamLevels() : '';
+            var userIds = $('#UserId').val();
+          
+            if (userIds == 0) userIds = $('#GroupId').val() != 0 ? getIds('UserId') : '';
+           
+            // Format Url
+            var newUrl = '/' + url.format(fromDate, toDate, todayType, levels, userIds);
+           
+            jQuery(grid_selector).jqGrid().setGridParam({ url: newUrl }).trigger("reloadGrid");
+        }
+</script>

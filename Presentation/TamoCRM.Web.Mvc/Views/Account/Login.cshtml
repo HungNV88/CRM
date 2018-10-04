@@ -1,0 +1,67 @@
+﻿@model TamoCRM.Web.Mvc.Models.LoginModel
+
+@{
+    ViewBag.Title = "Log in";
+    Layout = "~/Views/Shared/_LoginLayout.cshtml";
+}
+
+<div class="center">
+    <h1>
+        <span class="white" style="color: #34810c !important; font-weight: bold;">Freetalk System</span>
+    </h1>
+</div>
+
+<div class="space-6"></div>
+
+<div class="position-relative">
+
+    <div id="login-box" class="login-box visible widget-box no-border">
+        <div class="widget-body">
+
+            <div class="widget-main">
+                <h4 class="header blue lighter bigger" style="color: #34810c !important">
+                    <i class="icon-coffee green" style="color: #34810c !important"></i>
+                    Thông tin đăng nhập
+                </h4>
+
+                <div class="space-6"></div>
+
+                @using (Html.BeginForm())
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true)
+                    <fieldset>
+                        <label class="block clearfix">
+                            <span class="block input-icon input-icon-right">
+                                @Html.TextBoxFor(m => m.UserName, new { @class="form-control", placeholder = "Username" })
+                                <i class="icon-user"></i>
+                                @Html.ValidationMessageFor(m => m.UserName)
+                            </span>
+                        </label>
+
+                        <label class="block clearfix">
+                            <span class="block input-icon input-icon-right">
+                                @Html.PasswordFor(m => m.Password, new { @class="form-control", placeholder = "Password" })
+                                <i class="icon-lock"></i>
+                                @Html.ValidationMessageFor(m => m.Password)
+                            </span>
+                        </label>
+
+                        <div class="space"></div>
+                        <div class="clearfix">
+                            <button type="submit" class="width-40 pull-right btn btn-sm btn-primary">
+                                <i class="icon-key"></i>
+                                Đăng nhập
+                            </button>
+                        </div>
+
+                        <div class="space-4"></div>
+                    </fieldset>
+                }
+            </div>
+            <!-- /widget-main -->
+        </div>
+        <!-- /widget-body -->
+    </div>
+    <!-- /login-box -->
+</div>

@@ -1,0 +1,151 @@
+﻿@using TamoCRM.Domain.Channels
+@using TamoCRM.Domain.Collectors
+@using TamoCRM.Domain.ImportExcels
+@using TamoCRM.Web.Framework
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+@{
+    //var lstChannels = StoreData.SelectedList<ChannelInfo>();
+    var lstChannels = new SelectList(ViewBag.Channels1, "ChannelId", "Name"); 
+    var lstCollectors = StoreData.SelectedList<CollectorInfo>();
+    var lstImportExcels = StoreData.SelectedList<ImportExcelInfo>();
+    
+}
+
+
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed'); } catch (e) { }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Contact</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>Contact bị lỗi 						
+        </h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div id="alert"></div>
+        </div>
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <label class="col-sm-1">Người lấy </label>
+                    <div class="col-sm-2">
+                        @Html.DropDownList("CollectorId", lstCollectors, new { @class = "form-control" })
+                    </div>
+                    <label class="col-sm-1">Kênh </label>
+                    <div class="col-sm-3">
+                        @Html.DropDownList("ChannelId", lstChannels, new { @class = "form-control" })
+                    </div>
+                    <label class="col-sm-1">File </label>
+                    <div class="col-sm-4">
+                        @Html.DropDownList("ImportId", lstImportExcels, new { @class = "form-control" })
+                    </div>
+                </div>
+
+                <div class="space-4"></div>
+                <div class="form-group">
+                    <label class="col-sm-2">Ngày import</label>
+                    <div class="col-sm-2">
+                        @Html.TextBox("ImportDate", string.Empty, new { @style = "width: 90%;"})
+                    </div>
+                    <div class="col-sm-8">
+                        <button id="btnSearch" type="button" class="btn-import btn-primary" style="float: right; width: 100px;">Lọc contact</button>
+                    </div>
+                    <div class="clearfix"></div>
+                    </div>
+            </div>
+
+            <table id="grid-table"></table>
+            <div id="grid-pager"></div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var grid_selector = "#grid-table";
+    var url = "admin/api/contacttmp/Get?collectorId={0}&channelId={1}&importId={2}&importDate={3}";
+    var heades = ['Thao tác', 'Id', 'Họ tên', 'Email', 'Điện thoại', 'Nơi ở', 'Ngày đăng ký', 'Chiến dịch', 'Landing Page', 'Kênh', 'Mẫu quảng cáo', 'Từ khóa', 'Tên gói', 'ContactId'];
+    var model = [
+        {
+            name: 'act', index: '', width: 70, fixed: true, sortable: false, resize: false,
+            formatter: 'actions',
+            formatoptions: {
+                keys: true,
+
+                delOptions: {
+                    recreateForm: true, beforeShowForm: beforeDeleteCallback, delData: {
+                        ContactId: function () {
+                            var sel_id = $(grid_selector).jqGrid('getGridParam', 'selrow');
+                            var value = $(grid_selector).jqGrid('getCell', sel_id, 'Id');
+                            return value;
+                        }
+                    }
+                },
+                onSuccess: function (response) {
+                    $("#spiner").addClass("alert alert-block alert-success");
+                    $("#spiner").html(response.responseText);
+                    $("#btnSearch").click();
+                    return [true];
+                }
+            }
+        },
+        { name: 'Id', index: 'Id', editable: true, sorttype: 'int', editoptions: { disabled: 'true' }, width: 70 },
+        { name: 'Fullname', index: 'Fullname', editable: true, sorttype: 'string' },
+        { name: 'Email', index: 'Email', editable: true, sorttype: 'string' },
+        { name: 'Mobile1', index: 'Mobile1', editable: true, sorttype: 'string' },
+        { name: 'Address', index: 'Birthday', editable: true, sorttype: 'string' }, 
+        { name: 'RegisteredDate', index: 'RegisteredDate', editable: true, sorttype: 'string' },
+        { name: 'CampaindTpe', index: 'CampaindTpe', editable: true, sorttype: 'string' },
+        { name: 'LandingPage', index: 'LandingPage', editable: true, sorttype: 'string' },
+        { name: 'Channel', index: 'Channel', editable: true, sorttype: 'string' },
+        { name: 'TemplateAds', index: 'TemplateAds', editable: true, sorttype: 'string' },
+        { name: 'SearchKeyword', index: 'SearchKeyword', editable: true, sorttype: 'string' },
+        { name: 'Package', index: 'Package', editable: true, sorttype: 'string' },
+        { name: 'Code', index: 'Code', editable: true, sorttype: 'string' }
+    ];
+    var someRetValue;
+    $(document).ready(function () {
+        $('select').chosen();
+        var importId = $("#ImportId").val();
+        var channelId = $("#ChannelId").val();
+        var collectorId = $("#CollectorId").val();
+
+        $('#ImportDate').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly: true, endDate: "+0d" });
+        var importDate = $("#ImportDate").val().replaceAll('/', '');
+        
+        var newUrl = url.format(collectorId, channelId, importId, importDate);
+        setupGridTable(grid_selector, "#grid-pager", newUrl, "admin/api/contacttmp/edit", "Id", "Contact bị lỗi", heades, model, "", 10, '350px');
+        setupGridPagerWithoutEdit(grid_selector, "#grid-pager", newUrl, "admin/api/contacttmp/edit", "Id", "Contact bị lỗi", heades, model);
+        
+        $("#btnSearch").click(function (e) {
+            e.preventDefault();
+            var importId = $("#ImportId").val();
+            var channelId = $("#ChannelId").val();
+            var collectorId = $("#CollectorId").val();
+            var importDate = $("#ImportDate").val().replaceAll('/', '');
+            var newUrl = "/" + url.format(collectorId, channelId, importId, importDate);
+            jQuery(grid_selector).jqGrid().setGridParam({ url: newUrl }).trigger("reloadGrid");
+        });
+    });
+</script>
+

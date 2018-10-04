@@ -1,0 +1,182 @@
+﻿@using TamoCRM.Web.Framework.Users
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+    <meta charset="utf-8" />
+    <title>Dashboard - Tamo CRM Admin</title>
+
+    <meta name="description" content="overview &amp; stats" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- basic styles -->
+
+    <link href="/Content/themes/ace/assets/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/Content/themes/ace/assets/css/font-awesome.min.css" />
+
+    <!-- page specific plugin styles -->
+    <link rel="stylesheet" href="/Content/themes/ace/assets/css/jquery-ui-1.10.3.full.min.css" />
+	<link rel="stylesheet" href="/Content/themes/ace/assets/css/datepicker.css" />
+	<link rel="stylesheet" href="/Content/themes/ace/assets/css/ui.jqgrid.css" />
+
+    <!-- fonts -->
+
+    <link rel="stylesheet" href="/Content/themes/ace/assets/css/ace-fonts.css" />
+
+    <!-- ace styles -->
+
+    <link rel="stylesheet" href="/Content/themes/ace/assets/css/ace.min.css" />
+    <link rel="stylesheet" href="/Content/themes/ace/assets/css/ace-rtl.min.css" />
+    <link rel="stylesheet" href="/Content/themes/ace/assets/css/ace-skins.min.css" />
+
+
+    <script src="/Content/themes/ace/assets/js/ace-extra.min.js"></script>
+
+    <script type="text/javascript">
+        window.jQuery || document.write("<script src='/Content/themes/ace/assets/js/jquery-2.0.3.min.js'>" + "<" + "/script>");
+    </script>
+
+    <script type="text/javascript">
+        if ("ontouchend" in document) document.write("<script src='/Content/themes/ace/assets/js/jquery.mobile.custom.min.js'>" + "<" + "/script>");
+    </script>
+    <script src="/Content/themes/ace/assets/js/bootstrap.min.js"></script>
+    <script src="/Content/themes/ace/assets/js/typeahead-bs2.min.js"></script>
+
+    <!-- page specific plugin scripts -->
+
+    <script src="/Content/themes/ace/assets/js/date-time/bootstrap-datepicker.min.js"></script>
+    <script src="/Content/themes/ace/assets/js/jqGrid/jquery.jqGrid.min.js"></script>
+    <script src="/Content/themes/ace/assets/js/jqGrid/i18n/grid.locale-en.js"></script>
+    
+    <script src="/Content/themes/ace/assets/js/jquery-ui-1.10.3.custom.min.js"></script>
+    <script src="/Content/themes/ace/assets/js/jquery.ui.touch-punch.min.js"></script>
+    <script src="/Content/themes/ace/assets/js/jquery.slimscroll.min.js"></script>
+    <script src="/Content/themes/ace/assets/js/jquery.easy-pie-chart.min.js"></script>
+    <script src="/Content/themes/ace/assets/js/jquery.sparkline.min.js"></script>
+    <script src="/Content/themes/ace/assets/js/flot/jquery.flot.min.js"></script>
+    <script src="/Content/themes/ace/assets/js/flot/jquery.flot.pie.min.js"></script>
+    <script src="/Content/themes/ace/assets/js/flot/jquery.flot.resize.min.js"></script>
+    <script src="/Scripts/fuelux.tree.min.js"></script>
+    
+    <script src="/Content/themes/ace/assets/js/jquery.form.js"></script>
+        <script type="text/javascript" src="/Content/themes/ace/assets/js/jquery.tmpl.js"></script>
+    <!-- ace scripts -->
+
+    <script src="/Content/themes/ace/assets/js/ace-elements.min.js"></script>
+    <script src="/Content/themes/ace/assets/js/ace.min.js"></script>
+
+    <!-- tamo crm-->
+    <script src="/Scripts/admin.js"></script>
+    <script src="/Scripts/admin.utility.js"></script>
+    <!-- tamo css -->
+    <link rel="stylesheet" href="/Content/themes/ace/assets/css/tamo.css" />
+</head>
+
+<body>
+    <div class="navbar navbar-default" id="navbar">
+        <script type="text/javascript">
+            try {
+                ace.settings.check('navbar', 'fixed'); } catch (e) { }
+        </script>
+
+        <div class="navbar navbar-default" id="navbar">
+        <script type="text/javascript">
+            try {
+                ace.settings.check('navbar', 'fixed');
+            } catch (e) { }
+        </script>
+
+        <div class="navbar-container" id="navbar-container">
+            <div class="navbar-header pull-left">
+                <a href="#" class="navbar-brand">
+                    <small>Freetalk System
+                    </small>
+                </a>
+                <!-- /.brand -->
+            </div>
+            <!-- /.navbar-header -->
+            <div class="navbar-header pull-left">
+                <div style="margin-top: 7px;">
+                </div>
+                <!-- /.brand -->
+            </div>
+            <!-- /.navbar-header -->
+
+            <div class="navbar-header pull-right" role="navigation">
+                <ul class="nav ace-nav">
+                    <li class="light-blue" style="width: 115px; padding: 5px 10px 0 0;">
+                        @Html.Action("BranchSelectBox", "Branch")
+                    </li>
+                    <li class="light-blue">
+                        <a data-toggle="dropdown" href="#" class="dropdown-toggle">
+                            <span class="user-info">
+                                <small>Welcome,</small>
+                                @UserContext.GetCurrentUser().UserName
+                            </span>
+
+                            <i class="icon-caret-down"></i>
+                        </a>
+                        <ul class="user-menu pull-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
+                            <li>
+                                <a href="/Admin/User/ChangePassword">
+                                    <i class="icon-cog"></i>
+                                    Thay đối mật khẩu
+                                </a>
+                            </li>
+                            <li class="divider"></li>
+                            <li>
+                                <a href="/Account/Logoff">
+                                    <i class="icon-off"></i>
+                                    Đăng xuất
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-header -->
+        </div>
+        <!-- /.container -->
+    </div>
+        <!-- /.container -->
+    </div>
+
+    <div class="main-container" id="main-container">
+
+        <script type="text/javascript">
+            try {
+                ace.settings.check('main-container', 'fixed');
+            }
+            catch (e) {
+
+            }
+        </script>
+
+        <div class="main-container-inner">
+            <a class="menu-toggler" id="menu-toggler" href="#">
+                <span class="menu-text"></span>
+            </a>
+            <div class="sidebar" id="sidebar">
+
+                @Html.Partial("Menu")
+            </div>
+
+            <div class="main-content">
+                @RenderBody()
+                <div style="width: 100%; text-align: center; padding: 10px;">Copyright 2014 Topica. All Rights Reverved.</div>
+            </div>
+            <!-- /.main-content -->
+
+            <!-- /#ace-settings-container -->
+        </div>
+        <!-- /.main-container-inner -->
+
+        <a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
+            <i class="icon-double-angle-up icon-only bigger-110"></i>
+        </a>
+    </div>
+    <!-- /.main-container -->
+
+</body>
+</html>

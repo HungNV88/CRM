@@ -1,0 +1,149 @@
+﻿@using MvcCheckBoxList.Model
+@using TamoCRM.Core
+@model TamoCRM.Web.Mvc.Areas.Admin.Models.Email.MailModel
+@{
+    ViewBag.Title = "EditMail";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutSingle.cshtml";
+}
+@{
+    var lstTemplate = Util.SelectedList<EmailTemplateType>();
+}
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try { ace.settings.check('breadcrumbs', 'fixed') } catch (e) { }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="http://dev.crmtpe.topica.vn/admin/sendmail/listmail">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Email</li>
+    </ul>
+</div>
+<div class="page-content">
+    <div class="page-header">
+        <h1>
+            Sửa Email
+        </h1>
+    </div>
+    @*@using (Html.BeginForm("Edit", "SendMail", FormMethod.Post, new { enctype = "multipart/form-data" }))@*
+        {
+    *@
+    <div class="row">
+        <div class="col-xs-5">
+            @Html.TextBoxFor(x => x.Id, new { @style = "width: 100%", @type = "hidden" })
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-1">
+            <label>Tiêu đề</label>
+        </div>
+        <div class="col-xs-7">
+            <div class="clearfix">
+                @Html.TextBoxFor(x => x.Subject, new { @style = "width: 100%" })
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-xs-1">
+            <label>Kiểu Email</label>
+        </div>
+        <div class="col-xs-7">
+            <div class="clearfix">
+                @Html.DropDownListFor(x => x.TypeEmail, lstTemplate, new { @style = "width: 100%" })
+            </div>
+        </div>
+    </div>
+    <br />
+
+    @using (Html.BeginForm("Edit", "SendMail", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <div class="row">
+            <div class="col-xs-1">
+                <label>File Attach</label>
+            </div>
+            <div class="col-xs-7">
+                <div class="clearfix">
+                    <input type="file" name="Picture1" />
+                </div>
+            </div>
+        </div>
+            <div class="row">
+            <div class="col-xs-1">
+            </div>
+            <div class="col-xs-7">
+                <div class="clearfix">
+                    <input type="file" name="Picture2" />
+                </div>
+            </div>
+        </div>
+            <div class="row">
+            <div class="col-xs-1">
+            </div>
+            <div class="col-xs-7">
+                <div class="clearfix">
+                    <input type="file" name="Picture3" />
+                </div>
+            </div>
+        </div>
+        
+        <input type="submit" value="OK" />
+        
+    }
+
+    <br />
+    <div class="row">
+        <div class="col-xs-1">
+            <label>Nội dung</label>
+        </div>
+        <div class="col-xs-7">
+            <div class="clearfix">
+                @Html.TextAreaFor(x => x.Body, new { @class = "ckeditor", @id = "ckeditor" })
+                @*@Html.TextAreaFor(x => x.Body, new { @style = "width: 100%" })*@
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-xs-1"></div>
+        <div class="col-xs-2">
+            <button id="btnGoFilter" type="button" class="btn-primary" style="float: left;" onclick="return updateEmail();">Cập nhật</button>
+            <div class="clear-fix"></div>
+        </div>
+
+    </div>
+    @* }*@
+</div>
+<script type="text/javascript">
+    function updateEmail() {
+        var value = CKEDITOR.instances.ckeditor.getData();
+        $.ajax({
+            type: 'POST',
+            url: '/admin/api/email/editemailtemplate',
+            data: {
+                id: $('#Id').val(),
+                subject: $('#Subject').val(),
+                typeEmail: $('#TypeEmail').val(),
+                content: value,
+            },
+            beforeSend: function () {
+                alertProcess();
+            },
+            success: function (message) {
+                //alertSuccess('Sửa mail thành công!');
+                alert("Sửa mail thành công!");
+            },
+            error: function (request, status, ex) {
+                alertError("Sửa email bị lỗi, vui lòng thử lại sau");
+            }
+        });
+        return false;
+    }
+
+</script>

@@ -1,0 +1,173 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{2A57A174-DAEB-45A5-8864-861A25F5F443}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>TamoCRM.Core</RootNamespace>
+    <AssemblyName>TamoCRM.Core</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="RestSharp, Version=105.2.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\RestSharp.105.2.3\lib\net45\RestSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Helpers, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\..\packages\Microsoft.AspNet.WebPages.2.0.20710.0\lib\net40\System.Web.Helpers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\..\packages\Microsoft.AspNet.Mvc.4.0.20710.0\lib\net40\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Razor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\..\packages\Microsoft.AspNet.Razor.2.0.20710.0\lib\net40\System.Web.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\..\packages\Microsoft.AspNet.WebPages.2.0.20710.0\lib\net40\System.Web.WebPages.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Deployment, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\..\packages\Microsoft.AspNet.WebPages.2.0.20710.0\lib\net40\System.Web.WebPages.Deployment.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Razor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\..\packages\Microsoft.AspNet.WebPages.2.0.20710.0\lib\net40\System.Web.WebPages.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Caching\CachingProvider.cs" />
+    <Compile Include="CheckPointApi.cs" />
+    <Compile Include="Commons\Config.cs" />
+    <Compile Include="Commons\Extensions\ListExtensions.cs" />
+    <Compile Include="Commons\Extensions\StringExtensions.cs" />
+    <Compile Include="Commons\INotifyPropertyChange.cs" />
+    <Compile Include="Commons\Extensions\ObjectExtensions.cs" />
+    <Compile Include="Commons\SocketClient.cs" />
+    <Compile Include="Commons\Utilities\ContactValidHelper.cs" />
+    <Compile Include="Commons\Utilities\CookieHelper.cs" />
+    <Compile Include="Commons\Utilities\MiscUtility.cs" />
+    <Compile Include="Commons\Utilities\TimeStampConvert.cs" />
+    <Compile Include="Constant.cs" />
+    <Compile Include="Data\CheckDuplicateProvider.cs" />
+    <Compile Include="Data\DataProvider.AppointmentInterview.cs" />
+    <Compile Include="Data\DataProvider.Bank.cs" />
+    <Compile Include="Data\DataProvider.Catalog.cs" />
+    <Compile Include="Data\DataProvider.CC3ContactReport.cs" />
+    <Compile Include="Data\DataProvider.Country.cs" />
+    <Compile Include="Data\DataProvider.Email.cs" />
+    <Compile Include="Data\DataProvider.EstimateOwner.cs" />
+    <Compile Include="Data\DataProvider.FailedAdvisor.cs" />
+    <Compile Include="Data\DataProvider.FeeMoneyType.cs" />
+    <Compile Include="Data\DataProvider.Container.cs" />
+    <Compile Include="Data\DataProvider.LogFixmoney.cs" />
+    <Compile Include="Data\DataProvider.PackageFeeEdu.cs" />
+    <Compile Include="Data\DataProvider.PaymentType.cs" />
+    <Compile Include="Data\DataProvider.TeacherType.cs" />
+    <Compile Include="Data\DataProvider.Quality.cs" />
+    <Compile Include="Data\DataProvider.Product.cs" />
+    <Compile Include="Data\DataProvider.LogHandoverAdvisor.cs" />
+    <Compile Include="Data\DataProvider.MoneysLog.cs" />
+    <Compile Include="Data\DataProvider.PricePackageListed.cs" />
+    <Compile Include="Data\DataProvider.StatusCare.cs" />
+    <Compile Include="Data\DataProvider.TemplateAds.cs" />
+    <Compile Include="Data\DataProvider.TestResult.cs" />
+    <Compile Include="Data\DataProvider.CasecAccount.cs" />
+    <Compile Include="Data\DataProvider.LevelTester.cs" />
+    <Compile Include="Data\DataProvider.TimeSlot.cs" />
+    <Compile Include="Data\DataProvider.TimeSlots.cs" />
+    <Compile Include="Data\DataProvider.TopicaAccount.cs" />
+    <Compile Include="Data\DataProvider.UserDraft.cs" />
+    <Compile Include="Data\DataProvider.WebServiceConfig.cs" />
+    <Compile Include="Data\DataProvider.Table.cs" />
+    <Compile Include="Data\DataProvider.ContactDuplicate.cs" />
+    <Compile Include="Data\DataProvider.ContactAllInfo.cs" />
+    <Compile Include="Data\DataProvider.Logs.cs" />
+    <Compile Include="Data\DataProvider.MissedCall.cs" />
+    <Compile Include="Data\DataProvider.Report.cs" />
+    <Compile Include="Data\DataProvider.Activity.cs" />
+    <Compile Include="Data\DataProvider.Group.cs" />
+    <Compile Include="Data\DataProvider.StatusMap.cs" />
+    <Compile Include="Data\DataProvider.Branch.cs" />
+    <Compile Include="Data\DataProvider.CallHistory.cs" />
+    <Compile Include="Data\DataProvider.Channel.cs" />
+    <Compile Include="Data\DataProvider.Collector.cs" />
+    <Compile Include="Data\DataProvider.Contact.cs" />
+    <Compile Include="Data\DataProvider.ContactLevelInfo.cs" />
+    <Compile Include="Data\DataProvider.ContactTmp.cs" />
+    <Compile Include="Data\DataProvider.EducationLevel.cs" />
+    <Compile Include="Data\DataProvider.ImportExcel.cs" />
+    <Compile Include="Data\DataProvider.Level.cs" />
+    <Compile Include="Data\DataProvider.Phone.cs" />
+    <Compile Include="Data\DataProvider.Source.cs" />
+    <Compile Include="Data\DataProvider.SourceType.cs" />
+    <Compile Include="Data\DataProvider.UserRole.cs" />
+    <Compile Include="Enum.cs" />
+    <Compile Include="Providers\CheckDuplicateProviderFactory.cs" />
+    <Compile Include="Providers\DataProviderFactory.cs" />
+    <Compile Include="Providers\ProviderBase.cs" />
+    <Compile Include="Providers\ProviderConfiguration.cs" />
+    <Compile Include="Providers\ProviderConfigurationHandler.cs" />
+    <Compile Include="Commons\Utilities\ConvertHelper.cs" />
+    <Compile Include="Commons\Utilities\ObjectHelper.cs" />
+    <Compile Include="Commons\Utilities\SecurityHelper.cs" />
+    <Compile Include="Commons\Utilities\UnicodeHelper.cs" />
+    <Compile Include="Commons\Utilities\XmlHelper.cs" />
+    <Compile Include="Data\DataProvider.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Util.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

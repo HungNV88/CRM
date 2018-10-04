@@ -1,0 +1,209 @@
+﻿@using MvcCheckBoxList.Model
+@model TamoCRM.Web.Mvc.Areas.Admin.Models.Roles.RolePermisionModel
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+<style type="text/css">
+    .btn-import {
+        display: inline-block;
+        color: #FFF!important;
+        text-shadow: 0 -1px 0 rgba(0,0,0,0.25)!important;
+        background-image: none!important;
+        border-radius: 0;
+        box-shadow: none!important;
+        -webkit-transition: all ease .15s;
+        transition: all ease .15s;
+        cursor: pointer;
+        vertical-align: middle;
+        margin: 0;
+        position: relative;
+        font-size: 13px;
+        padding: 4px 9px;
+        line-height: 1.39;
+    }
+
+    .styled_checkbox {
+        cursor: pointer;
+        border-radius: 5px;
+        margin: 3px;
+        padding: 0px 10px 0 2px;
+    }
+
+    .styled_list {
+        margin-left: 5px;
+        padding: 3px 5px 3px 0px;
+    }
+
+</style>
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed'); } catch (e) { }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Quản trị</a>
+        </li>
+        <li class="active"><a href="javascript:void(0);">Phân quyền</a></li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>Phân quyền người dùng
+        </h1>
+    </div>
+    <!-- /.page-header -->
+
+
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            @using (Ajax.BeginForm("Index", "RolePermision", new AjaxOptions { HttpMethod = "POST" }, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "frmRolePermisions" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div id="spiner"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <input type="submit" name="btnUpdate" id="btnUpdate" value="Cập nhât" />
+                        <input type="reset" name="btnClear" id="btnClear" value="Clear" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-9">
+                        <div class="widget-box transparent">
+                            <div class="widget-header widget-header-small">
+                                <h4 class="blue smaller">
+                                    <i class="icon-rss orange"></i>
+                                    Roles
+                                </h4>
+                            </div>
+
+                            <div class="widget-body">
+                                <div class="widget-main padding-6" id="divRoleCheckbox">
+                                    @Html.CheckBoxListFor(x => x.PostedRole.Id, x => x.AllRole.OrderBy(c => c.Name), role => role.RoleID, role => role.Name, x => x.SelectedRole, new { @class = "styled_checkbox" }, new HtmlListInfo(HtmlTag.table, 5, new { @class = "styled_list" }), null, x => x.RoleID)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-3">
+                        <div class="widget-box transparent">
+                            <div class="widget-header widget-header-small">
+                                <h4 class="blue smaller">
+                                    <i class="icon-rss orange"></i>
+                                    Branches
+                                </h4>
+                            </div>
+
+                            <div class="widget-body">
+                                <div class="widget-main padding-8" id="divBranchCheckbox">
+                                    @Html.CheckBoxListFor(x => x.PostedBranch.Id, x => x.AllBranch, branch => branch.BranchId, branch => branch.Name, x => x.SelectedBranch, new { @class = "styled_checkbox" }, new HtmlListInfo(HtmlTag.table, 1, new { @class = "styled_list" }), null, x => x.BranchId)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="widget-box transparent">
+                            <div class="widget-header widget-header-small">
+                                <h4 class="blue smaller">
+                                    <i class="icon-rss orange"></i>
+                                    Functions
+                                </h4>
+                            </div>
+
+                            <div class="widget-body">
+                                <div class="widget-main padding-8" id="divFunctions">
+                                    @Html.ListBoxFor(x => x.PostedFunction.FunctionID, new SelectList(Model.AllFunction, "FunctionID", "Name"), new { @style = "width: 100%; height: 400px" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            <!-- PAGE CONTENT ENDS -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+<!-- /.page-content -->
+
+<!-- inline scripts related to this page -->
+<script type="text/javascript">
+    function updateRoleFunction(roleId, branchId) {
+        $.getJSON('/admin/api/function/get?roleId=' + roleId + '&branchId=' + branchId, function (data) {
+            $("#PostedFunction_FunctionID").val('');
+            $.each($("#PostedFunction_FunctionID option"), function (i) {
+                var option = $(this);
+                var selected = false;
+                $.each(data, function (j) {
+                    if ($(option).val() == data[j].FunctionID) {
+                        selected = true;
+                        return false;
+                    }
+                });
+                $(option).attr('selected', selected);
+            });
+        });
+    }
+    var curRoleCheck = null;
+    var curBranchCheck = null;
+    $(document).ready(function () {
+        $("#btnClear").click(function (e) {
+            e.preventDefault();
+            $("#PostedFunction_FunctionID").val('');
+        });
+        $("#divRoleCheckbox input[type=checkbox]").change(function (e) {
+            e.preventDefault();
+            if ($(this).is(":checked")) {
+                if ($(curRoleCheck).val() != $(this).val()) {
+                    if (curRoleCheck) $(curRoleCheck).attr('checked', false);
+                    curRoleCheck = $(this);
+                    if (curBranchCheck) {
+                        updateRoleFunction($(this).val(), $(curBranchCheck).val());
+                    }
+                }
+            } else {
+
+            }
+        }); 
+        $("#divBranchCheckbox input[type=checkbox]").change(function (e) {
+            e.preventDefault();
+            if ($(this).is(":checked")) {
+                if ($(curBranchCheck).val() != $(this).val()) {
+                    if (curBranchCheck) $(curBranchCheck).attr('checked', false);
+                    curBranchCheck = $(this);
+                    if (curRoleCheck) {
+                        updateRoleFunction($(curRoleCheck).val(), $(this).val());
+                    }
+                }
+            }
+        });
+        $('#frmRolePermisions').ajaxForm({
+            beforeSend: function () {
+                $("#spiner").html("<i class='icon-spinner icon-spin orange bigger-125'></i>Đang xử lý...");
+            },
+            success: function () {
+
+            },
+            complete: function (xhr) {
+                $("#spiner").show();
+                $("#spiner").addClass("alert alert-block alert-success");
+                $("#spiner").html("Cập nhật thành công.");
+            }
+        });
+    });
+</script>

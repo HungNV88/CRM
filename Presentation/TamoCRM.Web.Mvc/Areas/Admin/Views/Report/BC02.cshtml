@@ -1,0 +1,265 @@
+﻿@using TamoCRM.Core
+@using TamoCRM.Domain.Groups
+@using TamoCRM.Domain.Majors
+@using TamoCRM.Domain.Schools
+@using TamoCRM.Domain.SourceTypes
+@using TamoCRM.Web.Framework.Users
+
+@{
+    ViewBag.Title = "Báo cáo tỷ lệ L5B/L2 và L8/L2";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+
+    // Group
+    var groups = ViewBag.Groups;
+    var user = UserContext.GetCurrentUser();
+    if (user.GroupType != (int)GroupTVTSType.ManagerTVTS)
+    {
+        groups = ((List<GroupInfo>)groups).Where(c => c.LeaderId == user.UserID || c.GroupId == (int)ViewBag.GroupId).ToList();
+    }
+    ((List<GroupInfo>)groups).RemoveAll(c => c.GroupId == 0);
+    if (((List<GroupInfo>)groups).Count > 1)
+    {
+        ((List<GroupInfo>)groups).Insert(0, new GroupInfo { GroupId = 0, Name = "Tất cả" });
+    }
+    var branchId = UserContext.GetDefaultBranch();
+    var lstGroups = new SelectList(((List<GroupInfo>)groups).Where(c => c.BranchId == branchId), "GroupId", "Name");
+
+    // User
+    var users = ViewBag.Users;
+    var lstUsers = new SelectList(users, "UserID", "FullName");
+
+    // School
+    var schools = ViewBag.Schools;
+    ((List<SchoolInfo>)schools).RemoveAll(c => c.SchoolId == 0);
+    ((List<SchoolInfo>)schools).Insert(0, new SchoolInfo { SchoolId = 0, Name = "Tất cả" });
+    var lstSchools = new SelectList(schools, "SchoolId", "Name");
+
+    // Major
+    var majors = ViewBag.Majors;
+    ((List<MajorInfo>)majors).RemoveAll(c => c.MajorId == 0);
+    ((List<MajorInfo>)majors).Insert(0, new MajorInfo { MajorId = 0, Name = "Tất cả" });
+    var lstMajors = new SelectList(majors, "MajorId", "Name");
+
+    // SourceType
+    var sourceTypes = ViewBag.SourceTypes;
+    ((List<SourceTypeInfo>)sourceTypes).RemoveAll(c => c.SourceTypeId == 0);
+    ((List<SourceTypeInfo>)sourceTypes).Insert(0, new SourceTypeInfo { SourceTypeId = 0, Name = "Tất cả" });
+    var lstSourceTypes = new SelectList(sourceTypes, "SourceTypeId", "Name");
+
+    var lumpeds = ViewBag.Lumpeds;
+    var lstLumpeds = new SelectList(lumpeds, "Id", "Name");
+
+    var latchs = ViewBag.Latchs;
+    var lstLatchs = new SelectList(latchs, "Id", "Name");
+}
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        } catch (e) { }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>Báo cáo tỷ lệ L5B/L2 và L8/L2
+        </h1>
+    </div>
+    <!-- /.page-header -->
+
+
+
+    <div class="row">
+        <div class="form-group">
+            <div class="col-sm-12" id="alert">
+            </div>
+        </div>
+        <div class="col-xs-12">
+            @using (Ajax.BeginForm("BC02", "Report", new AjaxOptions { HttpMethod = "POST" }, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "uploadexcelform" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="row">
+                    <label class="col-sm-2 control-label no-padding-right" style="text-align: left !important;" for="form-field-2">Nhóm </label>
+                    <div class="col-sm-2">
+                        @Html.DropDownList("GroupId", lstGroups, new { @class = "form-control" })
+                    </div>
+                    <label class="col-sm-1 control-label no-padding-right" style="text-align: left !important;" for="form-field-2">TVTS</label>
+                    <div class="col-sm-2">
+                        @Html.DropDownList("UserId", lstUsers, new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="space-6"></div>
+                <div class="row">
+                    <label class="col-sm-2 control-label no-padding-right" style="text-align: left !important;" for="form-field-2">Trường </label>
+                    <div class="col-sm-2">
+                        @Html.DropDownList("SchoolId", lstSchools, new { @class = "form-control" })
+                    </div>
+                    <label class="col-sm-1 control-label no-padding-right" style="text-align: left !important;" for="form-field-2">Nghành </label>
+                    <div class="col-sm-2">
+                        @Html.DropDownList("MajorId", lstMajors, new { @class = "form-control" })
+                    </div>
+                    <label class="col-sm-1 control-label no-padding-right" style="text-align: left !important;" for="form-field-2">Nguồn </label>
+                    <div class="col-sm-2">
+                        @Html.DropDownList("SourceTypeId", lstSourceTypes, new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="space-6"></div>
+                <div class="row">
+                    <label class="col-sm-2 control-label no-padding-right" style="text-align: left !important;" for="form-field-2">Ngày bàn giao</label>
+                    <div class="col-sm-2">
+                        @Html.DropDownList("ddlDayReportType", (SelectList)ViewBag.DayReportTypes, new { @class = "form-control" })
+                    </div>
+                    <div id="divDay">
+                        <div id="divDayFrom">
+                            <label class="col-sm-1 control-label no-padding-right" style="text-align: left !important;" for="form-field-2" id="lblHandoverFromDate">Từ ngày</label>
+                            <div class="col-sm-2">
+                                @Html.TextBox("HandoverFromDate", string.Empty, new { @class = "form-control" })
+                            </div>
+                        </div>
+                        <div id="divDayTo">
+                            <label class="col-sm-1 control-label no-padding-right" style="text-align: left !important;" for="form-field-3">Đến ngày </label>
+                            <div class="col-sm-2">
+                                @Html.TextBox("HandoverToDate", string.Empty, new { @class = "form-control" })
+                            </div>
+                        </div>
+                    </div>
+                    <div id="divLumped" style="display: none;">
+                        <label class="col-sm-1 control-label no-padding-right" style="text-align: left !important;" for="form-field-3">Chọn gộp </label>
+                        <div class="col-sm-2">
+                            @Html.DropDownList("ddlLumpedId", lstLumpeds, new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div id="divLatch" style="display: none;">
+                        <label class="col-sm-1 control-label no-padding-right" style="text-align: left !important;" for="form-field-3">Chọn chốt </label>
+                        <div class="col-sm-2">
+                            @Html.DropDownList("ddlLatchId", lstLatchs, new { @class = "form-control" })
+                        </div>
+                    </div>
+                </div>
+                <div class="space-6"></div>
+                <div class="row">
+                    <label class="col-sm-2 control-label no-padding-right" style="text-align: left !important;" for="form-field-3">Ngày xuất báo cáo</label>
+                    <div class="col-sm-2">
+                        @Html.TextBox("ToDate", DateTime.Now.ToString("dd/MM/yyyy"), new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="space-6"></div>
+                <div class="row">
+                    <div class="col-sm-5">
+                        <button type="button" class="btn-import btn-primary" id="btnReport">Xuất báo cáo</button>
+                    </div>
+                    <div class="col-sm-7">
+                    </div>
+                </div>
+            }
+
+            <div class="space-6"></div>
+            <div id="mydiv">
+                <iframe id="frame" style="width: 100%; height: 400px; border: none;"></iframe>
+            </div>
+
+            <!-- PAGE CONTENT ENDS -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+<!-- /.page-content -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        initPage();
+
+        $("#btnReport").click(function (e) {
+            e.preventDefault();
+            var date = $("#ToDate").val();
+            var userId = $("#UserId").val();
+            var groupId = $("#GroupId").val();
+            var majorId = $("#MajorId").val();
+            var branchId = '@ViewBag.BranchId';
+            var schoolId = $("#SchoolId").val();
+            var sourceTypeId = $("#SourceTypeId").val();
+            var reportType = $("#ddlDayReportType").val();
+            var handoverToDate = $("#HandoverToDate").val();
+            var handoverFromDate = $("#HandoverFromDate").val();
+            var latchId = $('#ddlLatchId').val() == null || $('#ddlLatchId').val() == '' ? 0 : $('#ddlLatchId').val();
+            var lumpedId = $('#ddlLumpedId').val() == null || $('#ddlLumpedId').val() == '' ? 0 : $('#ddlLumpedId').val();
+
+            var url = '/admin/report/showbc02?dayReportType={0}&groupId={1}&userId={2}&schoolId={3}&majorId={4}&branchId={5}&sourceTypeId={6}&date={7}&lumpedId={8}&latchId={9}&hFromDate={10}&hToDate={11}';
+            var url = url.format(reportType, groupId, userId, schoolId, majorId, branchId, sourceTypeId, date, lumpedId, latchId, handoverFromDate, handoverToDate);
+            $("#frame").attr("src", url);
+        });
+    });
+
+    function loadLatch() {
+        var lumpedId = $('#ddlLumpedId').val();
+        var url = "/admin/api/latch/getbylumpedid?lumpedId=" + lumpedId;
+        $.ajax({
+            url: url,
+            type: 'GET',
+            success: function (data) {
+                if (data == null) return;
+                var options = '';
+                for (var i = 0; i < data.length; i++) {
+                    options += '<option value="' + data[i].Id + '">' + data[i].Name + '</option>';
+
+                }
+                $('#ddlLatchId').empty().append(options);
+            }
+        });
+    }
+
+    function initPage() {
+        $("#ToDate").datepicker({ format: 'dd/mm/yyyy', autoclose: true });
+        $("#HandoverToDate").datepicker({ format: 'dd/mm/yyyy', autoclose: true });
+        $("#HandoverFromDate").datepicker({ format: 'dd/mm/yyyy', autoclose: true });
+
+        // Group
+        $("#GroupId").change(function () {
+            loadUserByGroupId();
+        });
+
+        // Change Lumped
+        loadLatch();
+        $("#ddlLumpedId").change(function () {
+            loadLatch();
+        });
+
+        $("#ddlDayReportType").change(function () {
+            var id = $(this).val();
+            if (id == '@((int)DayReportType.Lumped)') {
+                $('#divDay').css('display', 'none');
+                $('#divLatch').css('display', 'none');
+                $('#divLumped').css('display', 'block');
+            } else if (id == '@((int)DayReportType.Latch)') {
+                $('#divDay').css('display', 'none');
+                $('#divLatch').css('display', 'block');
+                $('#divLumped').css('display', 'block');
+
+                loadLatch();
+            } else {
+                $('#divDay').css('display', 'block');
+                $('#divLatch').css('display', 'none');
+                $('#divLumped').css('display', 'none');
+                if (id == '@((int)DayReportType.Day)') {
+                    $('#divDayTo').css('display', 'block');
+                    $('#lblHandoverFromDate').html('Từ ngày');
+                } else {
+                    $('#divDayTo').css('display', 'none');
+                    $('#lblHandoverFromDate').html('Chọn ngày');
+                }
+            }
+        });
+        loadUserByGroupId();
+    }
+</script>

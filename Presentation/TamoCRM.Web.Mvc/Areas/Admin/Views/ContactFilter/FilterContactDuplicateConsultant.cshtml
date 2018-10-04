@@ -1,0 +1,124 @@
+﻿@using TamoCRM.Core
+@model TamoCRM.Web.Mvc.Areas.Admin.Models.Contacts.ContactCreateModel
+
+@{
+    ViewBag.Title = "Contact trùng cho TVTS";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    const int statusIds = (int)StatusType.HandoverConsultant;
+}
+
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        }
+        catch (e) {
+
+        }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Contact</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>@ViewBag.Title</h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            @using (Ajax.BeginForm("FilterContactDuplicateConsultant", "Contact", new AjaxOptions { HttpMethod = "POST" }, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "filter_contact_duplicate_consultant" }))
+            {
+                @Html.AntiForgeryToken()
+                
+                <div class="form-group">
+                    <div class="col-sm-12" id="alert">
+                    </div>
+                    <div class="col-sm-2">
+                        <label class="bolder">Ngày đăng ký lại</label>
+                    </div>
+                    <div class="col-sm-2">
+                        @Html.TextBox("DateDuplicate", string.Empty, new { @style = "width: 100%;" })
+                    </div>
+                </div>   
+            }
+            <div class="space-6"></div>
+                <button id="btnGoFilter" class="btn-primary" style="float: right; width: 100px;">Lọc</button>
+            <div class="clearfix"></div>
+
+            <div class="space-6"></div>
+            <table id="grid-table"></table>
+            <div id="grid-pager"></div>
+
+            <!-- PAGE CONTENT ENDS -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+
+<script type="text/javascript">
+    var statusIds = '@statusIds';
+    var grid_selector = "#grid-table";
+    var employeeTypeId = '@((int)EmployeeType.Consultant)';
+    var duplicateDate = $('#DateDuplicate').val().replaceAll('/', '');
+    var url = 'admin/api/contact/FilterDuplicate?statusIds=' + statusIds + '&employeeTypeId=' + employeeTypeId + '&dateDuplicate=' + duplicateDate;
+    var heades = ['Id', 'Họ và tên', 'Level', 'Email', 'Điện thoại', 'Ngày', 'Sáng/Chiều', 'Giờ', 'Nội dung cuộc gọi gần nhất', 'Trạng thái chăm sóc', 'Ngày bị trùng', 'Thông tin trùng', 'Chức năng'];
+    var model = [
+        { name: 'Id', index: 'Id', editable: false, sorttype: 'string', editoptions: { disabled: true }, width: '0px' },
+        { name: 'Fullname', index: 'Fullname', editable: false, width: '90px', sorttype: 'string' },
+        { name: 'LevelName', index: 'LevelName', editable: false, width: '40px', sorttype: 'string', align: 'center', formatter: stringFormatter },
+        { name: 'Email', index: 'Email', editable: false, width: '70px', sorttype: 'string', align: 'center' },
+        { name: 'Mobile', index: 'Mobile', editable: false, width: '70px', sorttype: 'string', align: 'center' },
+        { name: 'AppointmentDate', index: 'AppointmentDate', editable: false, width: '60px', align: 'center', formatter: stringFormatter },
+        { name: 'AppointmentAmPm', index: 'AppointmentAmPm', editable: false, width: '70px', align: 'center', formatter: stringFormatter },
+        { name: 'AppointmentTime', index: 'AppointmentTime', editable: false, width: '40px', align: 'center', formatter: stringFormatter },
+        { name: 'CallInfo', index: 'CallInfo', editable: false, width: '200px', sorttype: 'string', align: 'left' },
+        { name: 'StatusMapName', index: 'StatusMapName', editable: false, width: '100px', formatter: stringFormatter },
+        { name: 'ImportedDate', index: 'ImportedDate', editable: false, width: '60px', align: 'center', formatter: 'date', formatoptions: { srcformat: 'Y-m-dTH:i:s', newformat: 'd/m/Y' } },
+        { name: 'DuplicateInfo', index: 'DuplicateInfo', editable: false, width: '80px', sorttype: 'string' },
+        {
+            name: 'Function', index: 'Function', editable: false, width: '55px', align: 'center', formatter: "dynamicLink",
+            formatoptions: {
+                cellValue: function (cellValue, rowId, rowData, options) {
+                    return '<div style="color:#34810c;margin:5px;"><a style="cursor: pointer;" onclick="return openDialog(' + rowData.Id + ')"><img style="width:16px; height:16px;" src="../../../../Images/edit-16.png"/></a></div>';
+                }
+            }
+        }
+    ];
+
+    $(document).ready(function () {        
+        $('#DateDuplicate').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly: true, endDate: "+0d" });
+            
+        setupGridWithoutEdit("#grid-table", "#grid-pager", url, '', "Id", "Danh sách Contact trùng", heades, model);
+
+        $(grid_selector).jqGrid("setGroupHeaders", {
+            useColSpanStyle: true,
+            groupHeaders: [
+                { startColumnName: "Fullname", numberOfColumns: 4, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;height:40px;"><b>Thông tin Contact</b></td></tr></table>' },
+                { startColumnName: "AppointmentDate", numberOfColumns: 3, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;"><b>Thông tin lịch hẹn gọi lại</b></td></tr></table>' },
+                { startColumnName: "CallInfo", numberOfColumns: 2, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;"><b>Tình trạng chăm sóc</b></td></tr></table>' }
+            ]
+        });
+    });
+
+    $("#btnGoFilter").click(function (e) {
+        e.preventDefault();
+        var duplicateDate = $('#DateDuplicate').val().replaceAll('/', '');
+        var urlNew = 'admin/api/contact/FilterDuplicate?statusIds={0}&employeeTypeId={1}&dateDuplicate={2}';
+        var newUrl = '/' + urlNew.format(statusIds, employeeTypeId, duplicateDate);
+        jQuery(grid_selector).jqGrid().setGridParam({ url: newUrl, page: 1 }).trigger("reloadGrid");
+    });
+</script>

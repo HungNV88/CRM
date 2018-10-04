@@ -1,0 +1,349 @@
+﻿@using TamoCRM.Web.Framework
+@using TamoCRM.Web.Framework.Users
+@using TamoCRM.Domain.Groups
+@using TamoCRM.Core
+@using TamoCRM.Domain.UserRole
+@using TamoCRM.Domain.SourceTypes
+@using TamoCRM.Domain.Catalogs
+@{
+    ViewBag.Title = "Danh sách contact bàn giao thành công cho QL TVTS L8";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+
+    var packages = ViewBag.PackagePriceListed;
+    ((List<PackagePriceListed>)packages).Insert(0, new PackagePriceListed { Id = 0, Name = "0", Value="Tất cả" });
+    var listPackages = new SelectList(packages, "Name", "Value");
+    
+    var user = UserContext.GetCurrentUser();
+    var groups = (List<GroupInfo>)ViewBag.Groups;
+    var branchId = UserContext.GetDefaultBranch();
+    const int employeeId = (int)EmployeeType.Consultant;
+    if (user.GroupConsultantType != (int)GroupConsultantType.ManagerConsultant)
+    {
+        groups = groups.Where(c => c.LeaderId == UserContext.GetCurrentUser().UserID || c.GroupId == (int)ViewBag.GroupId).ToList();
+    }
+    ((List<GroupInfo>)groups).RemoveAll(c => c.GroupId == 0);
+    if (groups.Count > 1)
+    {
+        ((List<GroupInfo>)groups).Insert(0, new GroupInfo { GroupId = 0, Name = "Tất cả", BranchId = branchId, EmployeeTypeId = employeeId });
+    }
+
+    var lstGroups = new SelectList(groups.Where(c => c.BranchId == branchId).Where(c => c.EmployeeTypeId == employeeId), "GroupId", "Name");
+    var lstLevels = ViewBag.Levels;
+    
+    //Users List
+    var Users = ViewBag.Users;
+    ((List<UserInfo>)Users).RemoveAll(c => c.UserID == 0);
+    ((List<UserInfo>)Users).Insert(0, new UserInfo { UserID = 0, FullName = "Tất Cả" });
+    var lstUsers = new SelectList(Users, "UserID", "FullName");
+
+
+    List<SourceTypeInfo> sourceTypes = ViewBag.SourceTypes;
+    ((List<SourceTypeInfo>)sourceTypes).RemoveAll(c => c.SourceTypeId == 0);
+    ((List<SourceTypeInfo>)sourceTypes).Insert(0, new SourceTypeInfo { SourceTypeId = 0, Name = "Tất cả" });
+    var lstSourceTypes = new SelectList(sourceTypes, "SourceTypeId", "Name");    
+    
+    var PackageFeeEdus = ViewBag.PackageFeeEdu;
+    ((List<PackageFeeEduInfo>)PackageFeeEdus).Insert(0, new PackageFeeEduInfo { Id = 0, Name = "Tất cả"});
+    var listPackageFeeEdu = new SelectList(PackageFeeEdus, "Id", "Name");
+    
+}
+
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        }
+        catch (e) {
+
+        }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Contact</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>@ViewBag.Title</h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            @using (Ajax.BeginForm("ListContactHandoverSuccessAdvisorManager", "ContactFilter", new AjaxOptions { HttpMethod = "POST" }, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "filter_contact_handover_success_advisor_manager" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <div class="col-sm-12" id="alert">
+                    </div>
+                </div>
+                
+                <div style="border: 1px solid #c5d0dc; padding: 15px 20px 0 20px;">
+
+                    <div class="form-group">
+                        <div class="col-sm-2">
+                            Nhóm TVTS
+                        </div>
+                        <div class="col-sm-3">
+                            @Html.DropDownList("GroupId", lstGroups, new { @style = "width: 100%;" })
+                        </div>
+                        <div class="col-sm-2">
+                            <label class="">TVTS</label>
+                        </div>
+                        <div class="col-sm-3">
+                            @Html.DropDownList("UserId", lstUsers, new { @style = "width: 100%;" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-2">
+                            <label class="">Giá niêm yết</label>
+                        </div>
+                        <div class="col-sm-3">
+                            @Html.DropDownList("PackageListed", listPackages, new { @style = "width: 100%;" })
+                        </div>
+
+                        <div class="col-sm-2">
+                            <label class="">Nguồn Contacts</label>
+                        </div>
+                        <div class="col-sm-3">
+                            @Html.DropDownList("SourceType", lstSourceTypes, new { @style = "width: 100%;" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-2">
+                            <label class="">Ngày bàn giao từ </label>
+                        </div>
+                        <div class="col-sm-3">
+                            @Html.TextBox("FHandoverAdvisor", string.Empty, new { @style = "width: 100%;" })
+                        </div>
+                        <div class="col-sm-2">
+                            <label class="">Đến ngày</label>
+                        </div>
+                        <div class="col-sm-3">
+                            @Html.TextBox("THandoverAdvisor", string.Empty, new { @style = "width: 100%;" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-2">
+                            <label class="">Loại tài khoản</label>
+                        </div>
+                        <div class="col-sm-3">
+                            @Html.DropDownList("PackageFeeEdu", listPackageFeeEdu, new { @style = "width: 100%;" })
+                        </div>
+
+                        <div class="col-sm-2">
+                            <label class="">Hình thức nộp học phí</label>
+                        </div>
+                        <div class="col-sm-3">
+                            @Html.DropDownList("AppointmentType", Util.SelectedList<AppointmentType>(true))
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-2">
+                            Họ và Tên
+                        </div>
+                        <div class="col-sm-3">
+                            <input id="txtName" type="text" style="width: 90%;" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-2" style="width: 16.5%;">
+                            Điện thoại
+                        </div>
+                        <div class="col-sm-3" style="width: 24%;">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="icon-phone"></i>
+                                </span>
+                                <input id="txtMobile" type="text" />
+                            </div>
+                        </div>
+                        <div class="col-sm-1">
+                            Email
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="icon-envelope"></i>
+                                </span>
+                                <input id="txtEmail" type="text" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            <div class="space-6"></div>
+            <button id="btnGoFilter" class="btn-primary" style="float: right; margin-left: 10px;">Tìm kiếm</button>
+            <button id="btnClearFilter" class="btn-primary" style="float: right;">Xóa trang</button>
+            <div class="clearfix"></div>
+            <hr />
+            <b>Tổng số tiền: </b> <input id="lblTongSoTien" type="text" disabled="disabled" style="font-weight: bold" /> <b>VND</b>
+            <hr />
+            <div class="space-6"></div>
+            <table id="grid-table"></table>
+            <div id="grid-pager"></div>
+
+            <!-- PAGE CONTENT ENDS -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+
+<script type="text/javascript">
+    
+    var grid_selector = "#grid-table";
+    var branchId = '@UserContext.GetDefaultBranch()';
+    var employeeTypeId = '@((int)EmployeeType.Consultant)';
+    var url = 'admin/api/contact/GetAllHandoverSuccessContactAdvisorManager?name={0}&phone={1}&email={2}&userIds={3}&listedprice={4}&sourcetype={5}&datewanttolearn={6}&handoverfromdateadvisor={7}&handovertodateadvisor={8}&packageFeeEdu={9}&appointmentType={10}';
+    
+    var heades = ['Id', 'Ngày bàn giao thành công', 'TVTS', 'Sản phẩm', 'Họ và tên', 'Điện thoại', 'Email', 'Số tiền phải đóng sau ưu đãi','Số tiền đã nộp', 'Loại tài khoản', 'Giá trị gói tài khoản', 'Thời gian học (đơn vị ngày)', 'Hình thức thanh toán', 'Nguồn contact', 'Trạng thái', 'Chức năng'];
+    var model = [
+        { name: 'Id', index: 'Id', editable: false, sorttype: 'string', editoptions: { disabled: true }, width: '0px' },
+        { name: 'HandoverAdvisorSuccessTime', index: 'HandoverAdvisorSuccessTime', editable: false, sorttype: 'string', width: '25px', formatter: 'date', formatoptions: { srcformat: 'Y-m-dTH:i:s', newformat: 'd/m/Y H:i' } },
+        { name: 'UserName', index: 'UserName', editable: false, width: '20px', sorttype: 'string' },
+        { name: 'ProductSaleId', index: 'ProductSaleId', editable: false, width: '20px', formatter: productFomatter },
+        { name: 'Fullname', index: 'Fullname', editable: false, width: '30px', sorttype: 'string' },
+        { name: 'Mobile1', index: 'Mobile1', editable: false, width: '30px', sorttype: 'string', align: 'center' },
+        { name: 'Email', index: 'Email', editable: false, width: '30px', sorttype: 'string', align: 'center' },
+        { name: 'PackagePriceSale', index: 'PackagePriceSale', editable: false, width: '20px', sorttype: 'string', align: 'center', formatter: moneyFormatter },
+        { name: 'FeeEdu', index: 'FeeEdu', editable: false, width: '20px', sorttype: 'string', width: '0px', align: 'center', formatter: moneyFormatter }, // editoptions: { disabled: false },
+        { name: 'Package', index: 'Package', editable: false, width: '20px', sorttype: 'string', align: 'center' },
+        { name: 'PricePackageListedId', index: 'PricePackageListedId', editable: false, width: '20px', sorttype: 'string', align: 'center', formatter: moneyFormatter },
+        { name: 'LearnNumberDay', index: 'LearnNumberDay', editable: false, width: '15px', sorttype: 'string', align: 'center' },
+        { name: 'AppointmentType', index: 'AppointmentType', editable: false, width: '15px', sorttype: 'string', align: 'center' },
+        { name: 'SourceType', index: 'SourceType', editable: false, width: '20px', sorttype: 'string', align: 'center' },
+        { name: 'sHandoverStatusAdvisor', index: 'sHandoverStatusAdvisor', editable: false, width: '20px', sorttype: 'string', align: 'center' },
+        {
+            name: 'Function', index: 'Function', editable: false, width: '10px', align: 'center', formatter: "dynamicLink",
+            formatoptions: {
+                cellValue: function (cellValue, rowId, rowData, options) {
+                    var groupType = '@ViewBag.GroupType';
+                    if (groupType == '@((int)GroupConsultantType.ManagerConsultant)') {
+                        return '<div style="color:#34810c;margin:5px; float:left;"><a style="cursor: pointer;" onclick="return openDialog(' + rowData.Id + ')"><img style="width:16px; height:16px;" src="../../../../Images/edit-16.png"/></a></div>' +
+                            //'<div style="color:#34810c;margin:5px; float:left;"><a href="" onclick="return deleteClick(' + rowData.Id + ');">   <img style="width:16px; height:16px;" src="../../../../Images/delete-16.png"/></a></div>' +
+                            '<div style="clear: both;"></div>';
+                    } else {
+                        return '<div style="color:#34810c;margin:5px;"><a style="cursor: pointer;" onclick="return openDialog(' + rowData.Id + ')"><img style="width:16px; height:16px;" src="../../../../Images/edit-16.png"/></a></div>';
+                    }
+                }
+            }
+        }
+    ];
+    $(document).ready(function () {
+
+        bindGlobalProducts();
+
+        $('#UserId').chosen();
+        var groupId = $("#GroupId").val();
+        loadUser(branchId, groupId, employeeTypeId, "UserId");
+
+        $('#DateWantToLearn').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly: true });
+        $('#FHandoverAdvisor').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly: true });
+        $('#THandoverAdvisor').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly: true });
+        
+        var newUrl = url.format('', '', '', '', '0', 0,'',null,null,0,0);
+        setupGridWithHeight("#grid-table", "#grid-pager", newUrl, '', "Id", "Danh sách Contact bàn giao", heades, model, 'GET', '100%');
+        $(grid_selector).jqGrid("setGroupHeaders", {
+            useColSpanStyle: true,
+            groupHeaders: [
+                { startColumnName: "Fullname", numberOfColumns: 4, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;height:40px;"><b>Thông tin Contact</b></td></tr></table>' },
+                { startColumnName: "AppointmentDate", numberOfColumns: 3, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;"><b>Thông tin lịch hẹn gọi lại</b></td></tr></table>' },
+                { startColumnName: "CallInfo", numberOfColumns: 2, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;"><b>Tình trạng chăm sóc</b></td></tr></table>' }
+            ]
+        });
+
+        $(window).keydown(function (e) {
+            if (e.keyCode == 13) {
+                e.preventDefault();
+                $("#btnGoFilter").click();
+            }
+        });
+
+        $("#btnGoFilter").click(function (e) {
+            e.preventDefault();
+
+            // Param
+            var name = $('#txtName').val() == null ? '' : $('#txtName').val();
+            var email = $('#txtEmail').val() == null ? '' : $('#txtEmail').val();
+            var mobile = $('#txtMobile').val() == null ? '' : $('#txtMobile').val();
+            var userIds = $('#UserId').val();
+            if (userIds == 0) userIds = $('#GroupId').val() != 0 ? getIds('UserId') : '';
+            var listedprice = $('#PackageListed').val();
+            var sourcetype = $('#SourceType').val();
+            
+            var datewanttolearn = '';
+            var handoverfromdateadvisor = $('#FHandoverAdvisor').val().replaceAll('/','');
+            var handovertodateadvisor = $('#THandoverAdvisor').val().replaceAll('/','');
+            var packageFeeEdu = $('#PackageFeeEdu').val();
+            var appointmentType = $('#AppointmentType').val();
+            
+            // Format Url
+            alertHide();
+            var newUrl = '/' + url.format(name, mobile, email, userIds, listedprice, sourcetype, datewanttolearn, handoverfromdateadvisor, handovertodateadvisor, packageFeeEdu, appointmentType);
+            $.ajax({
+                type: 'POST',
+                url: '/admin/api/contact/GetTotalMoney',
+                data: {
+                    name: name,
+                    mobile: mobile,
+                    email: email,
+                    userids: userIds,
+                    listedprice: listedprice,
+                    sourcetype: sourcetype,
+                    datewanttolearn: datewanttolearn,
+                    handoverfromdateadvisor: handoverfromdateadvisor,
+                    handovertodateadvisor: handovertodateadvisor,
+                    packageFeeEdu: packageFeeEdu,
+                    appointmentType: appointmentType,     
+                },
+                beforeSend: function () {
+                    
+                },
+                success: function (response) {
+                    
+                    $("#lblTongSoTien").val(commaSeparateNumber(response));
+                },
+                error: function (request, status, ex) {
+                    
+                }
+            });
+            jQuery(grid_selector).jqGrid().setGridParam({ url: newUrl, page: 1 }).trigger("reloadGrid");
+            
+        });
+    });
+
+    $("#GroupId").change(function () {
+        var groupId = $("#GroupId").val();
+        $.when(loadUser(branchId, groupId, employeeTypeId, "UserId")).done(function () {
+            loadLevels();
+        });
+    });
+    
+    function commaSeparateNumber(val) {
+        if (val == null || val.length == 0) return '';
+        while (/(\d+)(\d{3})/.test(val.toString())) {
+            val = val.toString().replace(/(\d+)(\d{3})/, '$1' + '.' + '$2');
+        }
+        return val;
+    }
+</script>
+
+
+
+

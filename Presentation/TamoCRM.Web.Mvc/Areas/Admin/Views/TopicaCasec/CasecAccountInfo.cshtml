@@ -1,0 +1,98 @@
+﻿@{
+    ViewBag.Title = "CasecAccountInfo";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>Check thông tin tài khoản Casec còn lại</h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="form-group">
+            <div class="col-sm-12" id="alert">
+                @ViewBag.Message
+            </div>
+        </div>
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            <div class="form-group">
+                <div class="col-sm-3" style="margin-left: 0px;">
+                    <button  id="btnCheckCountCasec" class="btn-import btn-primary">Check số lượng tk Casec</button>
+                </div>
+            </div>
+            <br />
+            <div class="form-group">
+                <div class="col-sm-2" style="margin-left: 0px;">
+                    <label class="bolder">Số lượng còn: </label>
+                </div>
+                <div class="col-sm-1">
+                    <input type="text" readonly="readonly" name="" id="CountCasec" />
+                </div>
+            </div>
+            <br />
+            <hr />
+            <div class="space-6"></div>
+            <div class="space-6"></div>
+
+            @using (Ajax.BeginForm("CasecAccountInfo", "TopicaCasec", new AjaxOptions { HttpMethod = "POST" }, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <div class="col-sm-3">
+                        <input type="file" name="excelfile" id="excelfile" />
+                    </div>
+                    <div class="col-sm-3">
+                        <button type="submit" id="btnExcel" class="btn-import btn-primary" value="Import" style="padding-left: 0px;">Update</button>
+                    </div>
+                </div>
+            }
+            <div class="space-6"></div>
+            <table id="grid-table"></table>
+            <div id="grid-pager"></div>
+
+            <!-- PAGE CONTENT ENDS -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+
+<script type="text/javascript">
+    var grid_selector = "#grid-table";
+    
+    var newUrl = '/admin/api/CasecAccount/GetAllNotUse';
+    var heades = ['Id', 'Tài khoản', 'Mật khẩu', 'Trạng thái sử dụng'];
+    var model = [
+        { name: 'Id', index: 'Id', editable: false, sorttype: 'string', editoptions: { disabled: true }, width: '0px' },
+        { name: 'Account', index: 'Account', editable: false, width: '90px', sorttype: 'string' },
+        { name: 'Password', index: 'Password', editable: false, width: '80px', sorttype: 'string' },
+        { name: 'StatusString', index: 'StatusString', editable: false, width: '40px', sorttype: 'string' }
+    ];
+
+    $(document).ready(function () {
+
+        $("#btnCheckCountCasec").click(function (e) {
+            e.preventDefault();
+            alertHide();
+           
+            $.ajax({
+                type: 'GET',
+                url: '/admin/api/CasecAccount/CheckSumCasecAccount',
+                data: {
+                   
+                },
+                success: function (data) {
+                    $("#CountCasec").val(data);
+                    
+                },
+                error: function (request, status, ex) {
+                    alertError("Hệ thống bị lỗi!");
+                }
+            });
+        });
+    });
+</script>

@@ -1,0 +1,87 @@
+﻿@using TamoCRM.Core
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try { ace.settings.check('breadcrumbs', 'fixed') } catch (e) { }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Lọc contact</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>L1 (CC)
+        </h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            
+            <table id="grid-table"></table>
+
+            <div id="grid-pager"></div>
+
+
+            <!-- PAGE CONTENT ENDS -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+<!-- /.page-content -->
+
+<!-- inline scripts related to this page -->
+
+<script type="text/javascript">
+    var grid_selector = "#grid-table";
+    var heades = ['Id', 'Họ tên', 'Người lấy', 'Kênh', 'Trạng thái'];
+    var model = [
+            //{
+            //    name: 'act', index: '', width: 80, fixed: true, sortable: false, resize: false,
+            //    formatter: 'actions',
+            //    formatoptions: {
+            //        keys: true,
+
+            //        delOptions: {
+            //            recreateForm: true, beforeShowForm: beforeDeleteCallback, delData: {
+            //                ContactId: function () {
+            //                    var sel_id = $(grid_selector).jqGrid('getGridParam', 'selrow');
+            //                    var value = $(grid_selector).jqGrid('getCell', sel_id, 'Id');
+            //                    return value;
+
+            //                }
+            //            }
+            //        },
+            //    }
+            //},
+			{ name: 'Id', index: 'ContactId', width: 60, editable: true, sorttype: 'int', editoptions: { disabled: 'true' }, width: 50 },
+			{ name: 'Fullname', index: 'Fullname', editable: true, sorttype: 'string' },
+            { name: 'CollectorId', index: 'CollectorId', editable: true, sorttype: 'string', formatter: collectorFomatter },
+            { name: 'ChannelName', index: 'ChannelName', editable: true, sorttype: 'string' },
+            { name: 'StatusName', index: 'StatusName', editable: true, sorttype: 'string' }
+
+    ];
+    $(document).ready(function () {
+        setupGridWithoutEdit("#grid-table", "#grid-pager", "admin/contactfilter/GetForFilterTeam?branchId=@TamoCRM.Web.Framework.Users.UserContext.GetDefaultBranch()&collectorId=0&channelId=0&importId=0&levelId=@((int)LevelType.L1)&sourceTypeId=@TamoCRM.Domain.SourceTypes.SourceTypeIds.CC&schoolId=0&statusId=0", "", "ContactId", "Contacts", heades, model);
+        $("#btnSearch").click(function (e) {
+            e.preventDefault();
+            var newUrl = "/admin/contactfilter/GetForFilterTeam?branchId=@TamoCRM.Web.Framework.Users.UserContext.GetDefaultBranch()&collectorId=0&channelId=0&importId=0&levelId=@((int)LevelType.L1)&sourceTypeId=@TamoCRM.Domain.SourceTypes.SourceTypeIds.CC&schoolId=0&statusId=0";
+            jQuery(grid_selector).jqGrid().setGridParam({ url: newUrl }).trigger("reloadGrid");
+        });
+    });
+</script>
+

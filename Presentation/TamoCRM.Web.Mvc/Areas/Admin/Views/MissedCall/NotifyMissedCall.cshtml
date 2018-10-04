@@ -1,0 +1,55 @@
+﻿@{
+}
+<li class="light-blue" id="li-missedcall" style="border: none; margin-left: 0px; ">
+    <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+        <i id="icon-missedcall" class="icon-bell-alt icon-animated-bell"></i>
+        <span id="lblAmount" class="badge badge-important"></span>
+    </a>
+    <ul id="notify-content" class="pull-right dropdown-navbar dropdown-menu dropdown-caret dropdown-close" style="width: 220px;">
+        <li class="dropdown-header">
+            <i class="icon-mobile-phone"></i>
+            <span id="lblMessage" style="font-weight: bold;"></span> cuộc gọi nhỡ
+        </li>
+        <li id="notify-list" style="max-height: 250px; overflow-y: auto;"></li>
+    </ul>
+</li>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#li-missedcall').css('display', 'none');
+        $.ajax({
+            type: 'GET',
+            url: "/admin/api/MissedCall/GetAllMissedCall",
+            success: function (data) {
+                if (data != null && data.length > 0) {
+                    $('#lblAmount').html(data.length);
+                    $('#notify-content').css('display', '');
+                    var html = '';
+                    var amount = 0;
+                    for (var i = 0; i < data.length; i++) {
+                        var item = data[i];
+                        html += '<a style="cursor: pointer;" onclick="return openDialog(' + item.ContactId + ')">' +
+                            '<span class="msg-body" style="width: 100%;text-align: left;">' +
+                            '<span class="msg-title"><span class="blue">' + item.ContactName + ' (' + item.Amount + ' cuộc)</span></span>' +
+                            '<span class="msg-time"><i class="icon-phone"></i><span class="red"> ' + item.PhoneNumber + '</span></span>' +
+                            '<span class="msg-time"><i class="icon-time"></i><span> ' + item.StringMissedCallTime + '</span></span>' +
+                            '</span></a>';
+                        amount += item.Amount;
+                    }
+                    $('#notify-list').html(html);
+                    $('#lblMessage').html(amount);
+                    $('#li-missedcall').css('display', 'block');
+                } else {
+                    $('#lblAmount').html('');
+                    $('#notify-content').html('');
+                    $('#li-missedcall').css('display', 'none');
+                }
+            },
+            error: function (request, status, ex) {
+                $('#lblAmount').html('');
+                $('#notify-content').html('');
+                $('#li-missedcall').css('display', 'none');
+            }
+        });
+    });
+</script>

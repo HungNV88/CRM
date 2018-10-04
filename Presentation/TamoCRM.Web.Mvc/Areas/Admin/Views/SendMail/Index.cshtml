@@ -1,0 +1,26 @@
+﻿@model TamoCRM.Web.Mvc.Areas.Admin.Models.Email.ContactModel
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Gửi Email</h2>
+<section id="loginForm">
+    <h2>Form liên hệ</h2>
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true)
+
+        <fieldset>
+            <legend>
+                Form
+            </legend> 
+            @Html.EditorForModel()
+
+            <input type="submit" value="Gửi" />
+        </fieldset>
+        
+    }
+
+
+</section>

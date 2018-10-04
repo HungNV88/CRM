@@ -1,0 +1,172 @@
+﻿@using TamoCRM.Core
+@using TamoCRM.Core.Commons.Extensions
+@using TamoCRM.Domain.SourceTypes
+@using TamoCRM.Domain.UserRole
+@using TamoCRM.Domain.Groups
+@using TamoCRM.Web.Framework.Users
+@using TamoCRM.Web.Mvc.Areas.Admin.WebApi.Users
+@model TamoCRM.Web.Mvc.Areas.Admin.Models.Reports.BC10Model
+@{
+    ViewBag.Title = "Báo cáo tình trạng chi tiết Contact";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+
+    List<SourceTypeInfo> sourceTypes = ViewBag.SourceTypes;
+    if (sourceTypes != null)
+    {
+        sourceTypes = sourceTypes.Where(c => c.SourceTypeId == (int)SourceType.CC || c.SourceTypeId == (int)SourceType.MO || c.SourceTypeId == (int)SourceType.MF).ToList();
+        sourceTypes.RemoveAll(c => c.SourceTypeId == 0);
+        sourceTypes.Insert(0, new SourceTypeInfo { SourceTypeId = 0, Name = "Tất cả" });
+    }
+    var lstSourceTypes = new SelectList(sourceTypes, "SourceTypeId", "Name");
+    var groups = (List<GroupInfo>)ViewBag.Groups;
+    var branchId = UserContext.GetDefaultBranch();
+    var user = UserContext.GetCurrentUser();
+    if (user.GroupConsultantType != (int)GroupConsultantType.ManagerConsultant)
+    {
+        groups = groups.Where(c => c.LeaderId == UserContext.GetCurrentUser().UserID || c.GroupId == (int)ViewBag.GroupId).ToList();
+    }
+    ((List<GroupInfo>)groups).RemoveAll(c => c.GroupId == 0);
+    if (((List<GroupInfo>)groups).Count > 1)
+    {
+        ((List<GroupInfo>)groups).Insert(0, new GroupInfo { GroupId = 0, Name = "Tất cả", BranchId = branchId, EmployeeTypeId = (int)EmployeeType.Consultant });
+    }
+    var lstGroups = new SelectList(((List<GroupInfo>)groups).Where(c => c.BranchId == branchId).Where(c => c.EmployeeTypeId == (int)EmployeeType.Consultant), "GroupId", "Name");
+    int group_id = groups.FirstOrDefault().GroupId;
+
+    // User
+    var users = ((List<UserInfo>)ViewBag.Users).Where(c => !c.GroupId.IsIntegerNull()).Where(c => !c.IsSuperAdmin == true).Where(c => c.IsConsultant == true).Where(c => c.BranchId == branchId).ToList();
+    
+    var lstUsers = new SelectList(users.Select(c => new { UserID = c.UserID, FullName = c.FullName }).Distinct(), "UserID", "FullName");
+
+    //// Collaborator
+    //var collaborators = ((List<UserInfo>)ViewBag.Users).Where(c => c.IsCollaborator).ToList();
+    //if (collaborators.Any())
+    //{
+    //    collaborators.Insert(0, new UserInfo { UserID = 0, FullName = "Tất cả" });
+    //}
+    //var lstCollaborators = new SelectList(collaborators.Select(c => new { UserID = c.UserID, FullName = c.FullName }).Distinct(), "UserID", "FullName");
+
+   
+}
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        } catch (e) { }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Báo cáo</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>Báo cáo tình trạng chi tiết Contact</h1>
+    </div>
+    <!-- /.page-header -->
+
+
+
+    <div class="row">
+        <div class="form-group">
+            <div class="col-sm-12" id="alert">
+            </div>
+        </div>
+        <div class="col-xs-12">
+            @using (Ajax.BeginForm("BC10", "Report", new AjaxOptions { HttpMethod = "POST" }, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "uploadexcelform" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="row">
+                    <div class="col-xs-1">
+                        Nguồn
+                    </div>
+                    <div class="col-xs-2">
+                        <div class="clearfix">
+                            @Html.DropDownList("SourceTypeId", lstSourceTypes, new { @style = "width: 100%" })
+                            <input type="hidden" id="GroupId" value=@group_id />
+                        </div>
+                    </div>                  
+                    <div class="col-xs-1" style="width: 5%;">
+                        TVTS
+                    </div>
+                    <div class="col-xs-2">
+                        <div class="clearfix">
+                            @Html.DropDownList("UserId", lstUsers, new { @style = "width: 100%" })
+                        </div>
+                    </div>
+                    <div class="col-xs-1">
+                        Từ ngày
+                    </div>
+                    <div class="col-xs-2">
+                        <div class="clearfix">
+                            @Html.TextBox("UserFromDate", string.Empty, new { @style = "width: 100%" })
+                        </div>
+                    </div>
+                    <div class="col-xs-1">
+                        Đến ngày
+                    </div>
+                    <div class="col-xs-2">
+                        <div class="clearfix">
+                            @Html.TextBox("UserToDate", string.Empty, new { @style = "width: 100%" })
+                        </div>
+                    </div>
+                </div>
+                <div class="space-6"></div>
+                <hr />
+                <div class="space-2"></div>
+                <button type="button" class="btn-import btn-primary" id="btnReport" style="margin-right: 6px;">Xuất báo cáo</button>
+                <button type="button" class="btn-import btn-primary" id="btnSave">Tải về</button>
+                <div class="clearfix"></div>
+            }
+
+            <div class="space-6"></div>
+            <div id="mydiv">
+                <iframe id="frame" style="width: 100%; height: 400px; border: none;"></iframe>
+            </div>
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+<!-- /.page-content -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        GetConsultantNomrByBranchId(true);
+        loadUserByGroupId();
+        $("#UserToDate").datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly: true, endDate: "+0d" });
+        $("#UserFromDate").datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly: true, endDate: "+0d" });
+
+        $("#btnReport").click(function (e) {
+            e.preventDefault();
+            var consultantId = $('#UserId').val();
+            var sourceTypeId = $('#SourceTypeId').val();
+            var consultantToDate = $("#UserToDate").val().replaceAll('/', '');
+            var consultantFromDate = $("#UserFromDate").val().replaceAll('/', '');
+            
+            var url = '/admin/report/showbc10?sourceTypeId={0}&userId={1}&consultantFromDate={2}&consultantToDate={3}&reportType={4}';
+            var url = url.format(sourceTypeId, consultantId, consultantFromDate, consultantToDate, '@((int)ReportType.Pdf)');
+            $("#frame").attr("src", url);
+        });
+
+        $("#btnSave").click(function (e) {
+            e.preventDefault();
+            var consultantId = $('#UserId').val();
+            var sourceTypeId = $('#SourceTypeId').val();
+            var consultantToDate = $("#UserToDate").val().replaceAll('/', '');
+            var consultantFromDate = $("#UserFromDate").val().replaceAll('/', '');
+
+            var url = '/admin/report/showbc10?sourceTypeId={0}&userId={1}&consultantFromDate={2}&consultantToDate={3}&reportType={4}';
+            var url = url.format(sourceTypeId, consultantId, consultantFromDate, consultantToDate, '@((int)ReportType.Excel)');
+            $("#frame").attr("src", url);
+        });
+    });
+</script>

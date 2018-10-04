@@ -1,0 +1,23 @@
+﻿@using TamoCRM.Web.Framework.Users
+@{
+    var branches = ViewBag.UserBranches;
+    var selectList = new SelectList(branches, "BranchId","Name", UserContext.GetDefaultBranch().ToString());
+    var username = TamoCRM.Web.Framework.Users.UserContext.GetCurrentUser().UserName;
+}
+@Html.DropDownList("dropUserBranch", selectList, new { @class = "form-control" })
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#dropUserBranch").change(function (e) {
+            e.preventDefault();
+            document.cookie = "@(username)_branch=" + $(this).val();
+            $.ajax({
+                url: "/admin/branch/BranchSelectBox",
+                type: "POST",
+                data: { branchId: $("#dropUserBranch").val() }
+            }).done(function () {
+                location.reload();
+            });
+            
+        });
+    });
+</script>

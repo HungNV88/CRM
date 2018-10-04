@@ -1,0 +1,127 @@
+﻿@using TamoCRM.Core
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+
+    var lstLevels = ViewBag.LevelWithContactCount;
+}
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        } catch (e) { }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Danh sách contacts</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>Danh sách contacts L2+ (Nguồn Collector)
+        </h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            @using (Ajax.BeginForm("FilterContactCCL2Plus", "Contact", new AjaxOptions { HttpMethod = "GET" }, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "filter_contact_recovery_form" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <div class="col-sm-12" id="alert">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-1">
+                        <label class="bolder">Level</label>
+                    </div>
+                    @foreach (var item in lstLevels)
+                    {
+                        if (item.LevelId >= 2)
+                        {
+                        <div class="col-sm-2" style="width: 10%;">
+                            <input type="checkbox" name='chkLevels' id='@(item.LevelId)_chkLevel' />
+                            <label for="@(item.LevelId)_chkLevel">@item.Name (@item.ContactCount)</label>
+                        </div>
+                        }
+                    }
+                </div>
+                <div class="space-2"></div>
+                <hr />
+                <div class="space-2"></div>
+                <button id="btnGoFilter" class="btn-primary" style="margin-bottom: 10px; float: right;">Lọc Contact</button>
+                <div class="clearfix"></div>
+                <div class="space-4"></div>
+                <div class="row">
+                    <div class="col-xs-12">
+                        <table id="grid-table"></table>
+                        <div id="grid-pager"></div>
+                    </div>
+                </div>
+            }
+
+            <!-- PAGE CONTENT ENDS -->
+        </div>
+        <!-- /.col -->
+    </div>
+</div>
+<!-- /.page-content -->
+
+<!-- inline scripts related to this page -->
+
+<script type="text/javascript">
+    var url = '/admin/api/contact/FilterCCL2Plus?levelIds={0}';
+    var grid_selector = "#grid-table";
+    var heades = ['Id', 'Họ tên', 'SĐT', 'Email', 'Trường tốt nghiệp', 'Ngành tốt nghiệp', 'Nơi sống', 'Đã đi làm', 'Đã từng học liên thông, ĐH, VB2', 'Trường đăng ký', 'Ngành đăng ký', 'Ngày đăng ký', 'Ghi chú', 'CTV gọi'];
+    var model = [
+        { name: 'Id', index: 'ContactId', editable: false, sorttype: 'string', editoptions: { disabled: true }, width: '0px' },
+        { name: 'Fullname', index: 'Fullname', editable: true, sorttype: 'string' },
+        { name: 'Mobile', index: 'Mobile', editable: false, sorttype: 'string' },
+        { name: 'Email', index: 'Email', editable: false, sorttype: 'string' },
+        { name: 'SchoolGrad', index: 'SchoolGrad', editable: false, sorttype: 'string' },
+        { name: 'MajorGrad', index: 'MajorGrad', editable: false, sorttype: 'string' },
+        { name: 'LocationId', index: 'LocationId', editable: true, sorttype: 'string', formatter: locationFomatter },
+        { name: 'HaveJob', index: 'HaveJob', editable: false, align: 'center', formatter: haveJobFormatter },
+        { name: 'HaveLearn', index: 'HaveLearn', editable: false, align: 'center', formatter: haveLearnFormatter },
+        { name: 'SchoolId', index: 'SchoolId', editable: true, sorttype: 'string', formatter: schoolFomatter },
+        { name: 'MajorId', index: 'MajorId', editable: true, sorttype: 'string', formatter: majorFomatter },
+        { name: 'RegisteredDate', index: 'RegisteredDate', editable: false, formatter: 'date', formatoptions: { newformat: 'd/m/Y' } },
+        { name: 'Notes', index: 'Notes', editable: true, sorttype: 'string' },
+        { name: 'CollaboratorName', index: 'CollaboratorName', editable: true, sorttype: 'string' }
+    ];
+    $(document).ready(function () {
+        setupGridWithoutEdit("#grid-table", "#grid-pager", "", "", "ContactId", "Contacts", heades, model);
+        $(grid_selector).jqGrid("setGroupHeaders", {
+            useColSpanStyle: true,
+            groupHeaders: [
+                { startColumnName: "Fullname", numberOfColumns: 3, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;height:40px;"><b>Thông tin Contacts</b></td></tr></table>' },
+                { startColumnName: "SchoolGrad", numberOfColumns: 5, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;"><b>Thông tin Level 2</b></td></tr></table>' },
+                { startColumnName: "SchoolId", numberOfColumns: 4, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;"><b>Thông tin đăng ký học</b></td></tr></table>' }
+            ]
+        });
+        
+        $("#btnGoFilter").click(function (e) {
+            e.preventDefault();
+
+            // Param
+            var levelIds = buildParamLevels();
+            if (levelIds.length == 0) {
+               alertError("Nội dung tìm kiếm không phù hợp!");
+            }
+
+            // Format Url
+            var newUrl = url.format(levelIds);
+            jQuery(grid_selector).jqGrid().setGridParam({ url: newUrl }).trigger("reloadGrid");
+        });
+    });
+</script>

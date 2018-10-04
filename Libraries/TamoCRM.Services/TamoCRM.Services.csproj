@@ -1,0 +1,137 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{3C7855AC-1E91-4FD3-BF6E-AF0B56BDCD15}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>TamoCRM.Services</RootNamespace>
+    <AssemblyName>TamoCRM.Services</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Newtonsoft.Json.4.5.6\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="RestSharp">
+      <HintPath>C:\Users\kira1077\Desktop\RestSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="StackExchange.Redis">
+      <HintPath>..\..\packages\StackExchange.Redis.1.0.223\lib\StackExchange.Redis.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Activity\ActivityObjectChangeRepository.cs" />
+    <Compile Include="AppointmentInterview\AppointmentInterviewRepository.cs" />
+    <Compile Include="Banks\BankRepository.cs" />
+    <Compile Include="Branches\BranchRepository.cs" />
+    <Compile Include="Caching\RedisCachingProvider.cs" />
+    <Compile Include="CallHistories\CallHistoryRepository.cs" />
+    <Compile Include="CC3ContactReport\CC3ContactReportRepository.cs" />
+    <Compile Include="Channels\ChannelRepository.cs" />
+    <Compile Include="Collectors\CollectorRepository.cs" />
+    <Compile Include="ContactLevelInfos\ContactLevelInfoRepository.cs" />
+    <Compile Include="Contacts\ContactAllRepository.cs" />
+    <Compile Include="Contacts\ContactRepository.cs" />
+    <Compile Include="ContactTmps\ContactTmpRepository.cs" />
+    <Compile Include="Activity\ActivityLogRepository.cs" />
+    <Compile Include="ContactDuplicates\ContactDuplicateRepository.cs" />
+    <Compile Include="CasecAccounts\CasecAccountRepository.cs" />
+    <Compile Include="Catalogs\CatalogRepository.cs" />
+    <Compile Include="Container\ContainerRepository.cs" />
+    <Compile Include="Country\CountryRespository.cs" />
+    <Compile Include="Email\EmailRepository.cs" />
+    <Compile Include="EstimateOwner\EstimateOwnerRepository.cs" />
+    <Compile Include="FailedAdvisor\FailedAdvisorRepository.cs" />
+    <Compile Include="FeeMoneyType\FeeMoneyTypeRepository.cs" />
+    <Compile Include="LevelTester\LevelTesterRepository.cs" />
+    <Compile Include="LogFixMoney\LogFixMoneyRepository.cs" />
+    <Compile Include="LogHandoverAdvisor\LogHandoverAdvisorRepository.cs" />
+    <Compile Include="MoneyLogs\MoneyLogsRepository.cs" />
+    <Compile Include="Packge\PackgeRepository.cs" />
+    <Compile Include="PaymentType\PaymentTypeRepository.cs" />
+    <Compile Include="PricePackageListed\PricePackageListed.cs" />
+    <Compile Include="Product\ProductRepository.cs" />
+    <Compile Include="PackageFeeEdu\PackageFeeEduRepository.cs" />
+    <Compile Include="Quality\QualityRepository.cs" />
+    <Compile Include="StatusCare\StatusCareRepository.cs" />
+    <Compile Include="TeacherType\TeacherTypeRepository.cs" />
+    <Compile Include="TemplateAd\TemplateAdsRepository.cs" />
+    <Compile Include="TestResults\TestResultRepository.cs" />
+    <Compile Include="TimeSlots\TimeSlotRepository.cs" />
+    <Compile Include="TopicaAccounts\TopicaAccountRepository.cs" />
+    <Compile Include="UserDraft\UserDraftRepository.cs" />
+    <Compile Include="WebServiceConfig\WebServiceConfigRepository.cs" />
+    <Compile Include="Table\TableRepository.cs" />
+    <Compile Include="Logs\TmpLogServiceRepository.cs" />
+    <Compile Include="MissedCall\MissedCallRepository.cs" />
+    <Compile Include="Report\TmpJobReportRepository.cs" />
+    <Compile Include="DuplicateChecking\RedisDuplicateCheckingProvider.cs" />
+    <Compile Include="Groups\GroupRepository.cs" />
+    <Compile Include="StatusMap\StatusMapRepository.cs" />
+    <Compile Include="EducationLevels\EducationLevelRepository.cs" />
+    <Compile Include="ImportExcels\ImportExcelRepository.cs" />
+    <Compile Include="Levels\LevelRepository.cs" />
+    <Compile Include="Phones\PhoneRepository.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Sources\SourceRepository.cs" />
+    <Compile Include="SourceTypes\SourceTypeRepository.cs" />
+    <Compile Include="UserRole\FunctionRepository.cs" />
+    <Compile Include="UserRole\RolePermisionRepository.cs" />
+    <Compile Include="UserRole\RoleRepository.cs" />
+    <Compile Include="UserRole\UserRepository.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TamoCRM.Core\TamoCRM.Core.csproj">
+      <Project>{2a57a174-daeb-45a5-8864-861a25f5f443}</Project>
+      <Name>TamoCRM.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TamoCRM.Domain\TamoCRM.Domain.csproj">
+      <Project>{e7e8faa8-e51a-4925-a62d-0e9bcc99d091}</Project>
+      <Name>TamoCRM.Domain</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

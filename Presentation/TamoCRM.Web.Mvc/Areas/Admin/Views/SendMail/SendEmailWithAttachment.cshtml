@@ -1,0 +1,141 @@
+﻿@model TamoCRM.Web.Mvc.Areas.Admin.Models.Email.MailModel
+@using TamoCRM.Core
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutSingle.cshtml";
+    var lstTemplate = Util.SelectedList<EmailTemplateType>();
+}
+<script>
+    $(document).ready(function () {
+        if ('@ViewBag.Message' == 'Sent') {
+            alert('Mail Đã được gửi thành công');
+            window.close();
+        }                
+    });
+</script>
+<fieldset>
+    @using (@Html.BeginForm("SendEmailWithAttachment", "SendMail", FormMethod.Post, new { @id = "form1", @enctype = "multipart/form-data" }))
+    {
+        @Html.ValidationSummary()
+        
+        @*<div class="col-xs-12">*@
+            <div  style="margin-left: 30px;">
+                <table style="width: 1000px;">
+                    <tr>
+                        <td>
+                                Người nhận:
+                       </td>
+                        <td>
+                           <div>
+                                @Html.TextBoxFor(m => m.To, new { @style = "width: 100%" })
+                               
+                           </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Tiêu đề:
+                        </td>
+                        <td>
+                            <div >
+                                @Html.TextBoxFor(m => m.Subject, new { @style = "width: 100%" })
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Loại Email:
+                        </td>
+                        <td>
+                            <div>
+                                @Html.TextBoxFor(m => m.TypeEmail, new { @class = "hidden" })
+                                @Html.DropDownListFor(x => x.TypeEmail, lstTemplate, new { @style = "width: 100%", @disabled = "disabled" })                               
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            File đính kèm sẵn có:
+                        </td>
+                        <td>
+                            
+                               @*@Html.CheckBox("anh_041", true)huongdantestphongvan04.png
+                               <br />
+                               @Html.CheckBox("filedoc_042", true)CASEC_Huongdandanhchothisinh4aw.docx*@
+                            
+                            @Html.Raw(ViewBag.html4)   
+                            @Html.Raw(ViewBag.html6) 
+                            @Html.Raw(ViewBag.html7)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Nội dung:
+                        </td>
+                        <td>
+                            <div>
+                                @Html.TextAreaFor(x => x.Body, new { @class = "ckeditor", @id = "aboutme" })
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Đính kèm 1
+                        </td>
+                        <td>
+                            <div>
+                                <input type="file" name="fileUploader"/>
+                            </div>
+                        </td>
+                    </tr>
+                     <tr>
+                        <td>Đính kèm 2
+                        </td>
+                        <td>
+                            <div >
+                                <input type="file" name="fileUploader2" />
+                            </div>
+
+                        </td>
+                    </tr>
+                     <tr>
+                        <td>Đính kèm 3
+                        </td>
+                        <td>
+                            <div>
+                                <input type="file" name="fileUploader3" />
+                            </div>
+                        </td>
+                    </tr>
+                     <tr>
+                        <td>Đính kèm 4
+                        </td>
+                        <td>
+                            <div >
+                                <input type="file" name="fileUploader4" />
+                            </div>
+
+                        </td>
+                    </tr>
+                     <tr>
+                        <td>Đính kèm 5
+                        </td>
+                        <td>
+                            <div >
+                                <input type="file" name="fileUploader5" />
+                            </div>
+
+                        </td>
+                    </tr>
+                    <tr style="visibility: hidden">
+                        <td>
+                            <div >
+                                @Html.TextBoxFor(m => m.ContactId)
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+                <div>
+                    <input type="submit" value="Gửi" />
+                </div>
+
+            </div>
+                        @* </div>  *@
+    }
+</fieldset>

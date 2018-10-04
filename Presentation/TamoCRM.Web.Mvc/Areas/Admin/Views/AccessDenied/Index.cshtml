@@ -1,0 +1,65 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_Error.cshtml";
+}
+<style type="text/css">
+    .btn-import {
+        display: inline-block;
+        color: #FFF!important;
+        text-shadow: 0 -1px 0 rgba(0,0,0,0.25)!important;
+        background-image: none!important;
+        border-radius: 0;
+        box-shadow: none!important;
+        -webkit-transition: all ease .15s;
+        transition: all ease .15s;
+        cursor: pointer;
+        vertical-align: middle;
+        margin: 0;
+        position: relative;
+        font-size: 13px;
+        padding: 4px 9px;
+        line-height: 1.39;
+    }
+</style>
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed'); } catch (e) { }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Lỗi</li>
+    </ul>
+    <!-- .breadcrumb -->
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>Lỗi truy cập
+        </h1>
+    </div>
+    <!-- /.page-header -->
+
+
+
+    <div class="row">
+        <div class="col-xs-12">
+            <h2>@ViewBag.Message</h2>
+            <br />
+            <h5>Click <a href="/Home">tại đây</a> để quay lại trang mặc định</h5>
+
+            <!-- PAGE CONTENT ENDS -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+<!-- /.page-content -->

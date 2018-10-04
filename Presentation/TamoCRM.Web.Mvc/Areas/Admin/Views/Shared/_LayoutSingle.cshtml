@@ -1,0 +1,136 @@
+﻿@using TamoCRM.Domain.Catalogs
+@using TamoCRM.Domain.Channels
+@using TamoCRM.Domain.Collectors
+@using TamoCRM.Domain.EducationLevels
+@using TamoCRM.Domain.Levels
+@using TamoCRM.Domain.SourceTypes
+@using TamoCRM.Domain.StatusMap
+@using TamoCRM.Domain.UserRole
+@using TamoCRM.Web.Framework.Users
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Freetalk System - User: @UserContext.GetCurrentUser().UserName</title>
+
+    <meta name="description" content="overview &amp; stats" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- basic styles -->
+
+    <link href="/Content/themes/ace/assets/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/Content/themes/ace/assets/css/font-awesome.min.css" />
+
+    <!-- page specific plugin styles -->
+    <link rel="stylesheet" href="/Content/themes/ace/assets/css/jquery-ui-1.10.3.full.min.css" />
+    <link rel="stylesheet" href="/Content/themes/ace/assets/css/datepicker.css" />
+    <link rel="stylesheet" href="/Content/themes/ace/assets/css/bootstrap-timepicker.css" />
+    <link rel="stylesheet" href="/Content/themes/ace/assets/css/ui.jqgrid.css" />
+
+    <!-- fonts -->
+
+    <link rel="stylesheet" href="/Content/themes/ace/assets/css/ace-fonts.css" />
+
+    <!-- ace styles -->
+
+    <link rel="stylesheet" href="/Content/themes/ace/assets/css/ace.min.css" />
+    <link rel="stylesheet" href="/Content/themes/ace/assets/css/ace-rtl.min.css" />
+    <link rel="stylesheet" href="/Content/themes/ace/assets/css/ace-skins.min.css" />
+    <script src="/Content/themes/ace/assets/js/ace-extra.min.js"></script>
+
+    <script type="text/javascript">
+        window.jQuery || document.write("<script src='/Content/themes/ace/assets/js/jquery-2.0.3.min.js'>" + "<" + "/script>");
+    </script>
+
+    <script type="text/javascript">
+        if ("ontouchend" in document) document.write("<script src='/Content/themes/ace/assets/js/jquery.mobile.custom.min.js'>" + "<" + "/script>");
+    </script>
+    <script src="/Content/themes/ace/assets/js/bootstrap.min.js"></script>
+    <script src="/Content/themes/ace/assets/js/typeahead-bs2.min.js"></script>
+
+    <!-- page specific plugin scripts -->
+
+    <script src="/Content/themes/ace/assets/js/date-time/bootstrap-datepicker.min.js"></script>
+    <script src="/Content/themes/ace/assets/js/date-time/bootstrap-timepicker.min.js"></script>
+    <script src="/Content/themes/ace/assets/js/jqGrid/jquery.jqGrid.min.js"></script>
+    <script src="/Content/themes/ace/assets/js/jqGrid/i18n/grid.locale-en.js"></script>
+
+    <!-- page specific plugin scripts -->
+    <script src="/Content/themes/ace/assets/js/jquery-ui-1.10.3.custom.min.js"></script>
+    <script src="/Content/themes/ace/assets/js/jquery.ui.touch-punch.min.js"></script>
+    <script src="/Content/themes/ace/assets/js/jquery.slimscroll.min.js"></script>
+    <script src="/Content/themes/ace/assets/js/jquery.easy-pie-chart.min.js"></script>
+    <script src="/Content/themes/ace/assets/js/jquery.sparkline.min.js"></script>
+    <script src="/Content/themes/ace/assets/js/flot/jquery.flot.min.js"></script>
+    <script src="/Content/themes/ace/assets/js/flot/jquery.flot.pie.min.js"></script>
+    <script src="/Content/themes/ace/assets/js/flot/jquery.flot.resize.min.js"></script>
+    <script src="/Scripts/fuelux.tree.min.js"></script>
+
+    <script type="text/javascript" src="/Content/themes/ace/assets/js/jquery.form.js"></script>
+    <script type="text/javascript" src="/Content/themes/ace/assets/js/jquery.tmpl.js"></script>
+
+    <!-- ace scripts -->
+
+    <script type="text/javascript" src="/Content/themes/ace/assets/js/ace-elements.min.js"></script>
+    <script type="text/javascript" src="/Content/themes/ace/assets/js/ace.min.js"></script>
+    <script type="text/javascript" src="/Content/themes/ace/assets/ckeditor/ckeditor.js"></script>
+
+    <!-- tamo crm-->
+    <script src="/Scripts/admin.js"></script>
+    <script src="/Scripts/admin.utility.js"></script>
+    <!-- tamo css -->
+    <link rel="stylesheet" href="/Content/themes/ace/assets/css/tamo.css" />
+
+    <!-- Piwik -->
+    @*<script type="text/javascript">
+        var _paq = _paq || [];
+        _paq.push(["setDocumentTitle", document.domain + "/" + document.title]);
+        _paq.push(['trackPageView']);
+        _paq.push(['enableLinkTracking']);
+        (function() {
+            var u=(("https:" == document.location.protocol) ? "https" : "http") + "://noc.tis.topica.vn/topica/";
+            _paq.push(['setTrackerUrl', u+'piwik.php']);
+            _paq.push(['setSiteId', 35]);
+            var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; g.type='text/javascript';
+            g.defer=true; g.async=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+        })();
+    </script>*@
+</head>
+
+<body>
+    <div class="main-container" id="main-container">
+        <div class="main-container-inner">
+            <div class="main-content" style="margin: 0;">
+                @RenderBody()
+                <div style="width: 100%; text-align: center; padding: 10px;">Copyright 2014 Topica. All Rights Reverved.</div>
+            </div>
+        </div>
+    </div>
+    <!-- /.main-container -->
+
+</body>
+
+</html>
+<script type="text/javascript">
+    globalLevels = @Html.Raw(Json.Encode(((IEnumerable<LevelInfo>)ViewBag.Levels).Select(c => new { LevelId = c.LevelId, Name = c.Name })))
+    globalStatusMaps = @Html.Raw(Json.Encode(((IEnumerable<StatusMapInfo>)ViewBag.StatusMaps).Select(c => new { Id = c.Id, Name = c.Name })))
+    globalUsers = @Html.Raw(Json.Encode(((IEnumerable<UserInfo>)ViewBag.Users).Select(c => new { UserID = c.UserID, FullName = c.FullName })))
+    globalStatusCares = @Html.Raw(Json.Encode(((IEnumerable<StatusCareInfo>)ViewBag.StatusCares).Select(c => new { Id = c.Id, Name = c.Name })))
+    @*globalChannels = @Html.Raw(Json.Encode(((IEnumerable<ChannelInfo>)ViewBag.Channels).Select(c => new { ChannelId = c.ChannelId, Name = c.Name })))*@
+    globalCollectors = @Html.Raw(Json.Encode(((IEnumerable<CollectorInfo>)ViewBag.Collectors).Select(c => new { CollectorId = c.CollectorId, Name = c.Name })));
+    globalSourceTypes = @Html.Raw(Json.Encode(((IEnumerable<SourceTypeInfo>)ViewBag.SourceTypes).Select(c => new { SourceTypeId = c.SourceTypeId, Name = c.Name })))
+    globalEducationLevels = @Html.Raw(Json.Encode(((IEnumerable<EducationLevelInfo>)ViewBag.EducationLevels).Select(c => new { EducationLevelId = c.EducationLevelId, Name = c.Name })));
+
+    $(document).ready(function () {
+        bindGlobalChannels()
+    });
+
+    function bindGlobalChannels() {
+        if (!globalChannels) {
+            $.getJSON('/admin/api/channel/get').done(function (data) {
+                globalChannels = data;
+            });
+        }
+    }
+</script>

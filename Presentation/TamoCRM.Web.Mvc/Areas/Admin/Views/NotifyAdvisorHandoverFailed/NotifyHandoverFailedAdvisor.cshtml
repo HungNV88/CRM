@@ -1,0 +1,70 @@
+﻿@using TamoCRM.Core;
+@{  
+      
+}
+<li class="light-blue" id="li-failedadvisor" style="border: none; margin-left: 0px; ">
+    <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+        <i class="icon-user"></i>
+        <span id="lblAmountNotify" class="badge badge-important"></span>
+    </a>
+    <ul id="notify-content-advisor" class="pull-right dropdown-navbar dropdown-menu dropdown-caret dropdown-close" style="width: 220px;">
+        <li class="dropdown-header">
+            <i class="icon-glyphicon"></i>
+            <span id="lblMessageNotify" style="font-weight: bold;"></span> thông báo
+        </li>
+        <li id="notify-list-advisor" style="max-height: 250px; overflow-y: auto;"></li>
+    </ul>
+</li>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#li-failedadvisor').css('display', 'none');
+        $.ajax({
+            type: 'GET',
+            url: "/admin/api/FailedAdvisor/GetAllNotifyFailedAdvisor",
+            success: function (data) {
+                if (data != null && data.length > 0) {
+                    $('#lblAmountNotify').html(data.length);
+                    $('#notify-content-advisor').css('display', '');
+                    var html = '';
+                    var amount = 0;
+                    for (var i = 0; i < data.length; i++) {
+                        var item = data[i];            
+                   
+                        if (item.Status == 3) //bàn giao nhưng không nhận
+                        {
+                            html += '<a style="cursor: pointer;" onclick="return openDialogHandoverAdvisor(' + item.ContactId + ')">' +
+                            '<span class="msg-body" style="width: 100%; text-align: left;">' +
+                            '<span class="msg-title"><span class="black"> Học viên ' + item.ContactName + ' không được Advisor tiếp nhận </span></span>' +
+                            '<span class="msg-time"><i class="icon-time"></i><span> ' + item.StringHandoverAdvisorTime + '</span></span>' +
+                            '</span></a>';
+                            amount += item.Amount;
+                        }
+
+                        if (item.Status == 4) //bàn giao thành công
+                        {
+                            html += '<a style="cursor: pointer;" onclick="return openDialogHandoverAdvisor(' + item.ContactId + ')">' +
+                            '<span class="msg-body" style="width: 100%;text-align: left;">' +
+                            '<span class="msg-title"><span class="black"> Học viên ' + item.ContactName + ' đã được bàn giao thành công. </span></span>' +
+                            '<span class="msg-time"><i class="icon-time"></i><span> ' + item.StringHandoverAdvisorTime + '</span></span>' +
+                            '</span></a>';
+                        }
+                    }
+                    $('#notify-list-advisor').html(html);
+                    $('#lblMessageNotify').html(data.length);  //data.length
+                    $('#li-failedadvisor').css('display', 'block');
+                } else {
+                    $('#lblAmountNotify').html('');
+                    $('#notify-content-advisor').html('');
+                    $('#li-failedadvisor').css('display', 'none');
+                }
+            },
+            error: function (request, status, ex) {
+                $('#lblAmountNotify').html('');
+                $('#notify-content-advisor').html('');
+                $('#li-failedadvisor').css('display', 'none');
+            }
+        });
+    });
+</script>
+

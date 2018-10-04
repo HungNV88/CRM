@@ -1,0 +1,295 @@
+﻿@using TamoCRM.Core
+@using TamoCRM.Web.Framework
+@using TamoCRM.Domain.Branches
+@using TamoCRM.Domain.UserRole
+@model TamoCRM.Web.Mvc.Areas.Admin.Models.Contacts.ContactCreateModel
+
+@{
+    ViewBag.Title = "Tìm kiếm Contact cho Quản lý";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    var lstStatus = Util.SelectedListExclude<StatusType>(false, (int)StatusType.HandoverCollaborator, (int)StatusType.HandoverConsultant, (int)StatusType.AcceptCollaborator, (int)StatusType.NewCollaborator, (int)StatusType.RecoveryCollaborator, (int)StatusType.RecoveryConsultant, (int)StatusType.DuplicateContact, (int)StatusType.ContainerMOL);
+    var lstUsers = StoreData.SelectedList<UserInfo>();
+    var lstBranches = StoreData.SelectedList<BranchInfo>();
+}
+
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        }
+        catch (e) {
+
+        }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Contact</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>@ViewBag.Title</h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            @using (Ajax.BeginForm("FilterContactSearchFastManagerContact", "ContactFilter", new AjaxOptions { HttpMethod = "POST" }, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "filter_contact_search_fast_form" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <div class="col-sm-12" id="alert">
+                    </div>
+                </div>
+                @*<div style="border: 1px solid #c5d0dc; padding: 15px 20px 0 20px;">
+                    <div class="form-group">
+                        <div class="col-sm-1">
+                            Họ và Tên
+                        </div>
+                        <div class="col-sm-3">
+                            <input id="txtName" type="text" style="width: 90%;" />
+                        </div>
+                        <div class="col-sm-1" style="width: 9%;">
+                            Điện thoại
+                        </div>
+                        <div class="col-sm-3" style="width: 24%;">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="icon-phone"></i>
+                                </span>
+                                <input id="txtMobile" type="text" />
+                            </div>
+                        </div>
+                        <div class="col-sm-1">
+                            Email
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="icon-envelope"></i>
+                                </span>
+                                <input id="txtEmail" type="text" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="float: right">
+                        <button id="btnClearFilter" class="btn-primary">Xóa trắng</button>
+                        <button id="btnGoFilter" class="btn-primary" style="margin-right: 15px;">Tìm kiếm</button>
+                    </div>
+                </div>*@
+                <div style="border: 1px solid #c5d0dc; padding: 15px">
+                    <div class="form-group">
+                        <div class="col-sm-1">
+                            Họ và Tên
+                        </div>
+                        <div class="col-sm-3">
+                            <input id="txtName" type="text" style="width: 90%;" />
+                        </div>
+                        <div class="col-sm-1" style="width: 9%;">
+                            Điện thoại
+                        </div>
+                        <div class="col-sm-3" style="width: 24%;">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="icon-phone"></i>
+                                </span>
+                                <input id="txtMobile" type="text" />
+                            </div>
+                        </div>
+                        <div class="col-sm-1">
+                            Email
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="icon-envelope"></i>
+                                </span>
+                                <input id="txtEmail" type="text" style="width: 100%;" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row" style="float: right">
+                        <button id="btnClearFilter" class="btn-primary">Xóa trắng</button>
+                        <button id="btnGoFilter" class="btn-primary" style="margin-right: 15px;">Tìm kiếm</button>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+
+                <div class="space-6"></div>
+                <div id="divForward" style="border: 1px solid #c5d0dc; padding: 15px">
+                    <div class="form-group">
+                        <div class="col-sm-4"></div>
+                        <div class="col-sm-1" style="width: 9%;">
+                            
+                        </div>
+                        <div class="col-sm-3" style="width: 24%;">
+                            
+                        </div>
+                        <div class="col-sm-1">
+                            Kho
+                        </div>
+                        <div class="col-sm-3">
+                            @Html.DropDownListFor(x => x.StatusId, lstStatus, new { @class = "form-control", @style = "width: 100%;" })
+                        </div>
+                    </div>
+                    <div class="row" style="float: right">
+                        <button id="btnForward" class="btn-primary" style="float:right; margin-right: 15px;">Chuyển kho</button>               
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            }
+
+                    @*<div class="space-6"></div>
+                        <button id="btnGoFilter" class="btn-primary" style="float: right; margin-left: 10px;">Tìm kiếm</button>
+                        <button id="btnClearFilter" class="btn-primary" style="float: right;">Xóa trang</button>
+                        <div class="clearfix"></div>*@
+
+                    <div class="clearfix"></div>
+                    <div class="space-6"></div>
+                    <table id="grid-table"></table>
+                    <div id="grid-pager"></div>
+
+                    <!-- PAGE CONTENT ENDS -->
+                </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+
+<script type="text/javascript">
+    var grid_selector = "#grid-table";
+    var employeeTypeId = '@((int)EmployeeType.ManagerContact)';
+    var url = 'admin/api/contact/FilterSearchForManagerContact?name={0}&mobile={1}&email={2}&employeeTypeId=' + employeeTypeId;
+    var heades = ['Id', 'Họ và tên', 'Level', 'Email', 'Điện thoại', 'Ngày', 'Sáng/Chiều', 'Giờ', 'Nội dung cuộc gọi gần nhất', 'Trạng thái chăm sóc', 'Trạng thái gọi', 'Tổng số cuộc gọi', 'Kho', 'TVTS/Lọc', 'Chức năng', '<input type="checkbox" id="chkSelectAll" onclick="fixCheckBoxGrid(event)" />'];
+    var model = [
+        { name: 'Id', index: 'Id', editable: false, sorttype: 'string', editoptions: { disabled: true }, width: '0px' },
+        { name: 'Fullname', index: 'Fullname', editable: false, width: '90px', sorttype: 'string' },
+        { name: 'LevelId', index: 'LevelName', editable: false, width: '40px', sorttype: 'string', align: 'center', formatter: stringFormatter },
+        { name: 'Email', index: 'Email', editable: false, width: '70px', sorttype: 'string', align: 'center' },
+        { name: 'Mobile1', index: 'Mobile1', editable: false, width: '70px', sorttype: 'string', align: 'center' },
+        { name: 'AppointmentConsultantDate', index: 'AppointmentConsultantDate', editable: false, width: '80px', align: 'center', formatter: 'date', formatoptions: { srcformat: 'Y-m-dTH:i:s', newformat: 'd/m/Y' } },
+        { name: 'AppointmentConsultantAmPm', index: 'AppointmentConsultantAmPm', editable: false, width: '50px', align: 'center', formatter: stringFormatter },
+        { name: 'AppointmentConsultantTime', index: 'AppointmentConsultantTime', editable: false, width: '40px', align: 'center', formatter: 'date', formatoptions: { srcformat: 'Y-m-dTH:i:s', newformat: 'H:i' } },
+        { name: 'CallInfoConsultant', index: 'CallInfoConsultant', editable: false, width: '200px', sorttype: 'string', align: 'left' },
+        { name: 'StatusCareConsultantId', index: 'StatusCareConsultantId', editable: false, width: '120px', formatter: statusCareFomatter },
+        { name: 'StatusMapConsultantId', index: 'StatusMapConsultantId', editable: false, width: '70px', formatter: statusMapFomatter },
+        { name: 'CallAmount', index: 'CallAmount', editable: false, width: '60px', align: 'center' },
+        { name: 'StatusId', index: 'StatusId', editable: false, formatter: statusFomatter },
+        { name: 'UserConsultantId', index: 'UserConsultantId', editable: false, width: '80px', formatter: userFomatter },
+        {
+            name: 'Function', index: 'Function', editable: false, width: '55px', align: 'center', formatter: "dynamicLink",
+            formatoptions: {
+                cellValue: function (cellValue, rowId, rowData, options) {
+                    return '<div style="color:#34810c;margin:5px;"><a style="cursor: pointer;" onclick="return openDialog(' + rowData.Id + ')"><img style="width:16px; height:16px;" src="../../../../Images/edit-16.png"/></a></div>';
+                }
+            }
+        },
+       { name: 'chkSelect', index: 'chkSelect', editable: false, edittype: 'checkbox', align: 'center', width: '40px', editoptions: { value: "True:False" }, formatter: checkboxFomatter, formatoptions: { disabled: false } }   
+    ];
+
+    $(document).ready(function () {
+        bindGlobalStatusMaps();
+        setupGridWithoutEdit("#grid-table", "#grid-pager", '', '', "Id", "Danh sách Contact", heades, model);
+        $(grid_selector).jqGrid("setGroupHeaders", {
+            useColSpanStyle: true,
+            groupHeaders: [
+                { startColumnName: "Fullname", numberOfColumns: 4, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;height:40px;"><b>Thông tin Contact</b></td></tr></table>' },
+                { startColumnName: "AppointmentDate", numberOfColumns: 3, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;"><b>Thông tin lịch hẹn gọi lại</b></td></tr></table>' },
+                { startColumnName: "CallInfo", numberOfColumns: 3, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;"><b>Tình trạng chăm sóc</b></td></tr></table>' }
+            ]
+        });
+
+        $(window).keydown(function (e) {
+            if (e.keyCode == 13) {
+                e.preventDefault();
+                $("#btnGoFilter").click();
+            }
+        });
+
+        $("#btnGoFilter").click(function (e) {
+            e.preventDefault();
+
+            // Param
+            var name = $('#txtName').val();
+            var email = $('#txtEmail').val();
+            var mobile = $('#txtMobile').val();
+            if (name.length == 0 && email.length == 0 && mobile.length == 0) {
+                alertError("Nội dung tìm kiếm không phù hợp.");
+                return;
+            }
+
+            if (!validateEmail(email)) {
+                alertError("Email tìm kiếm không đúng định dạng.");
+                return;
+            }
+
+            // Format Url
+            alertHide();
+            var newUrl = '/' + url.format(name, mobile, email);
+            jQuery(grid_selector).jqGrid().setGridParam({ url: newUrl, page: 1 }).trigger("reloadGrid");
+        });
+
+        $("#btnClearFilter").click(function (e) {
+            e.preventDefault();
+
+            // Param
+            $('#txtName').val('');
+            $('#txtEmail').val('');
+            $('#txtMobile').val('');
+        });
+
+        $("#btnForward").click(function (e) {
+            e.preventDefault();
+            
+            // Param
+            var ids = '';
+            var items = $("#grid-table td input");
+            for (var i = 0; i < items.length; i++) {
+                if ($(items[i]).is(':checked')) {
+                    ids += ids.length == 0
+                        ? $('#grid-table').jqGrid('getCell', i + 1, 'Id')
+                        : ',' + $('#grid-table').jqGrid('getCell', i + 1, 'Id');
+                }
+            }
+            
+            var statusId = $('#StatusId').val();
+            alert(statusId + " " + ids);
+            var r = confirm("Có phải bạn muốn chuyển contact đã chọn sang cho kho của TVTS?");
+            if (r == true) {
+                $.ajax({
+                    type: 'GET',
+                    url: '/admin/api/contact/HandoverContainerContact',
+                    data: {
+                        ids: ids,
+                        statusId: statusId,
+                        employeeTypeId: employeeTypeId,
+                    },
+                    beforeSend: function () {
+                        alertProcess();
+                    },
+                    success: function (response) {
+                        alertSuccess("Chuyển kho thành công " + response + " contacts");
+                    },
+                    error: function (request, status, ex) {
+                        alertError("Hệ thống bị lỗi, chuyển kho không thành công.");
+                    }
+                });
+            }
+        });
+
+        $("#chkSelectAll").click(function () {
+            checkAll('chkSelectAll', 'checkbox');
+        });
+    });
+</script>

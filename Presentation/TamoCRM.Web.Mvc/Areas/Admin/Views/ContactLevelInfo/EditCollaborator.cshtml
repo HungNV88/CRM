@@ -1,0 +1,580 @@
+﻿@using TamoCRM.Core
+@using TamoCRM.Domain.Catalogs
+@using TamoCRM.Domain.StatusMap
+@using TamoCRM.Web.Framework
+@using TamoCRM.Core.Commons.Extensions
+@using System.Linq;
+
+@model TamoCRM.Web.Mvc.Areas.Admin.Models.ContactLevelInfos.ContactLevelInfoModel
+@{
+    ViewBag.Title = "Thông tin học viên";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutSingle.cshtml";
+}
+@{
+    var lstGenders = Util.SelectedList<GenderType>();
+    var lstAppointments = Util.SelectedList<AppointmentType>();
+
+    var products = ViewBag.Products;
+    var packages = ((List<PackagePriceListed>)ViewBag.PackagePriceListed)
+                   .Where(c => c.Nation == 1)
+                   .OrderBy(c => c.Poistion)
+                   .ToList();
+
+    var listPackages = new SelectList(packages, "Name", "Value");
+    var lstProducts = new SelectList(products, "Id", "Name");
+
+    //FeeMoneyTypes List
+    var FeeMoneyTypes = ViewBag.FeeMoneyType;
+    var lstFeeMoneyTypes = new SelectList(FeeMoneyTypes, "Id", "Name");
+
+    //////
+    //PackageFeeEdus List
+    var PackageFeeEdus = ViewBag.PackageFeeEdu;
+    var lstPackageFeeEdus = new SelectList(PackageFeeEdus, "Id", "Name");
+
+    var TimeSlots = ViewBag.TimeSlots;
+    ((List<TimeSlotInfo>)TimeSlots).RemoveAll(c => c.Id == 0);
+    ((List<TimeSlotInfo>)TimeSlots).Insert(0, new TimeSlotInfo { Id = 0, Name = "-" });
+    var listTimeSlots = new SelectList(TimeSlots, "Id", "Name");
+
+    //TeacherTypes List
+    var TeacherTypes = ViewBag.TeacherTypes;
+    ((List<TeacherTypeInfo>)TeacherTypes).RemoveAll(c => c.Id == 0);
+    ((List<TeacherTypeInfo>)TeacherTypes).Insert(0, new TeacherTypeInfo { Id = 0, Name = "-" });
+    var listTeacherTypes = new SelectList(TeacherTypes, "Id", "Name");
+
+    //LevelTester List
+    var LevelTester = ViewBag.LevelTester;
+    ((List<LevelTesterInfo>)LevelTester).RemoveAll(c => c.Id == 0);
+    ((List<LevelTesterInfo>)LevelTester).Insert(0, new LevelTesterInfo { Id = 0, Name = "-" });
+    var listLevelTester = new SelectList(LevelTester, "Id", "Name");
+
+    var Qualities = ViewBag.Quality;   //ViewBag.Qualities;
+    var lstQualities = new SelectList(Qualities, "Id", "Name");
+    
+    var StatusCares = ViewBag.StatusCares;
+    ((List<StatusCareInfo>)StatusCares).RemoveAll(c => c.Id == 0);
+    ((List<StatusCareInfo>)StatusCares).Insert(0, new StatusCareInfo { Id = 0, Name = "Tất cả" });
+    var lstStatusCares = new SelectList(StatusCares, "Id", "Name");
+
+    var statusMaps = ((IEnumerable<StatusMapInfo>)ViewBag.StatusMaps)
+        .Where(c => c.IsShow)
+        .Where(c => c.Name.ToLower() != "chưa gọi")
+        .Where(c => c.StatusMapType == (int)EmployeeType.Collaborator)
+        .Where(c => c.LevelId == 0 || c.LevelId == Model.ContactInfo.LevelId)
+        .OrderBy(c => c.StatusCareId);
+    var lstStatusMaps = new SelectList(statusMaps, "Id", "Name");
+}
+<style>
+    .widget-body label {
+        padding-top: 0;
+    }
+</style>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>Thông tin học viên
+        </h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="form-group">
+            <div class="col-sm-12" id="alert">
+            </div>
+        </div>
+        <div class="col-xs-12">
+            @using (Html.BeginForm("EditCollaborator", "ContactLevelInfo", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(x => x.ContactInfo.Id)
+                @Html.HiddenFor(x => x.ContactInfo.LevelId)
+                @Html.HiddenFor(x => x.ContactInfo.StatusId)
+                @Html.HiddenFor(x => x.ContactInfo.CallCount)
+                @Html.HiddenFor(x => x.ContactInfo.HandoverHistoryCollaboratorId)
+                <div class="widget-box" id="divL1">
+                    <div class="widget-header">
+                        <h4>Thông tin L1</h4>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="col-xs-1" style="width: 11%;">
+                                    <label>Họ Tên</label>
+                                </div>
+                                <div class="col-xs-3" style="width: 22%;">
+                                    <div class="clearfix">
+                                        @Html.TextBoxFor(x => x.ContactInfo.Fullname, new { @style = "width: 100%", @required = "required", error = "Họ và tên rỗng" })
+                                    </div>
+                                </div>
+                                <div class="col-xs-1">
+                                    <label>Giới tính</label>
+                                </div>
+                                <div class="col-xs-3" style="width: 22%;">
+                                    @Html.DropDownListFor(x => x.ContactInfo.Gender, lstGenders, new { @style = "width: 100%" })
+                                </div>
+                                <div class="col-xs-1" style="width: 14%;">
+                                    <label>Ngày sinh</label>
+                                </div>
+                                <div class="col-xs-3" style="width: 22%;">
+                                    <div class="clearfix">
+                                        @Html.TextBoxFor(x => x.Birthday, new { @style = "width: 100%" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-4"></div>
+                            <div class="row">
+                                <div class="col-xs-1" style="width: 11%;">
+                                    <label>SĐT 1</label>
+                                </div>
+                                <div class="col-xs-3" style="width: 22%;">
+                                    <div class="input-group clearfix">
+                                        <span class="input-group-addon" style="padding: 0;">
+                                            <button id="btnCall1" type="button" class="btn-primary icon-phone" style="height: 26px; width: 30px;"></button>
+                                        </span>
+                                        @Html.TextBoxFor(x => x.ContactInfo.Mobile1, new { @style = "width: 100%", @readonly = "readonly" })
+                                    </div>
+                                </div>
+                                <div class="col-xs-1">
+                                    <label>SĐT 2</label>
+                                </div>
+                                <div class="col-xs-3" style="width: 22%;">
+                                    <div class="input-group clearfix">
+                                        <span class="input-group-addon" style="padding: 0;">
+                                            <button id="btnCall2" type="button" class="btn-primary icon-phone" style="height: 26px; width: 30px;"></button>
+                                        </span>
+                                        @Html.TextBoxFor(x => x.ContactInfo.Mobile2, new { @style = "width: 100%", @pattern = "^(?!0)((\\d{3}-\\d{3}-\\d{4,5})|\\d{9,10})$", error = "Số điện thoại không đúng định dạng" })
+                                    </div>
+                                </div>
+                                <div class="col-xs-1" style="width: 14%;">
+                                    <label>SĐT 3</label>
+                                </div>
+                                <div class="col-xs-3" style="width: 22%;">
+                                    <div class="input-group clearfix">
+                                        <span class="input-group-addon" style="padding: 0;">
+                                            <button id="btnCall3" type="button" class="btn-primary icon-phone" style="height: 26px; width: 30px;"></button>
+                                        </span>
+                                        @Html.TextBoxFor(x => x.ContactInfo.Mobile3, new { @style = "width: 100%", @pattern = "^(?!0)((\\d{3}-\\d{3}-\\d{4,5})|\\d{9,10})$", error = "Số điện thoại không đúng định dạng" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-4"></div>
+                            <div class="row">
+                                <div class="col-xs-1" style="width: 11%;">
+                                    <label>Email 1</label>
+                                </div>
+                                <div class="col-xs-3" style="width: 22%;">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">
+                                            <i class="icon-envelope" style="width: 11px;"></i>
+                                        </span>
+                                        @Html.TextBoxFor(x => x.ContactInfo.Email, new { @style = "width: 100%", @type = "email", error = "Email không đúng định dạng" })
+                                    </div>
+                                </div>
+                                <div class="col-xs-1">
+                                    <label>Email 2</label>
+                                </div>
+                                <div class="col-xs-3" style="width: 22%;">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">
+                                            <i class="icon-envelope" style="width: 11px;"></i>
+                                        </span>
+                                        @Html.TextBoxFor(x => x.ContactInfo.Email2, new { @style = "width: 100%", @type = "email", error = "Email không đúng định dạng" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-4"></div>
+                            <div class="row">
+                                <div class="col-xs-1" style="width: 11%;">
+                                    <label>Địa chỉ liên hệ</label>
+                                </div>
+                                <div class="col-xs-11" style="width: 88.33%;">
+                                    <div class="clearfix">
+                                        @Html.TextBoxFor(x => x.ContactInfo.Address, new { @style = "width: 100%" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-4"></div>
+                            <div class="row">
+                                <div class="col-xs-1" style="width: 11%;">
+                                    Ghi chú
+                                </div>
+                                <div class="col-xs-11" style="width: 88.33%;">
+                                    @Html.TextAreaFor(x => x.ContactInfo.Notes, new { @class = "autosize-transition form-control" })
+                                </div>
+                            </div>
+                            <hr />
+                            <div class="row">
+                                 <div class="col-xs-1" style="width: 11%;"></div>
+                                <div class="col-xs-4">
+                                    @Html.CheckBoxFor(x => x.ContactLevelInfo.WantStudyEnglish)
+                                    <label for="ContactLevelInfo_WantStudyEnglish" style="cursor: pointer;">Có muốn học tiếng anh không? </label>
+                                </div>
+                            </div>
+                            <hr />
+                            <div class="row">
+                                <div class="col-xs-1" style="width: 11%;">
+                                    @Html.CheckBoxFor(x => x.ContactLevelInfo.HasAppointment)
+                                    <label for="ContactLevelInfo_HasAppointment" style="cursor: pointer;">Lịch hẹn</label>
+                                </div>
+                                <div class="col-xs-2">
+                                    @Html.TextBoxFor(x => x.AppointmentTime, new { disabled = "disabled" })
+                                </div>
+                                <div class="col-xs-2">
+                                    @Html.DropDownListFor(x => x.ContactLevelInfo.ApointmentType, lstAppointments, new { disabled = "disabled" })
+                                </div>
+                                <div class="col-xs-1">
+                                    <label>Ghi chú </label>
+                                </div>
+                                <div class="col-xs-5">
+                                    @Html.TextBoxFor(x => x.ContactLevelInfo.ApointmentNotes, new { @style = "width: 100%" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="space-6"></div>
+               
+                <div class="widget-box">
+                    <div class="widget-header">
+                        <h4>Nội dung & kết quả cuộc gọi</h4>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="space-4"></div>
+                            <div class="row">
+                                <div class="col-xs-2" style="width: 11%;">
+                                    <label>Lịch gọi lại</label>
+                                </div>
+                                <div class="col-xs-3">
+                                    @Html.TextBoxFor(x => x.RecallTime, string.Empty, new { @class = "input-small", @style = "width:50%;" })
+                                    <span class="input-append bootstrap-timepicker">
+                                        @Html.TextBoxFor(x => x.RecallTime24h, string.Empty, new { @class = "input-small" })
+                                        <span class="add-on"><i class="icon-time"></i></span>
+                                    </span>
+                                </div>
+                                <div class="col-xs-1"></div>
+                                <div class="col-xs-2">
+                                    <label>Chất lượng cuộc gọi</label>
+                                </div>
+                                <div class="col-xs-3">
+                                    @Html.DropDownListFor(x => x.ContactInfo.QualityId, lstQualities, new { @style = "width: 100%;" })
+                                </div>
+                            </div>
+                            <div class="space-4"></div>
+                            <div class="row">
+                                <div class="col-xs-2" style="width: 11%;">
+                                    <label>Trạng thái gọi </label>
+                                </div>
+                                <div class="col-xs-3">
+                                    @Html.HiddenFor(x => x.CallHistoryId, string.Empty)
+                                    @Html.DropDownListFor(x => x.ContactInfo.StatusMapCollaboratorId, lstStatusMaps, new { @style = "width: 100%;" })
+                                </div>
+                                <div class="col-xs-1"></div>
+                                <div class="col-xs-2">
+                                    <label>Trạng thái chăm sóc</label>
+                                </div>
+                                <div class="col-xs-3">
+                                    @Html.DropDownList("ContactInfo_StatusCareCollaboratorId", lstStatusCares, new { @style = "width: 100%;", onfocus = "this.defaultIndex=this.selectedIndex;", onchange = "this.selectedIndex=this.defaultIndex;" })
+                                </div>
+                            </div>
+                            <div class="space-4"></div>
+                            <div class="row">
+                                <div class="col-xs-1" style="width: 11%;">
+                                    <label>Nội dung </label>
+                                </div>
+                                <div class="col-xs-11" style="width: 89%;">
+                                    @Html.TextAreaFor(x => x.ContactInfo.CallInfoCollaborator, new { @style = "width: 100%; height: 80px;", @required = "required", error = "Nội dung cuộc gọi không được rỗng" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="space-6"></div>
+                <button id="btnSubmit" type="submit" class="btn-primary" style="float: right; width: 100px;" onclick="return submitForm();">Cập nhật</button>
+                <div class="clearfix"></div>
+                
+                <div class="space-6"></div>
+                <table id="grid-table"></table>
+                <div id="grid-pager"></div>
+            }
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+<script src="/Content/themes/ace/assets/js/jquery.form.js"></script>
+<script src="/Content/themes/ace/assets/js/jquery.validate.min.js"></script>
+<script src="/Content/themes/ace/assets/js/additional-methods.min.js"></script>
+
+
+<script type="text/javascript">
+    var callCount = '@Model.ContactInfo.CallCount';
+    var employeeTypeId = '@((int)EmployeeType.Collaborator)';
+    var grid_selector = "#grid-table";
+    var url = 'admin/api/callhistory/GetAllByContactId?contactId={0}&employeeTypeId={1}';
+    var heades = ['Id', 'CallId', 'CallType', 'UserLogType', 'Thời gian gọi', 'Trạng thái', 'Trạng thái gọi', 'Level', 'Thời gian gọi lại', 'Nội dung', 'Ghi âm'];
+    var model = [
+        { name: 'CallHistoryId', index: 'CallHistoryId', editable: false, sorttype: 'string', editoptions: { disabled: true }, width: '0px' },
+        { name: 'CallId', index: 'CallType', editable: false, sorttype: 'string', editoptions: { disabled: true }, width: '0px' },
+        { name: 'CallType', index: 'CallType', editable: false, sorttype: 'string', editoptions: { disabled: true }, width: '0px' },
+        { name: 'UserLogType', index: 'UserLogType', editable: false, sorttype: 'string', editoptions: { disabled: true }, width: '0px' },
+        { name: 'CallTime', index: 'CallTime', editable: false, sorttype: 'string', width: '70px', formatter: 'date', formatoptions: { srcformat : 'Y-m-dTH:i:s', newformat : 'd/m/Y H:i' } },
+        { name: 'StatusCareId', index: 'StatusCareId', editable: false, width: '100px', formatter: statusCareFomatter },
+        { name: 'StatusMapId', index: 'StatusMapId', editable: false, width: '60px', formatter: statusMapFomatter },
+        { name: 'LevelId', index: 'LevelId', editable: false, width: '100px', formatter: levelFomatter },
+        { name: 'RecallTime', index: 'RecallTime', editable: false, sorttype: 'string', width: '70px', formatter: 'date', formatoptions: { newformat: 'd/m/Y' } },
+        { name: 'CallCenterInfo', index: 'CallCenterInfo', editable: false, sorttype: 'string', width: '100px' },
+        { name: 'LinkRecord', index: 'LinkRecord', editable: false, align: 'center', width: '100px', formatter: listenFomatter }
+    ];
+
+    function PlayRecord(id)
+    {
+        $("#ngheghiam_"+id).html("<audio id='audio_listen' controls style='width: 98%'><source src='"+$("#link_record_"+id).val()+"' type='audio/mpeg' /></audio>");
+    }
+
+    $(document).ready(function () {
+        initForm();
+        isViewMode();
+        turnOnInput();
+        //displayLevel();
+        customValidate();
+        changeStatusMap();
+        changeColorStatusMap();
+
+        $('#Birthday').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly:true, endDate: "+0d", todayHighlight: "true"  });
+        $('#CompletedTime').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly:true, startDate: "+0d", todayHighlight: "true"  });
+        $('#AppointmentTime').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly:true, startDate: "+0d", todayHighlight: "true"  });
+        $('#RecallTime').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly:true, startDate: "+0d", todayHighlight: "true", orientation: "top"  });
+        $('#RecallTime24h').timepicker({ minuteStep: 5, disableFocus: true, showSeconds: true, showMeridian: false, todayHighlight: "true", defaultTime: false });
+
+        // Call
+        $("#btnCall1").click(function (e) {
+            callMobile('ContactInfo_Mobile1', 'btnCall1');
+        });
+        $("#btnCall2").click(function (e) {
+            callMobile('ContactInfo_Mobile2', 'btnCall2');
+        });
+        $("#btnCall3").click(function (e) {
+            callMobile('ContactInfo_Mobile3', 'btnCall3');
+        });
+
+        $('#ContactInfo_StatusMapCollaboratorId').change(function () {
+            changeStatusMap();
+        });
+        $('#ContactInfo_StatusCareCollaboratorId').attr('readonly', 'readonly');
+        $('#ContactInfo_CallInfoCollaborator').val('');
+
+        // L3
+        displayAppointment();
+        $('#ContactLevelInfo_HasAppointment').click(function(e) {
+            displayAppointment();
+        });
+    });
+
+    function displayAppointment() {
+        if ($('#ContactLevelInfo_HasAppointment').is(':checked')) {
+            $("#AppointmentTime").removeAttr("disabled");
+            $("#ContactLevelInfo_ApointmentType").removeAttr("disabled");
+            $("#ContactLevelInfo_ApointmentNotes").removeAttr("disabled");
+        } else {
+            $("#AppointmentTime").attr("disabled", "disabled");
+            $("#ContactLevelInfo_ApointmentType").attr("disabled", "disabled");
+            $("#ContactLevelInfo_ApointmentNotes").attr("disabled", "disabled");
+        }
+    }
+
+    function checkStatusDontCall() {
+        return $('#ContactInfo_StatusCareCollaboratorId').val() == '@((int)StatusCareType.DontCall)';
+    }
+
+    function checkStatusUnknown() {
+        return $('#ContactInfo_StatusCareCollaboratorId').val() == '@((int)StatusCareType.UnKnown)';
+    }
+
+    function checkLevelNext(levelId) {
+        if (levelId == '@((int)LevelType.L8)' ||
+            levelId == '@((int)LevelType.L9)')
+            return true;
+        return false;
+    }
+
+    function checkLevelCurrent(levelId) {
+        if (levelId == '@((int)LevelType.L8)' ||
+            levelId == '@((int)LevelType.L9)')
+            return true;
+        return false;
+    }
+
+    function submitForm() {
+        if (!checkDuplicate()) return false;
+        if (callCount >= 2 && checkStatusUnknown()) return true;
+
+        var array = jQuery.parseJSON('@Html.Raw(Json.Encode(((IEnumerable<StatusMapInfo>)ViewBag.StatusMaps).Select(c => new
+                                {
+                                                             Id = c.Id,
+                                                             Name = c.Name,
+                                                             LevelIdNext = c.LevelIdNext,
+                                                             StatusCareId = c.StatusCareId
+                                })))');
+
+        var levelIdNext = 0;
+
+        for (var i = 0; i < array.length; i++) {
+            if (array[i].Id == statusMapId) {
+                levelIdNext = array[i].LevelIdNext;
+                break;
+            }
+        }
+
+        @*var levelIdNext = '@Model.ContactInfo.LevelId';*@
+
+        if (!checkStatusDontCall()) {
+            //if($("#ContactInfo_StatusMapCollaboratorId").val(149)) { //Id cua statusMap CC3 (dong y nhan thong tin)
+            //    alert("shshsh");
+            //    return true;
+            //}
+            if (!checkLevelNext(levelIdNext)) {
+                if ($('#RecallTime').val() == '') {
+                    alertError('Thông tin ngày hẹn không được rỗng');
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    function displayLevel() {
+        // CallCount
+        if (callCount >= 3) {
+            $("#btnCall1").attr("disabled", "disabled");
+            $("#btnCall2").attr("disabled", "disabled");
+            $("#btnCall3").attr("disabled", "disabled");
+        }
+    }
+
+    function turnOnInput() {
+        $("#btnCall1").removeAttr("disabled");
+        $("#btnCall2").removeAttr("disabled");
+        $("#btnCall3").removeAttr("disabled");
+    }
+
+    function callMobile(name, button) {
+        if ($('#' + name).val() == '') {
+            alertError("Số điện thoại không được rỗng");
+            return;
+        }
+        if ($('#' + name)[0].checkValidity()) {
+            $("#" + button).attr("disabled", "disabled");
+
+            var id = '@ViewBag.Id';
+            var mobile = $('#' + name).val();
+            var newUrl = '/admin/api/callhistory/call?id={0}&mobile={1}';
+            $.ajax({
+                type: 'GET',
+                url: newUrl.format(id, mobile),
+                success: function (data) {
+                    alertSuccess("Gọi điện thành công.");
+                    if (data != null && data.CallHistoryId != null)
+                        $('#CallHistoryId').val(data.CallHistoryId);
+
+                    jQuery(grid_selector).jqGrid().trigger("reloadGrid");
+                },
+                error: function (request, status, ex) {
+                    $('#' + name).removeAttr("disabled");
+                    $("#" + button).removeAttr("disabled");
+                    alertError("Gọi điện không thành công.");
+                }
+            });
+        }
+    }
+
+    function changeStatusMap() {
+        var array = @Html.Raw(Json.Encode(((IEnumerable<StatusMapInfo>)ViewBag.StatusMaps).Select(c => new { Id = c.Id, Name = c.Name, StatusCareId = c.StatusCareId })));
+        for (var i = 0; i < array.length; i++) {
+            if ($('#ContactInfo_StatusMapCollaboratorId').val() == array[i].Id) {
+                var statusCareId = array[i].StatusCareId;
+                $('#ContactInfo_StatusCareCollaboratorId').val(statusCareId);
+            }
+        }
+    }
+
+    function changeColorStatusMap() {
+        var array = @Html.Raw(Json.Encode(((IEnumerable<StatusMapInfo>)ViewBag.StatusMaps).Select(c => new { Id = c.Id, Name = c.Name, StatusCareId = c.StatusCareId })));
+        $("#ContactInfo_StatusCareCollaboratorId option").each(function()
+        {
+            var id = $(this).val();
+            if (id == 1) {
+                $(this).css("background-color", "YellowGreen");
+            } else  if (id == 2) {
+                $(this).css("background-color", "Yellow");
+            } else  if (id == 3) {
+                $(this).css("background-color", "Orange");
+            } else  if (id == 4) {
+                $(this).css("background-color", "Violet");
+            }
+
+            for (var i = 0; i < array.length; i++) {
+                $("#ContactInfo_StatusMapCollaboratorId option").each(function() {
+                    if ($(this).val() == array[i].Id) {
+                        var id = array[i].StatusCareId;
+                        if (id == 1) {
+                            $(this).css("background-color", "YellowGreen");
+                        } else if (id == 2) {
+                            $(this).css("background-color", "Yellow");
+                        } else if (id == 3) {
+                            $(this).css("background-color", "Orange");
+                        } else if (id == 4) {
+                            $(this).css("background-color", "Violet");
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    function isViewMode() {
+        var mode = '@ViewBag.IsView';
+        if (mode == 1) {
+            $('#btnCall1').css('display', 'none');
+            $('#btnCall2').css('display', 'none');
+            $('#btnCall3').css('display', 'none');
+            $('#btnSubmit').css('display', 'none');
+        }
+    }
+
+    var message = '@ViewBag.Message';
+    if (message == null || message == '') {
+        $("#alert").removeClass();
+        $("#alert").html('');
+    }
+    else {
+        $("#alert").addClass("alert alert-block alert-success");
+        $("#alert").html(message);
+        if ('@ViewBag.Close' == '1')
+            window.close();
+    }
+
+    function requestFullScreen(element) {
+        // Supports most browsers and their versions.
+        var requestMethod = element.requestFullScreen || element.webkitRequestFullScreen || element.mozRequestFullScreen || element.msRequestFullScreen;
+
+        if (requestMethod) { // Native full screen.
+            requestMethod.call(element);
+        } else if (typeof window.ActiveXObject !== "undefined") { // Older IE.
+            var wscript = new ActiveXObject("WScript.Shell");
+            wscript.SendKeys("{F11}");
+        }
+    }
+
+    function initForm() {
+        // Grid
+        setupGridTable("#grid-table", "", url.format('@ViewBag.Id', employeeTypeId), "", "Id", "Lịch sử các cuộc gọi", heades, model, "", 1000, '350px');
+        $("#grid-table").hideCol("CallId");
+        $("#grid-table").hideCol("CallType");
+        $("#grid-table").hideCol("UserLogType");
+        $("#grid-table").hideCol("CallHistoryId");
+    }
+</script>

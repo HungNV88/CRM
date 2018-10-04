@@ -1,0 +1,508 @@
+﻿@using TamoCRM.Core
+@using TamoCRM.Domain.Catalogs
+@using TamoCRM.Domain.ImportExcels
+@using TamoCRM.Domain.Levels
+@using TamoCRM.Domain.SourceTypes
+@using TamoCRM.Web.Framework
+@using TamoCRM.Domain.Channels
+@using TamoCRM.Domain.StatusMap
+
+@model TamoCRM.Web.Mvc.Areas.Admin.Models.Contacts.ContactCreateModel
+
+@{
+    ViewBag.Title = "Kho Contact MOL";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+
+    var lstStatus = Util.SelectedListExclude<StatusType>(false, (int)StatusType.HandoverCollaborator, (int)StatusType.HandoverConsultant, (int)StatusType.AcceptCollaborator, (int)StatusType.New, (int)StatusType.NewCollaborator, (int)StatusType.RecoveryCollaborator, (int)StatusType.RecoveryConsultant, (int)StatusType.L8Container);
+    var lstStatusDuplicate = Util.SelectedListExclude<StatusType>(false, (int)StatusType.HandoverCollaborator, (int)StatusType.HandoverConsultant, (int)StatusType.AcceptCollaborator, (int)StatusType.ContainerMOL, (int)StatusType.NewCollaborator, (int)StatusType.RecoveryCollaborator, (int)StatusType.RecoveryConsultant, (int)StatusType.DuplicateContact);
+
+    //Level List
+    var Level = ViewBag.Levels;
+    ((List<LevelInfo>)Level).RemoveAll(c => c.LevelId == 0);
+    ((List<LevelInfo>)Level).Insert(0, new LevelInfo { LevelId = 0, Name = "Tất cả" });
+    var lstLevels = new SelectList(Level, "LevelId", "Name");
+
+    //Container List
+    var Container = ViewBag.Containers;
+    ((List<ContainerInfo>)Container).RemoveAll(c => c.Id == 0);
+    ((List<ContainerInfo>)Container).Insert(0, new ContainerInfo { Id = 0, Name = "Tất cả" });
+    var lstContainers = new SelectList(Container, "Id", "Name");
+
+    //SourceType List
+    var SourceType = ViewBag.SourceTypes;
+    ((List<SourceTypeInfo>)SourceType).RemoveAll(c => c.SourceTypeId == 0);
+    ((List<SourceTypeInfo>)SourceType).Insert(0, new SourceTypeInfo { SourceTypeId = 0, Name = "Tất cả" });
+    var lstSourceType = new SelectList(SourceType, "SourceTypeId", "Name");
+
+    //var lstImportExcels = StoreData.SelectedList<ImportExcelInfo>();
+    var importExcel = ViewBag.ImportExcels;
+    ((List<ImportExcelInfo>)importExcel).RemoveAll(c => c.ImportId == 0);
+    ((List<ImportExcelInfo>)importExcel).Insert(0, new ImportExcelInfo { ImportId = 0, FilePath = "Tất cả" });
+    var lstImportExcels = new SelectList(importExcel, "ImportId", "FilePath");
+
+    //Product List
+    var product = ViewBag.Products;
+    ((List<ProductInfo>)product).RemoveAll(c => c.Id == 0);
+    ((List<ProductInfo>)product).Insert(0, new ProductInfo { Id = 0, Name = "Tất cả" });
+    var lstProducts = new SelectList(product, "Id", "Name");
+
+    //StatusCare List
+    var StatusCares = ViewBag.StatusCares;
+    ((List<StatusCareInfo>)StatusCares).RemoveAll(c => c.Id == 0);
+    ((List<StatusCareInfo>)StatusCares).Insert(0, new StatusCareInfo { Id = 0, Name = "Tất Cả" });
+    var lstStatusCares = new SelectList(StatusCares, "Id", "Name");
+
+    //StatusMaps List
+    var StatusMaps = ViewBag.StatusMaps;
+    ((List<StatusMapInfo>)StatusMaps).RemoveAll(c => c.Id == 0);
+    ((List<StatusMapInfo>)StatusMaps).Insert(0, new StatusMapInfo { Id = 0, Name = "Tất Cả" });
+    var lstStatusMaps = new SelectList(StatusMaps, "Id", "Name");
+}
+
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        }
+        catch (e) {
+
+        }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Contact</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>Kho contact MOL</h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            @using (Ajax.BeginForm("index", "Container", new AjaxOptions { HttpMethod = "POST" }, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "containerForm" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <div class="col-sm-12" id="alert">
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom: 5px;">
+                    <div class="col-sm-8" id="divFilter">
+                        <div style="border: 1px solid #c5d0dc; padding: 15px 15px 6px 15px;">
+                            <div class="row">
+                                <div class="col-xs-5">
+                                    <div class="col-sm-3">
+                                        <label class="bolder">Nguồn</label>
+                                    </div>
+                                    <div class="col-sm-5">
+                                        @Html.DropDownListFor(x => x.TypeId, lstSourceType, new { @class = "form-control", @style = "width: 180px;" })
+                                    </div>
+                                    <div class="row"></div>
+                                    <div class="col-sm-3">
+                                        <label class="bolder">Level</label>
+                                    </div>
+                                    <div class="col-sm-5">
+                                        @Html.DropDownListFor(x => x.LevelId, lstLevels, new { @class = "form-control", @style = "width: 180px;" })
+                                    </div>
+
+                                    <div class="row"></div>
+                                    <div class="col-sm-3">
+                                        <label class="bolder">File</label>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        @Html.DropDownListFor(x => x.ImportId, lstImportExcels, new { @class = "form-control", @style = "width: 180px;" })
+                                    </div>
+
+                                    <div class="row"></div>
+                                    <div class="col-sm-3">
+                                        <label class="bolder">Trạng Thái</label>
+                                    </div>
+                                    <div class="col-sm-5">
+                                        @Html.DropDownListFor(x => x.StatusId, lstStatus, new { @class = "form-control", @style = "width: 180px;" })
+                                    </div>
+
+                                    <div class="row"></div>
+                                    <div class="col-sm-3">
+                                        <label class="bolder">Ngày đăng ký từ: </label>
+                                    </div>
+                                    <div class="col-sm-5">
+                                        @Html.TextBox("FromRegisterDate", string.Empty, new { @style = "width: 100%;" })
+                                    </div>
+                                    
+                                    <div class="row"></div>
+                                    <div class="col-sm-3">
+                                        <label class="bolder">Đến ngày: </label>
+                                    </div>
+                                    <div class="col-sm-5">
+                                        @Html.TextBox("ToRegisterDate", string.Empty, new { @style = "width: 100%;" })
+                                    </div>
+
+                                    <div class="row"></div>
+                                    <div class="col-sm-4" style="visibility: hidden">
+                                        <label class="bolder">Kho Nguồn</label>
+                                    </div>
+                                    <div class="col-sm-5" style="visibility: hidden">
+                                        @Html.DropDownListFor(x => x.ContainerId, lstContainers, new { @class = "form-control", @style = "width: 180px;" })
+                                    </div>
+                                    <div class="row"></div>
+                                    <div class="col-sm-4" style="visibility: hidden">
+                                        <label class="bolder">Trạng thái chăm sóc</label>
+                                    </div>
+                                    <div class="col-sm-5" style="visibility: hidden">
+                                        @Html.DropDownListFor(x => x.StatusCareId, lstStatusCares, new { @id = "StatusCareId", @class = "form-control", @style = "width: 180px;" })
+                                    </div>
+                                    <div class="row"></div>
+                                    <div class="col-sm-4">
+                                        <label class="bolder" style="visibility: hidden">Trạng thái gọi</label>
+                                    </div>
+                                    <div class="col-sm-5" style="visibility: hidden">
+                                        @Html.DropDownListFor(x => x.StatusMapId, lstStatusMaps, new { @id = "StatusMapId", @class = "form-control", @style = "width: 180px;" })
+                                    </div>
+                                </div>
+                                <div class="col-xs-6">
+                                    @*<label class="bolder">
+                                        Số lượng cần chuyển
+                                    </label>
+                                    <input type="number" id="txtSumHandoverContact" min="0" value="0" style="width: 60px;margin-left:10px;" />*@
+                                    <div class="space-6"></div>
+                                    <div class="row" style="padding-right: 10px;">
+                                        <input type="checkbox" name="chkChannels" id="chkChannels" style="margin-left: 11px;">
+                                        <label class="bolder">
+                                            Kênh
+                                        </label>
+                                        @*<label class="bolder" style="padding: 0 0 0 140px;">
+                                            Tỷ lệ %
+                                        </label>*@
+                                        <br />
+                                        <div id="divChannel" class="col-sm-12" style="max-height: 140px; overflow-y: auto; padding: 5px 10px;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-6"></div>
+                        <div class="row" style="float: right">
+                            <button id="btnGoFilter" class="btn-primary" style="margin-right: 10px; width: 100px;">Lọc Contact</button>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div style="border: 1px solid #c5d0dc; padding: 15px;">
+                            <div class="form-group">
+                                <div class="col-sm-12" style="text-align: center;">
+                                    <label class="bolder">Thông tin chuyển kho</label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <label class="bolder">Kho Đích</label>
+                                </div>
+                                <div class="col-sm-8" style="padding: 0;">
+                                    @Html.DropDownListFor(x => x.StatusIdDulicate, lstStatusDuplicate, new { @class = "form-control", @style = "width: 180px;" })
+                                </div>
+                            </div>
+                            <div class="space-6"></div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <label class="bolder">Số lượng</label>
+                                </div>
+                                <div class="col-sm-8" style="padding: 0;">
+                                    @Html.TextBox("txtAmount", "0", "number", new { type = "number", min = 0, max = 10000, @readonly = "readonly" })
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="space-6"></div>
+                        <div class="row" style="float: right">
+                            <button id="btnSubmit" class="btn-primary" style="margin-right: 10px; width: 100px;">Chuyển Kho</button>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+            }
+            <div class="space-6"></div>
+            <table id="grid-table"></table>
+            <!-- PAGE CONTENT ENDS -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+
+<script type="text/javascript">
+    var grid_selector = "#grid-table";
+    var employeeTypeId = '@((int)EmployeeType.Consultant)';
+    var heades = ['Id', 'Họ và tên', 'Số điện thoại', 'Email', 'Kênh', 'Level', 'Trạng thái', 'Ngày đăng ký'];
+    var model = [
+        { name: 'Id', index: 'Id', editable: false, sorttype: 'string', editoptions: { disabled: true }, width: '0px' },
+        { name: 'Fullname', index: 'Fullname', editable: false, sorttype: 'string' },
+        { name: 'Mobile1', index: 'Mobile1', editable: false, sorttype: 'string' },
+        { name: 'Email', index: 'Email', editable: false, sorttype: 'string' },
+        { name: 'ChannelId', index: 'ChannelId', editable: false, formatter: channelFomatter },
+        { name: 'LevelId', index: 'LevelId', editable: false, formatter: levelFomatter },
+        { name: 'StatusId', index: 'StatusId', editable: false, formatter: statusFomatter },
+        { name: 'RegisteredDate', index: 'RegisteredDate', editable: false, formatter: 'date', formatoptions: { newformat: 'd/m/Y' } }
+    ];
+    $(document).ready(function () {
+
+        $('#FromRegisterDate').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly: true, endDate: "+0d" });
+        $('#ToRegisterDate').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly: true, endDate: "+0d" });
+
+        var lstChannels = @Html.Raw(Json.Encode(((IEnumerable<ChannelInfo>)ViewBag.Channels).Select(c => new { ChannelId = c.ChannelId, Name = c.Name })))
+
+        $('select').chosen();
+        setupGridTable("#grid-table", '', '', '', "Id", "Danh sách Contact", heades, model, "", 1000, '350px');
+
+        updateChannelCount();
+        $('#divFilter select').change(function (e) {
+            updateChannelCount();
+        });
+
+        $('#FromRegisterDate').change(function () {
+            updateChannelCount();
+        });
+
+        $('#ToRegisterDate').change(function () {
+            updateChannelCount();
+        });
+
+        $('#chkChannels').click(function (e) {
+            checkAllClassName('chkChannels', 'chkChannel');
+        });
+        $("#btnGoFilter").click(function (e) {
+            e.preventDefault();
+            var amount = parseInt($('#txtAmount').val());
+            if (amount <= 0) {
+                alertError('Số lượng cần lọc bằng 0, thử lại sau!');
+                return;
+            }
+
+            // Param
+            var typeIds = $('#TypeId').val();
+            var levelIds = $('#LevelId').val();
+            var statusIds = getIds('StatusId');
+            var importIds = $('#ImportId').val();
+            var channelIds = buildParamChannel(lstChannels);
+            var containerIds = $('#ContainerId').val();
+            var statusMapId = $("#StatusMapId").val();
+            var statusCareId = $("#StatusCareId").val();
+            var channelAmounts = buildParamChannelAmount(lstChannels);
+            var fromRegisterDate = $('#FromRegisterDate').val().replaceAll('/', '');
+            var toRegisterDate = $('#ToRegisterDate').val().replaceAll('/', '');
+
+            var newUrl = "/admin/api/contact/FilterHandoverForMOL?typeIds={0}&levelIds={1}&importIds={2}&statusIds={3}&containerIds={4}&channelIds={5}&channelAmounts={6}&employeeTypeId={7}&statusCareId={8}&statusMapId={9}&fromRegisterDate={10}&toRegisterDate={11}".format(typeIds, levelIds, importIds, statusIds, containerIds, channelIds, channelAmounts, employeeTypeId, statusCareId, statusMapId, fromRegisterDate, toRegisterDate);
+            jQuery(grid_selector).jqGrid().setGridParam({ url: newUrl }).trigger("reloadGrid");
+        });
+        $("#btnSubmit").click(function (e) {
+            e.preventDefault();
+
+            var IsConfirm = confirm("Bạn chắc chắn muốn chuyển sang kho TVTS");
+
+            if (IsConfirm) {
+
+                var amount = parseInt($('#txtAmount').val());
+                if (amount <= 0) {
+                    alertError('Số lượng cần chuyển kho bằng 0, thử lại sau!');
+                    return;
+                }
+
+                // Param
+                var typeIds = $('#TypeId').val();
+                var levelIds = $('#LevelId').val();
+                var statusIdMOL = getIds('StatusIdDulicate');
+                var statusId = getIds('StatusId');
+                var importIds = $('#ImportId').val();
+                var channelIds = buildParamChannels(lstChannels);
+                var fromRegisterDate = $('#FromRegisterDate').val().replaceAll('/', '');
+                var toRegisterDate = $('#ToRegisterDate').val().replaceAll('/', '');
+                var channelAmounts = buildParamChannelAmount(lstChannels);
+                $.ajax({
+                    type: 'POST',
+                    url: '/admin/api/contact/ChangeStatusContact',
+                    data: {
+                        typeIds: typeIds,
+                        levelIds: levelIds,
+                        importIds: importIds,
+                        statusId: statusId,
+                        statusIdMOL: statusIdMOL,
+                        channelIds: channelIds,
+                        channelAmounts: channelAmounts,
+                        fromRegisterDate: fromRegisterDate,
+                        toRegisterDate: toRegisterDate
+                    },
+                    beforeSend: function () {
+                        alertProcess();
+                    },
+                    success: function (response) {
+                        alertSuccess("Chuyển kho thành công " + response + " contacts");
+                        $("#btnGoFilter").click();
+                        updateChannelCount();
+                    },
+                    error: function (request, status, ex) {
+                        alertError("Hệ thống bị lỗi, Chuyển kho không thành công. " + ex);
+                    }
+                });
+            }
+            else {
+                
+            }
+            
+        });
+    });
+
+    function updateChannelCount() {
+        var typeId = $('#TypeId').val();
+        var levelId = $('#LevelId').val();
+        var statusIds = getIds('StatusId');
+        var importId = $('#ImportId').val();
+        var containerId = $('#ContainerId').val();
+        var statusMapId = $("#StatusMapId").val();
+        var statusCareId = $("#StatusCareId").val();
+        var fromRegisterDate = $('#FromRegisterDate').val().replaceAll('/', '');
+        var toRegisterDate = $('#ToRegisterDate').val().replaceAll('/', '');
+
+        $.get("/admin/api/channel/FilterCountForHandoverMOL", {
+            typeIds: typeId,
+            levelIds: levelId,
+            importIds: importId,
+            statusIds: statusIds,
+            containerIds: containerId,
+            employeeTypeId: employeeTypeId,
+
+            //Thêm ngày 11/01/2016
+            statusMapId: statusMapId,
+            statusCareId: statusCareId,
+
+            //Thêm ngày 28/03/2016
+            fromRegisterDate: fromRegisterDate,
+            toRegisterDate: toRegisterDate
+        }).done(function (data) {
+            $('#txtAmount').val(0);
+            $('#divChannel').html('');
+            $('#divChannel').css('border', 'none');
+            if (data != null && data.length > 0) {
+                var html = '';
+                for (var i = 0; i < data.length; i++) {
+                    var item = data[i];
+                    html += '<div style="float: left;padding-top:2px;">';
+                    html += '<input type="checkbox" name="' + item.ChannelId + '_chkChannel" id="' + item.ChannelId + '_chkChannel" class="chkChannel" title="' + item.Name + '" value="' + item.Amount + '" />';
+                    html += '<label for="' + item.ChannelId + '_chkChannel" id="' + item.ChannelId + '_lblChannel">&nbsp;' + item.Name.subStringEx(22) + '</label>';
+                    html += '<label class="' + item.ChannelId + '_lblChannelCount" id="' + item.ChannelId + '_lblChannelCount">&nbsp;(<b>' + item.Amount + '</b>)</label>';
+                    html += "</div>";
+
+                    html += '<div style="float: right;" id="divChannelAmount">';
+                    html += '<input name="' + item.ChannelId + '_txtChannelAmount" id="' + item.ChannelId + '_txtChannelAmount" max="' + item.Amount + '" min="0" type="number" value="0" style="width: 60px;">';
+                    html += "</div>";
+
+                    //html += '<div style="float: right; margin:0 80px 0 0;" id="divChannelPercentage">';
+                    //html += '<input name="' + item.ChannelId + '_txtChannelPercentage" id="' + item.ChannelId + '_txtChannelPercentage" max="100" min="0" type="number" value="0" style="width: 60px;">';
+                    //html += "</div>";
+                    html += '<div class="clearfix" />';
+                }
+                if (html != '') {
+                    $('#divChannel').html(html);
+                    $('#divChannel').css('border', '1px solid #ccc');
+                }
+
+                $('#divChannel input[type="checkbox"]').change(function (e) {
+                    var id = this.id.replaceAll('_chkChannel', '_txtChannelAmount');
+                    if (this.checked) {
+                        $('#' + id).val(this.value);
+                    } else {
+                        $('#' + id).val(0);
+                    }
+
+                    var total = 0;
+                    $('#divChannel input[type="number"]').each(function () {
+                        total += parseInt(this.value);
+                    });
+                    $('#txtAmount').val(total);
+                });
+
+                //$('#divChannel input[type="checkbox"]').change(function (e) {
+                //    var id = this.id.replaceAll('_chkChannel', '_txtChannelAmount');
+                //    var id2 = this.id.replaceAll('_chkChannel', '_txtChannelPercentage');
+                //    if (this.checked) {
+                //        //$('#' + id).val(this.value);
+                //        $('#' + id).val(($('#txtSumHandoverContact').val() / 100 * $('#' + id2).val()).toFixed(0));
+                //        if ($('#' + id).val() > this.value) {
+                //            $('#' + id).val(this.value);
+                //        }
+                //    } else {
+                //        $('#' + id).val(0);
+                //    }
+
+                //    var total = 0;
+                //    $('#divChannelAmount input[type="number"]').each(function () {
+                //        total += parseInt(this.value);
+                //    });
+                //    $('#txtAmount').val(total);
+                //});
+
+                //$('#divChannelAmount input[type="number"]').change(function (e) {
+                //    var total = 0;
+                //    $('#divChannel input[type="number"]').each(function () {
+                //        var id = this.id.replaceAll('_txtChannelAmount', '_chkChannel');
+                //        if ($('#' + id).is(':checked')) {
+                //            total += parseInt(this.value);  
+                //        }
+                //        else
+                //            $(this).val(0);
+                //    });
+                //    $('#txtAmount').val(total);
+                //});
+
+                $('#divChannel input[type="number"]').change(function (e) {
+                    var total = 0;
+                    $('#divChannel input[type="number"]').each(function () {
+                        var id = this.id.replaceAll('_txtChannelAmount', '_chkChannel');
+                        if ($('#' + id).is(':checked'))
+                            total += parseInt(this.value);
+                        else
+                            $(this).val(0);
+                    });
+                    $('#txtAmount').val(total);
+                });
+                
+                //$('#divChannelPercentage input[type="number"]').change(function (e) {
+                //    var total = 0;
+                //    $('#divChannelPercentage input[type="number"]').each(function () {
+                //        var id = this.id.replaceAll('_txtChannelPercentage', '_txtChannelAmount');
+                //        var id2 = this.id.replaceAll('_txtChannelPercentage', '_chkChannel');
+
+                //        if ($('#' + id2).is(':checked')) {
+                //            $('#' + id).val(($('#txtSumHandoverContact').val() / 100 * (this.value)).toFixed(0));
+                //            var value_id1 = parseInt($('#' + id).val());
+                //            var value_id2 = parseInt($('#' + id2).val());
+                //            //alert(value_id1 + " " + value_id2);
+                //            if (value_id1 > value_id2)
+                //            {
+                //                $('#' + id).val(value_id2);
+                //            }
+                //            total += parseInt($('#' + id).val());
+                //        }
+                //        else
+                //            $(this).val(0);
+                //    });
+                //    $('#txtAmount').val(total);
+                //});
+            }
+        });
+    }
+</script>
+
+
+
+

@@ -1,0 +1,125 @@
+﻿@using TamoCRM.Core
+@using TamoCRM.Domain.Groups
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+
+    // Group
+    var groups = ViewBag.Groups;
+    ((List<GroupInfo>)groups).RemoveAll(c => c.GroupId == 0);
+    ((List<GroupInfo>)groups).Insert(0, new GroupInfo { GroupId = 0, Name = "Tất cả", EmployeeTypeId = (int)EmployeeType.Consultant });
+    var lstGroups = new SelectList(((List<GroupInfo>)groups).Where(c => c.EmployeeTypeId == (int)EmployeeType.Consultant), "GroupId", "Name");
+}
+
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        } catch (e) { }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Chỉ tiêu đặt hàng</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>Chỉ tiêu đặt hàng cho TVTS
+        </h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            <div class="row">
+                <label class="col-sm-1 control-label no-padding-right" style="text-align: left !important;" for="form-field-2">Nhóm </label>
+                <div class="col-sm-3">
+                    @Html.DropDownList("GroupId", lstGroups, new { @class = "form-control" })
+                </div>
+                <label class="col-sm-1 control-label no-padding-right" style="text-align: left !important;" for="form-field-2">Tổng chỉ tiêu </label>
+                <div class="col-sm-3">
+                    <input type="text" readonly="readonly" id="CountNorm"></div>
+                <div class="space-4"></div>
+            </div>
+            <hr />
+            <table id="grid-table"></table>
+
+            <!-- PAGE CONTENT ENDS -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+<!-- /.page-content -->
+
+<!-- inline scripts related to this page -->
+
+<script type="text/javascript">
+    var countNorm = 0;
+    var grid_selector = "#grid-table";
+    var heades = ['Tên nhóm', 'Họ và tên', 'Số lượng đặt hàng', 'Thao tác', 'ConsultantId'];
+    var model = [
+        { name: 'GroupName', index: 'GroupName', editable: true, sorttype: 'string', width: 150, fixed: true },
+        { name: 'UserID', index: 'UserID', editable: true, sorttype: 'string', align: 'left', editoptions: { disabled: 'true' }, formatter: userFomatter },
+        { name: 'Norms', index: 'Norms', editable: true, sorttype: 'int', width: 150, fixed: true, formatter: normFomatter },
+        {
+            name: 'act',
+            index: '',
+            width: 50,
+            fixed: true,
+            sortable: false,
+            resize: false,
+            formatter: 'actions',
+            formatoptions: {
+                keys: true,
+                delbutton: false,
+                delOptions: {
+                    recreateForm: true,
+                    beforeShowForm: beforeDeleteCallback,
+                    delData: {
+                        ConsultantNomrsId: function () {
+                            var sel_id = $(grid_selector).jqGrid('getGridParam', 'selrow');
+                            var value = $(grid_selector).jqGrid('getCell', sel_id, 'ConsultantId');
+                            return value;
+                        }
+                    }
+                },
+            }
+        },
+        { name: 'UserID', index: 'UserID', width: '0px', editable: true, sorttype: 'int', editoptions: { disabled: 'true' } }
+    ];
+
+    $(document).ready(function () {
+        loadGrid(true);
+        $('#GroupId').change(function (e) {
+            loadGrid(false);
+        });
+    });
+
+    function loadGrid(first) {
+        var groupId = $('#GroupId').val();
+        var employeeTypeId = '@((int)EmployeeType.Consultant)';
+        if (first) {
+            var url = 'admin/api/user/GetNorms?groupId={0}&employeeTypeId={1}'.format(groupId, employeeTypeId);
+            setupGridTable("#grid-table", "#grid-pager", url, "admin/api/user/EditNormsConsultant", "UserID", "Tư vấn tuyển sinh", heades, model, '', 0, '450px');
+        } else {
+            var url = '/admin/api/user/GetNorms?groupId={0}&employeeTypeId={1}'.format(groupId, employeeTypeId);
+            jQuery(grid_selector).jqGrid().setGridParam({ url: url }).trigger("reloadGrid");
+        }
+    }
+
+    function normFomatter(cellvalue, options, rowObject) { 
+        countNorm += parseInt(cellvalue);
+        $("#CountNorm").val(countNorm);
+        return cellvalue;
+    }
+</script>

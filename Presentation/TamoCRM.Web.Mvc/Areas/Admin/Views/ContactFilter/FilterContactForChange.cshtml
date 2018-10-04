@@ -1,0 +1,463 @@
+﻿@using TamoCRM.Core
+@using TamoCRM.Domain.Branches
+@using TamoCRM.Domain.Catalogs
+@using TamoCRM.Domain.Groups
+@using TamoCRM.Domain.StatusMap
+@using TamoCRM.Domain.UserRole
+@using TamoCRM.Domain.Levels
+
+@using TamoCRM.Web.Framework
+@model TamoCRM.Web.Mvc.Areas.Admin.Models.Contacts.ContactCreateModel
+
+@{
+    ViewBag.Title = "Tìm kiếm và chuyển giao contact cho TVTS";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+
+    var lstUsers = StoreData.SelectedList<UserInfo>();
+    var lstBranches = StoreData.SelectedList<BranchInfo>();
+    
+    var StatusMaps = ViewBag.StatusMaps;
+    var lstStatusMaps = new SelectList(StatusMaps, "Id", "Name");
+    
+    var StatusCares = ViewBag.StatusCares;
+    var lstStatusCares = new SelectList(StatusCares, "Id", "Name");
+
+    var Levels = ViewBag.Levels;
+    ((List<LevelInfo>)Levels).RemoveAll(c => c.LevelId == 0);
+    ((List<LevelInfo>)Levels).Insert(0, new LevelInfo { LevelId = 0, Name = "Tất cả" });
+    var lstLevel = new SelectList(Levels, "LevelId", "Name");
+    // Group
+    var groups = ViewBag.Groups;
+    ((List<GroupInfo>)groups).RemoveAll(c => c.GroupId == 0);
+    ((List<GroupInfo>)groups).Insert(0, new GroupInfo { GroupId = 0, Name = "Tất cả", EmployeeTypeId = (int)EmployeeType.Consultant });
+    var lstGroups = new SelectList(((List<GroupInfo>)groups).Where(c => c.EmployeeTypeId == (int)EmployeeType.Consultant), "GroupId", "Name");
+}
+
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        }
+        catch (e) {
+
+        }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Contact</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>@ViewBag.Title</h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="form-group">
+            <div class="col-sm-12" id="alert">
+            </div>
+        </div>
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            @using (Ajax.BeginForm("FilterContactForChange", "ContactFilter", new AjaxOptions { HttpMethod = "POST" }, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "filter_contact_search_fast_form" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="row">
+                    <div class="form-group" id="divLevels"></div> 
+                </div>
+                <div class="row">
+                    <div class="col-sm-1"></div>
+                    <label class="col-sm-1 control-label no-padding-right" style="text-align: left !important;" for="form-field-2">Từ ngày </label>
+                    <div class="col-sm-2">
+                        @Html.TextBox("FromDate", DateTime.Now.ToString("dd/MM/yyyy"), new { @class = "form-control" })
+                    </div>
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-2">
+                        <label class="bolder">Trạng thái chăm sóc</label>
+                    </div>
+                    <div class="col-sm-3">
+                        @Html.DropDownList("ddlStatusCare", lstStatusCares, new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="space-4"></div>
+                <div class="row">
+                    <div class="col-sm-1"></div>
+                    <label class="col-sm-1 control-label no-padding-right" style="text-align: left !important;" for="form-field-3">Đến ngày </label>
+                    <div class="col-sm-2">
+                        @Html.TextBox("ToDate", DateTime.Now.ToString("dd/MM/yyyy"), new { @class = "form-control" })
+                    </div>
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-2">
+                        <label class="bolder">Trạng thái gọi</label>
+                    </div>
+                    <div class="col-sm-3">
+                        @Html.DropDownList("ddlStatusMap", lstStatusMaps, new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="space-6"></div>
+                <div class="row">
+                    <div class="col-sm-1"></div>
+                    <label class="col-sm-1 control-label no-padding-right" style="text-align: left !important;" for="form-field-2">Vùng </label>
+                    <div class="col-sm-2">
+                        @Html.DropDownList("BranchId", lstBranches, new { @style = "width: 120px;float: left;margin-right:10px;" })
+                    </div>
+                    <label class="col-sm-1 control-label no-padding-right" style="text-align: left !important;" for="form-field-2">Nhóm </label>
+                    <div class="col-sm-2">
+                        @Html.DropDownList("GroupId", lstGroups, new { @class = "form-control" })
+                    </div>
+                    <label class="col-sm-1 control-label no-padding-right" style="text-align: left !important;" for="form-field-2">TVTS</label>
+                    <div class="col-sm-2">
+                        @Html.DropDownList("UserId", lstUsers, new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="space-4"></div>
+                <hr />
+                <div class="space-6"></div>
+                <div class="row" style="text-align: right; margin-right: 0;">
+                    <button id="btnGoFilter" class="btn-primary" style="float: right; margin-left: 10px; width: 100px;">Lọc contact</button>
+                </div>
+            }
+
+            <div class="space-6"></div>
+            <div class="row" style="margin-right: 0;">
+                <table id="grid-table"></table>
+                <div id="grid-pager"></div>
+            </div>
+            <div class="space-6"></div>
+            <div class="row">
+                <h3 class="header smaller lighter blue">
+                    <i class="icon-user"></i>
+                    Bàn giao TVTS khác
+                </h3>
+                <label class="col-sm-1 control-label no-padding-right" style="text-align: left !important;" for="form-field-2">Ngày phân </label>
+                <div class="col-sm-2">
+                    @Html.TextBox("HandoverDate", DateTime.Now.ToString("dd/MM/yyyy"), new { @class = "form-control" })
+                </div>
+                <label class="col-sm-1 control-label no-padding-right" style="text-align: left !important;" for="form-field-2">Vùng </label>
+                <div class="col-sm-2">
+                    @Html.DropDownList("TargetBranchId", lstBranches, new { @style = "width: 120px;float: left;margin-right:10px;" })
+                </div>
+                <label class="col-sm-1 control-label no-padding-right" style="text-align: left !important;" for="form-field-2">Nhóm </label>
+                <div class="col-sm-2">
+                    @Html.DropDownList("TargetGroupId", lstGroups, new { @class = "form-control" })
+                </div>
+                <label class="col-sm-1 control-label no-padding-right" style="text-align: left !important;" for="form-field-2">TVTS</label>
+                <div class="col-sm-2">
+                    @Html.DropDownList("TargetUserId", lstUsers, new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="space-6"></div>
+            <div class="row">
+                <div class="col-sm-9"></div>
+                <div class="col-sm-3" style="text-align: right;">
+                    <button id="btnForward" class="btn-primary" style="margin-right: 5px;">Chuyển</button>
+                    <button id="btnForwardAll" class="btn-primary" style=" width: 120px;">Chuyển tất cả</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div>
+    <!-- /.col -->
+</div>
+<!-- /.row -->
+
+<script type="text/javascript">
+    var grid_selector = "#grid-table";
+    var groupType = '@ViewBag.GroupType';
+    var employeeTypeId = '@((int)EmployeeType.Consultant)';
+    var url = 'admin/api/contact/FilterContactForChange?branchId={0}&levelids={1}&statusMapId={2}&statusCareId={3}&userIds={4}&fromDate={5}&toDate={6}&employeeTypeId=' + employeeTypeId;
+    var heades = ['Id', 'Họ và tên', 'Điện thoại', 'Level', 'Ngày', 'Giờ', 'Nội dung cuộc gọi gần nhất', 'Trạng thái chăm sóc', 'Tổng số cuộc gọi', 'TVTS', 'Ngày phân contact', 'Kiểu nguồn', '<input type="checkbox" id="chkSelectAll" onclick="fixCheckBoxGrid(event)" />'];
+    var model = [
+        { name: 'Id', index: 'Id', editable: false, sorttype: 'string', editoptions: { disabled: true }, width: '0px' },
+        { name: 'Fullname', index: 'Fullname', editable: false, width: '90px', sorttype: 'string' },
+        { name: 'Mobile1', index: 'Mobile1', editable: false, width: '80px', sorttype: 'string' },
+        { name: 'LevelId', index: 'LevelId', editable: false, width: '40px', sorttype: 'string', align: 'center', formatter: levelFomatter },
+        { name: 'AppointmentConsultantDate', index: 'AppointmentConsultantDate', editable: false, width: '65px', align: 'center', formatter: 'date', formatoptions: { srcformat: 'Y-m-dTH:i:s', newformat: 'd/m/Y' } },
+        { name: 'AppointmentConsultantTime', index: 'AppointmentConsultantTime', editable: false, width: '40px', align: 'center', formatter: 'date', formatoptions: { srcformat: 'Y-m-dTH:i:s', newformat: 'H:i' } },
+        { name: 'CallInfoConsultant', index: 'CallInfoConsultant', editable: false, width: '180px', sorttype: 'string', align: 'left' },
+        { name: 'StatusCareConsultantId', index: 'StatusCareConsultantId', editable: false, width: '120px', formatter: statusCareFomatter },
+        { name: 'CallAmount', index: 'CallAmount', editable: false, width: '60px', align: 'center' },
+        { name: 'UserConsultantId', index: 'UserConsultantId', editable: false, width: '90px', formatter: userFomatter },
+        { name: 'HandoverConsultantDate', index: 'HandoverConsultantDate', editable: false, formatter: 'date', formatoptions: { newformat: 'd/m/Y' }, width: '80px' },
+        { name: 'TypeId', index: 'TypeId', editable: false, formatter: sourceTypeFomatter },
+        { name: 'chkSelect', index: 'chkSelect', editable: false, edittype: 'checkbox', align: 'center', width: '40px', editoptions: { value: "True:False" }, formatter: checkboxFomatter, formatoptions: { disabled: false } }
+    ];
+
+    $(document).ready(function () {
+        initForm();
+        loadLevels();
+        $("#BranchId").change(function () {
+            var groupId = $("#GroupId").val();
+            var branchId = $("#BranchId").val();
+            
+            // Load
+            loadGroup(branchId, employeeTypeId, "GroupId");
+            loadUser(branchId, groupId, employeeTypeId, "UserId");
+        });
+        $("#GroupId").change(function () {
+            var groupId = $("#GroupId").val();
+            var branchId = $("#BranchId").val();
+            
+            loadUser(branchId, groupId, employeeTypeId, "UserId");
+        });
+        $("#TargetBranchId").change(function () {
+            var groupId = $("#TargetGroupId").val();
+            var branchId = $("#TargetBranchId").val();
+            
+            // Load
+            loadGroup(branchId, employeeTypeId, "TargetGroupId");
+            loadUser(branchId, groupId, employeeTypeId, "TargetUserId");
+        });
+        $("#TargetGroupId").change(function () {
+            var groupId = $("#TargetGroupId").val();
+            var branchId = $("#TargetBranchId").val();
+
+            loadUser(branchId, groupId, employeeTypeId, "TargetUserId");
+        });
+        $(window).keydown(function (e) {
+            if (e.keyCode == 13) {
+                e.preventDefault();
+                $("#btnGoFilter").click();
+            }
+        });
+
+        $("#btnGoFilter").click(function (e) {
+            e.preventDefault();
+
+            // Param
+            var userIds = getIds('UserId');
+            var branchId = $('#BranchId').val();
+            var levelIds = $('#chkLevels').is(':checked') ? '' : buildParamLevels();
+            
+            var statusMapId = $('#ddlStatusMap').val();
+            var statusCareId = $('#ddlStatusCare').val();
+            var toDate = $('#ToDate').val().replaceAll('/', '');
+            var fromDate = $('#FromDate').val().replaceAll('/', '');
+            
+            // Format Url
+            var newUrl = '/' + url.format(branchId, levelIds, statusMapId, statusCareId, userIds, fromDate, toDate);
+            jQuery(grid_selector).jqGrid().setGridParam({ url: newUrl }).trigger("reloadGrid");
+        });
+        $("#btnForward").click(function (e) {
+            e.preventDefault();
+
+            // Param
+            var ids = '';
+            var items = $("#grid-table td input");
+            for (var i = 0; i < items.length; i++) {
+                if ($(items[i]).is(':checked')) {
+                    ids += ids.length == 0
+                        ? $('#grid-table').jqGrid('getCell', i + 1, 'Id')
+                        : ',' + $('#grid-table').jqGrid('getCell', i + 1, 'Id');
+                }
+            }
+            if (ids.length == 0) {
+                alertError('Bạn chưa chọn contact để chuyển giao, vui lòng chọn!');
+                return;
+            }
+            var targetBranchId = $('#TargetBranchId').val();
+            if (targetBranchId == 0) {
+                alertError('Bạn chưa chọn vùng cần chuyền giao, vui lòng chọn!');
+                return;
+            }
+            var targetUserId = $('#TargetUserId').val();
+            if (targetUserId == 0) {
+                alertError('Bạn chưa chọn TVTS cần chuyền giao, vui lòng chọn!');
+                return;
+            }
+            var handoverDate = $('#HandoverDate').val().replaceAll('/', '');
+            var r = confirm("Có phải bạn muốn chuyển contact đã chọn sang cho TVTS khác?");
+            if (r == true) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/admin/api/contact/Forward',
+                    data: {
+                        ids: ids,
+                        handoverDate: handoverDate,
+                        targetUserId: targetUserId,
+                        targetBranchId: targetBranchId,
+                        employeeTypeId: employeeTypeId,
+                    },
+                    beforeSend: function () {
+                        alertProcess();
+                    },
+                    success: function (response) {
+                        alertSuccess("Chuyển giao thành công " + response + " contacts");
+                        $("#btnGoFilter").click();
+                    },
+                    error: function (request, status, ex) {
+                        alertError("Hệ thống bị lỗi, Chuyển giao không thành công.");
+                    }
+                });
+            }
+        });
+        $("#btnForwardAll").click(function (e) {
+            e.preventDefault();
+
+            var items = $("#grid-table td input");
+            if (items.length == 0) {
+                alertError('Bạn chưa lọc contact để chuyển giao, vui lòng lọc!');
+                return;
+            }
+            var targetBranchId = $('#TargetBranchId').val();
+            if (targetBranchId == 0) {
+                alertError('Bạn chưa chọn vùng cần chuyền giao, vui lòng chọn!');
+                return;
+            }
+            var targetUserId = $('#TargetUserId').val();
+            if (targetUserId == 0) {
+                alertError('Bạn chưa chọn TVTS cần chuyền giao, vui lòng chọn!');
+                return;
+            }
+
+            var r = confirm("Có phải bạn muốn chuyển toàn bộ cho TVTS khác?");
+            if (r == true) {
+                // Param
+                var userIds = getIds('UserId');
+                var branchId = $('#BranchId').val();
+                var statusMapId = $('#ddlStatusMap').val();
+                var statusCareId = $('#ddlStatusCare').val();
+                var toDate = $('#ToDate').val().replaceAll('/', '');
+                var fromDate = $('#FromDate').val().replaceAll('/', '');
+                var handoverDate = $('#HandoverDate').val().replaceAll('/', '');
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/admin/api/contact/ForwardAll',
+                    data: {
+                        toDate: toDate,
+                        userIds: userIds,
+                        branchId: branchId,
+                        fromDate: fromDate,
+                        statusMapId: statusMapId,
+                        statusCareId: statusCareId,
+                        handoverDate: handoverDate,
+                        targetUserId: targetUserId,
+                        targetBranchId: targetBranchId,
+                        employeeTypeId: employeeTypeId,
+                    },
+                    beforeSend: function () {
+                        alertProcess();
+                    },
+                    success: function (response) {
+                        alertSuccess("Chuyển giao thành công " + response + " contacts");
+                        $("#btnGoFilter").click();
+                    },
+                    error: function (request, status, ex) {
+                        alertError("Hệ thống bị lỗi, Chuyển giao không thành công.");
+                    }
+                });
+            }
+        });
+
+        $("#chkSelectAll").click(function () {
+            checkAll('chkSelectAll', 'checkbox');
+        });
+    });
+
+    // StatusCare
+    $("#ddlStatusCare").change(function () {
+        loadStatusMap(employeeTypeId);
+    });
+    
+    function initForm() {
+        $('#UserId').chosen();
+        $('#TargetUserId').chosen();
+        loadStatusMap(employeeTypeId);
+        $('#ToDate').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly: true });
+        $('#FromDate').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly: true });
+        $('#HandoverDate').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly: true, startDate: "+0d" });
+        setupGridWithoutEditPageSize("#grid-table", "#grid-pager", '', '', "Id", "Danh sách Contact", heades, model, 'GET', 100);
+        $(grid_selector).jqGrid("setGroupHeaders", {
+            useColSpanStyle: true,
+            groupHeaders: [
+                { startColumnName: "Fullname", numberOfColumns: 3, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;height:40px;"><b>Thông tin Contact</b></td></tr></table>' },
+                { startColumnName: "AppointmentDate", numberOfColumns: 2, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;"><b>Thông tin lịch hẹn gọi lại</b></td></tr></table>' },
+                { startColumnName: "CallInfo", numberOfColumns: 2, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;"><b>Tình trạng chăm sóc</b></td></tr></table>' }
+            ]
+        });
+
+        var groupId = $("#GroupId").val();
+        var branchId = $("#BranchId").val();
+        loadGroup(branchId, employeeTypeId, "GroupId");
+        loadUser(branchId, groupId, employeeTypeId, "UserId");
+        
+        // Target
+        groupId = $("#TargetGroupId").val();
+        branchId = $("#TargetBranchId").val();
+        loadGroup(branchId, employeeTypeId, "TargetGroupId");
+        loadUser(branchId, groupId, employeeTypeId, "TargetUserId");
+    }
+
+    function loadLevels() {
+        $('#divLevels').html('');
+        var userIds = $('#UserId').val();
+        if (userIds == 0) userIds = $('#GroupId').val() != 0 ? getIds('UserId') : '';
+        $.ajax({
+            type: 'GET',
+            url: '/admin/api/level/GetLevelWithContactCount',
+            data: {
+                userIds: userIds,
+                employeeTypeId: employeeTypeId,
+            },
+            success: function (data) {
+                if (data != null && data.length > 0) {
+                    var total = 0;
+                  
+                    var html = '';
+                    html += '<div class="col-sm-2">' +
+                        '<label class="bolder">Level</label>' +
+                        '</div>' +
+                        '<div class="col-sm-1" style="width: 11.3%;">' +
+                        '<input type="checkbox" id="chkLevels" checked />' +
+                        '<label>Tất cả </label>' +
+                        '</div>';
+                    for (var i = 1; i < data.length; i++) {
+                        var item = data[i];
+                        if (item.LevelId <= 8) {
+                            html += '<div class="col-sm-1" style="width: 9%;">' +
+                                '<input type="checkbox" name="chkLevels" id="' + item.LevelId + '_chkLevel" />' +
+                                '<label for="' + item.LevelId + '_chkLevel">' + item.Name + '</label>' +
+                                '</div>';
+                        }
+                    }
+                    $('#divLevels').html(html);
+                    reloadGrid();
+
+                    $('#chkLevels').change(function () {
+                        if ($('#chkLevels').is(':checked')) {
+                            var elements = document.getElementsByName('chkLevels');
+                            for (var i = 0; i < elements.length; i++) {
+                                $(elements[i]).attr('checked', false);
+                            }
+                            var levelIds = $('#chkLevels').is(':checked') ? '' : buildParamLevels();
+                            loadStatusMapByLevel(levelIds, employeeTypeId);
+                        }
+                    });
+                    $('input[name="chkLevels"]').change(function () {
+                        $('#chkLevels').attr('checked', false);
+                        var levelIds = $('#chkLevels').is(':checked') ? '' : buildParamLevels();
+                        loadStatusMapByLevel(levelIds, employeeTypeId);
+                    });
+
+                    var levelIds = $('#chkLevels').is(':checked') ? '' : buildParamLevels();
+                    loadStatusMapByLevel(levelIds, employeeTypeId);
+                }
+            },
+            error: function (request, status, ex) {
+                alertError("Hệ thống bị lỗi, không thể tải danh sách level.");
+            }
+        });
+    }
+</script>

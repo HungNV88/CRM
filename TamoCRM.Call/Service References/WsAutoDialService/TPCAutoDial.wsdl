@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:intf="http://DefaultNamespace" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:impl="http://DefaultNamespace" targetNamespace="http://DefaultNamespace" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://DefaultNamespace">
+      <xsd:element name="processMsg">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="input" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="processMsgResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="processMsgReturn" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="processMsgRequest">
+    <wsdl:part name="parameters" element="impl:processMsg" />
+  </wsdl:message>
+  <wsdl:message name="processMsgResponse">
+    <wsdl:part name="parameters" element="impl:processMsgResponse" />
+  </wsdl:message>
+  <wsdl:portType name="TPCAutoDial">
+    <wsdl:operation name="processMsg">
+      <wsdl:input name="processMsgRequest" message="impl:processMsgRequest" />
+      <wsdl:output name="processMsgResponse" message="impl:processMsgResponse" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="TPCAutoDialSoapBinding" type="impl:TPCAutoDial">
+    <wsdlsoap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="processMsg">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="processMsgRequest">
+        <wsdlsoap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="processMsgResponse">
+        <wsdlsoap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="TPCAutoDialService">
+    <wsdl:port name="TPCAutoDial" binding="impl:TPCAutoDialSoapBinding">
+      <wsdlsoap:address location="http://118.70.170.113:8080/TPCGoAutoDial/services/TPCAutoDial" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

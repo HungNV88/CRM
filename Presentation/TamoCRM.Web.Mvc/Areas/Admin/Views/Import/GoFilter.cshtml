@@ -1,0 +1,554 @@
+﻿@using TamoCRM.Core
+@using TamoCRM.Web.Framework
+@model TamoCRM.Web.Mvc.Areas.Admin.Models.Contacts.GoFilterModel
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+@{
+    var lstSchools = ViewBag.Schools;
+    var lstBranches = ViewBag.Branches;
+    var branchSelectList = new SelectList(lstBranches, "BranchId", "Name");
+
+    var lstStatusReturns = StoreData.ListStatusMap
+        .Where(c => c.LevelIdNext <= (int)LevelType.L1)
+        .Where(c => c.StatusMapType == (int)EmployeeType.Collaborator);
+}
+<style type="text/css">
+    .tblChannel tr th, .tblChannel tr td {
+        padding: 3px;
+    }
+
+    .tblSchool tr th, .tblSchool tr td {
+        padding: 3px;
+    }
+</style>
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        } catch (e) { }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Contact</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>Bàn giao đội lọc		
+        </h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="form-group">
+            <div class="col-sm-12" id="alert">
+            </div>
+        </div>
+        <div class="col-xs-12">
+            <div id="spiner"></div>
+        </div>
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            @using (Ajax.BeginForm("GoFilter", "Import", new AjaxOptions { HttpMethod = "POST" }, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "gofilterform" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <div class="col-sm-1">
+                        <label class="col-sm-0 control-label no-padding-right bolder" for="form-field-3">Nguồn</label>
+                    </div>
+                    <div class="col-sm-2" id="divSourceTypeCheckbox" style="margin-top: 6px; height: 25px;">
+                        @Html.CheckBoxListFor(model => model.PostedSourceTypes.SourceTypeIds, model => model.AllSourceTypes, source => source.SourceTypeId, source => source.Code, model => model.SelectedSourceTypes)
+                    </div>
+                    <div class="col-sm-2">
+                        <label class="col-sm-0 control-label no-padding-right bolder" for="form-field-2">Ngày nhập từ ngày</label>
+                    </div>
+                    <div class="col-sm-2" style="font-weight: bold;">
+                        @Html.TextBoxFor(model => model.FromDate, new { @required = "required", error = "Từ ngày không được rỗng" })
+                    </div>
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-1">
+                        <label class="col-sm-0 control-label no-padding-right bolder" for="form-field-3">Đến ngày</label>
+                    </div>
+                    <div class="col-sm-2" style="font-weight: bold;">
+                        @Html.TextBoxFor(model => model.ToDate, new { @required = "required", error = "Đến ngày không được rỗng" })
+                    </div>
+                </div>
+                <div class="space-4"></div>
+                <div class="row" id="divTypeCC" style="margin-bottom: 10px;">
+                    <div class="col-xs-2" style="border: 1px solid #ccc; padding-top: 5px; padding-left: 25px; margin-right: 12px;">
+                        <div class="row">
+                            <input type="radio" name='rdbTypeCC' id='chkCc_All' value="@((int)TodayType.All)" />
+                            <label for="chkCc_Newe">Tất cả</label>
+                        </div>
+                        <div class="row">
+                            <input type="radio" name='rdbTypeCC' id='chkCc_New' value="@((int)TodayType.New)"  />
+                            <label for="chkCc_Newe">Mới</label>
+                        </div>
+                        <div class="row">
+                            <input type="radio" name='rdbTypeCC' id='chkCc_Use' value="@((int)TodayType.Appointment)"  />
+                            <label for="chkCc_Newe">Tái sử dụng</label>
+                        </div>
+                    </div>
+                    <div id="divReuse" class="col-xs-9" style="border: 1px solid #ccc; padding-top: 5px;">
+                        @foreach (var item in lstStatusReturns)
+                        {
+                            <div class="col-sm-3">
+                                <input type="checkbox" name='chkchkStatusReuses' id='@(item.Id)_chkStatusReuse' value="@item.Id" />
+                                @if (item.Name.ToLower() == "không đúng đối tượng")
+                                {
+                                    <label for="@(item.Id)_chkStatusReuse">KĐĐT</label>
+                                }
+                                else if (item.Name.ToLower().Contains("không có nhu cầu"))
+                                {
+                                    <label for="@(item.Id)_chkStatusReuse">Không nhu cầu</label>
+                                }
+                                else
+                                {
+                                    <label for="@(item.Id)_chkStatusReuse">@item.Name</label>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-8" style="height: 300px; overflow-y: auto; display: block; padding: 0;">
+                        <table border="1" class="table table-striped table-bordered table-hover" style="margin-bottom: 0;">
+                            <thead>
+                                <tr>
+                                    <td class="col-sm-1" style="font-weight: bold; width: 60px;">Mã</td>
+                                    <td class="col-sm-5" style="font-weight: bold">Kênh</td>
+                                    <td class="col-sm-1" style="font-weight: bold; width: 60px;">Số lượng</td>
+                                    <td class="center col-sm-1" style="font-weight: bold; width: 60px;">
+                                        <input type="checkbox" id="chkChannels" /></td>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyChannel">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-sm-4">
+                        <table border="1" class="table table-striped table-bordered table-hover" style="margin-bottom: 0; height: 300px; overflow-y: auto; display: block;">
+                            <thead>
+                                <tr>
+                                    <td class="col-sm-3" style="font-weight: bold">Trường</td>
+                                    <td class="center col-sm-1" style="font-weight: bold">
+                                        <input type="checkbox" id="chkSchools" /></td>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodySchool">
+                                @foreach (var school in lstSchools)
+                                {
+                                    <tr>
+                                        <td class="col-sm-3">
+                                            <label for="@(school.SchoolId)_chkSchool">@school.Name</label></td>
+                                        <td class="col-sm-1 center">
+                                            <input type="checkbox" id="@(school.SchoolId)_chkSchool" name="@(school.SchoolId)_chkSchool" value="@(school.SchoolId)" class="chkSchool"/>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="space-4"></div>
+                <div class="form-group">
+                    <div class="col-sm-4">
+                        <label>Tổng số sau khi lọc:</label>
+                        <span id="spanFilterCount" style="font-weight: bold;">0</span>
+                        <label style="padding-left: 10px;">Số lượng:</label>@Html.TextBoxFor(model => model.Total, new { @style = "width: 40px;" })
+                    </div>
+                    <div class="col-sm-1" style="width: 9.7%;">
+                        Cơ sở đến:
+                    </div>
+                    <div class="col-sm-2">
+                        @Html.DropDownListFor(x => x.BranchId, branchSelectList, new { @width = 90 })
+                    </div>
+                    <div class="col-sm-2">
+                        <button id="btnGoFilter" class="btn-import btn-primary" value="Import">Đưa đội lọc</button>
+                    </div>
+                </div>
+            }
+
+
+            <table id="grid-table"></table>
+
+            <div id="grid-pager"></div>
+
+
+            <!-- PAGE CONTENT ENDS -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+<!-- /.page-content -->
+
+<!-- inline scripts related to this page -->
+<script id="tmplContact" type="text/x-jquery-tmpl">
+    <tr>
+        <td></td>
+        <td>${Fullname}</td>
+        <td>${Address}</td>
+        <td>${Email}</td>
+    </tr>
+</script>
+<script type="text/javascript">
+    $("#ToDate").datepicker({ format: 'dd/mm/yyyy', autoclose: true });
+    $("#FromDate").datepicker({ format: 'dd/mm/yyyy', autoclose: true });
+    var curSourceTypeCheck = null;
+
+    $(document).ready(function () {
+        $('#divReuse').css('display', 'none');
+        $('#divTypeCC').css('display', 'none');
+        $("#BranchId").attr('readonly', 'readonly');
+        $("#BranchId").attr('onfocus', 'this.defaultIndex=this.selectedIndex;');
+        $("#BranchId").attr('onchange', 'this.selectedIndex=this.defaultIndex;');
+
+        customValidate();
+        htmlGlobal = $("#tbodyChannel").html();
+
+        $("#ToDate").change(function (e) {
+            e.preventDefault();
+            updateChannelCount();
+            $("#spanFilterCount").html('0');
+        });
+        $("#FromDate").change(function (e) {
+            e.preventDefault();
+            updateChannelCount();
+            $("#spanFilterCount").html('0');
+        });
+        $("#tbodySchool input[type=checkbox]").change(function (e) {
+            updateCount();
+        });
+        $("#tbodyChannel input[type=checkbox]").change(function (e) {
+            updateCount();
+        });
+        $("#divSourceTypeCheckbox input[type=checkbox]").change(function (e) {
+            e.preventDefault();
+            if ($(this).is(":checked")) {
+                if ($(curSourceTypeCheck).val() != $(this).val()) {
+                    if (curSourceTypeCheck) $(curSourceTypeCheck).attr('checked', false);
+                    curSourceTypeCheck = $(this);
+                }
+                if ($(this).val() == '@((int)SourceType.CC)') {
+                    hideReuse();
+                    $('#divTypeCC').css('display', '');
+                    $('#chkCc_All').prop('checked', true);
+                    $('#chkCc_New').prop('checked', false);
+                    $('#chkCc_Use').prop('checked', false);
+                } else {
+                    hideReuse();
+                    $('#divTypeCC').css('display', 'none');
+                    $('#chkCc_All').prop('checked', true);
+                    $('#chkCc_New').prop('checked', false);
+                    $('#chkCc_Use').prop('checked', false);
+                }
+            }
+            else {
+                hideReuse();
+                $('#divTypeCC').css('display', 'none');
+                $('#chkCc_All').prop('checked', true);
+                $('#chkCc_New').prop('checked', false);
+                $('#chkCc_Use').prop('checked', false);
+            }
+            updateChannelCount();
+            $("#spanFilterCount").html('0');
+        });
+        $("#divTypeCC input[type=radio]").change(function (e) {
+            if ($("#chkCc_Use").is(':checked')) showReuse();
+            else hideReuse();
+
+            updateChannelCount();
+            $("#spanFilterCount").html('0');
+        });
+        $("#divReuse input[type=checkbox]").change(function (e) {
+            updateChannelCount();
+            $("#spanFilterCount").html('0');
+        });
+
+        $("#btnGoFilter").click(function (e) {
+            handover();
+            return false;
+        });
+        $('#gofilterform').ajaxForm({
+            beforeSend: function () {
+                alertProcess();
+            },
+            uploadProgress: function (event, position, total, percentComplete) {
+
+            },
+            success: function () {
+
+            },
+            complete: function (xhr) {
+                alertSuccess("Chuyển giao thành công.");
+                $('#gofilterform').trigger("reset");
+                $("#spanFilterCount").html('0');
+            }
+        });
+
+        $("#chkChannels").click(function () {
+            checkAllClassName('chkChannels', 'chkChannel');
+            updateCount();
+        });
+        $("#chkSchools").click(function () {
+            checkAllClassName('chkSchools', 'chkSchool');
+            updateCount();
+        });
+    });
+
+    function updateChannelCount() {
+        var sourceTypeId = 0;
+        var toDate = $("#ToDate").val().replaceAll('/', '');
+        var fromDate = $("#FromDate").val().replaceAll('/', '');
+        var typeCc = $("#divTypeCC input[type=radio]:checked").val();
+        var statusMapIds = '';
+        $('#divReuse input[type=checkbox]').each(function () {
+            if ($(this).is(':checked'))
+                statusMapIds += statusMapIds.length == 0 ? $(this).val() : ',' + $(this).val();
+        });
+        if (statusMapIds == '') {
+            $('#divReuse input[type=checkbox]').each(function () {
+                statusMapIds += statusMapIds.length == 0 ? $(this).val() : ',' + $(this).val();
+            });
+        }
+        $.each($("#divSourceTypeCheckbox input[type=checkbox]"), function (index) {
+            if ($(this).is(':checked'))
+                sourceTypeId = $(this).attr("value");
+        });
+
+        if (sourceTypeId == 0) {
+            $("#tbodyChannel").html(htmlGlobal);
+            return;
+        }
+
+        $.each($("#tbodyChannel input[type=checkbox]"), function (index) {
+            $(this).attr('checked', false);
+        });
+
+        $.each($("#tbodySchool input[type=checkbox]"), function (index) {
+            $(this).attr('checked', false);
+        });
+
+        $.each($("#divSourceTypeCheckbox input[type=checkbox]"), function (index) {
+            $(this).attr("disabled", "disabled");
+        });
+
+        $.ajax({
+            type: 'GET',
+            url: '/admin/api/channel/FilterCountForDistributor',
+            data: { sourceTypeId: sourceTypeId, typeCc: typeCc, statusMapIds: statusMapIds, from: fromDate, to: toDate },
+            success: function (data) {
+                $.each($("#divSourceTypeCheckbox input[type=checkbox]"), function (index) {
+                    $(this).removeAttr("disabled");
+                });
+                $('#tbodyChannel').html('');
+                if (data != null && data.length > 0) {
+                    var html = '';
+                    for (var i = 0; i < data.length; i++) {
+                        var item = data[i];
+                        html += '<tr id="' + item.ChannelId + '_trChannel" name="trChannel">';
+                        html += '<td class="col-sm-1" style="width: 60px;">';
+                        html += '<label>' + item.Code + '</label>';
+                        html += '</td>';
+                        html += '<td class="col-sm-5">';
+                        html += '<label for="' + item.ChannelId + '_chkChannel">' + item.Name + '</label>';
+                        html += '</td>';
+                        html += '<td class="col-sm-1" style="width: 60px;">';
+                        html += '<label id="' + item.ChannelId + '_lblChannel" name="lblChannel">' + item.Amount + '</label>';
+                        html += '</td>';
+                        html += '<td class="center col-sm-1" style="width: 60px;">';
+                        html += '<input type="checkbox" id="' + item.ChannelId + '_chkChannel" name="' + item.ChannelId + '_chkChannel" value="' + item.ChannelId + '" class="chkChannel"/>';
+                        html += '</td>';
+                        html += '</tr>';
+                    }
+                    $('#tbodyChannel').html(html);
+                    
+                    $("#tbodyChannel input[type=checkbox]").change(function (e) {
+                        updateCount();
+                    });
+                }
+                alertHide();
+            },
+            error: function (request, status, ex) {
+                alertError("Hệ thống bị lỗi, lọc contact không thành công.");
+            }
+        });
+
+        $('#chkSchools').prop('checked', false);
+        $('#chkChannels').prop('checked', false);
+    }
+
+    function validateForm() {
+        if ($("#FromDate").val() == '') {
+            alert("Chưa nhập ngày bắt đầu");
+            return false;
+        }
+
+        if ($("#ToDate").val() == '') {
+            alert("Chưa nhập ngày kết thúc");
+            return false;
+        }
+
+        if (parseInt($("#spanFilterCount").html()) < 1) {
+            alert("Chưa lọc dữ liệu hoặc không có dữ liệu");
+            return false;
+        }
+
+        var total;
+        try {
+            total = parseInt($("#Total").val());
+            if (total == 0) {
+                alert("Số lượng bàn giao không hợp lệ");
+                return false;
+            }
+        }
+        catch (err) {
+            alert("Số lượng bàn giao không hợp lệ");
+            return false;
+        }
+
+        return true;
+    }
+
+    function updateCount() {
+        var toDate = $("#ToDate").val().replaceAll('/', '');
+        var fromDate = $("#FromDate").val().replaceAll('/', '');
+        var typeCc = $("#divTypeCC input[type=radio]:checked").val();
+        var sourceTypeId = $("#divSourceTypeCheckbox input[type=checkbox]:checked").val();
+        var statusMapIds = '';
+        $('#divReuse input[type=checkbox]').each(function () {
+            if ($(this).is(':checked'))
+                statusMapIds += statusMapIds.length == 0 ? $(this).val() : ',' + $(this).val();
+        });
+        if (statusMapIds == '') {
+            $('#divReuse input[type=checkbox]').each(function () {
+                statusMapIds += statusMapIds.length == 0 ? $(this).val() : ',' + $(this).val();
+            });
+        }
+        var schoolIds = '';
+        $.each($("#tbodySchool input[type=checkbox]:checked"), function (index) {
+            schoolIds += schoolIds.length == 0 ? $(this).val() : ',' + $(this).val();
+        });
+        var channelIds = '';
+        $.each($("#tbodyChannel input[type=checkbox]:checked"), function (index) {
+            channelIds += channelIds.length == 0 ? $(this).val() : ',' + $(this).val();
+        });
+
+        if (schoolIds.length <= 0 || channelIds.length <= 0 ||
+            sourceTypeId == undefined || sourceTypeId == 0) {
+            $("#spanFilterCount").html('0');
+            return;
+        }
+
+        $.ajax({
+            type: 'GET',
+            url: '/admin/api/channel/FilterContactCountForDistributor',
+            data: { sourceTypeId: sourceTypeId, typeCc: typeCc, statusMapIds: statusMapIds, from: fromDate, to: toDate, channelIds: channelIds, schoolIds: schoolIds },
+            success: function (data) {
+                $("#spanFilterCount").html(data);
+            },
+            error: function (request, status, ex) {
+                alertError("Hệ thống bị lỗi, lọc contact không thành công.");
+            }
+        });
+    }
+
+    function handover() {
+        var toDate = $("#ToDate").val().replaceAll('/', '');
+        var fromDate = $("#FromDate").val().replaceAll('/', '');
+        var typeCc = $("#divTypeCC input[type=radio]:checked").val();
+        var sourceTypeId = $("#divSourceTypeCheckbox input[type=checkbox]:checked").val();
+        var statusMapIds = '';
+        $('#divReuse input[type=checkbox]').each(function () {
+            if ($(this).is(':checked'))
+                statusMapIds += statusMapIds.length == 0 ? $(this).val() : ',' + $(this).val();
+        });
+        if (statusMapIds == '') {
+            $('#divReuse input[type=checkbox]').each(function () {
+                statusMapIds += statusMapIds.length == 0 ? $(this).val() : ',' + $(this).val();
+            });
+        }
+        var schoolIds = '';
+        $.each($("#tbodySchool input[type=checkbox]:checked"), function (index) {
+            schoolIds += schoolIds.length == 0 ? $(this).val() : ',' + $(this).val();
+        });
+        var channelIds = '';
+        $.each($("#tbodyChannel input[type=checkbox]:checked"), function (index) {
+            channelIds += channelIds.length == 0 ? $(this).val() : ',' + $(this).val();
+        });
+
+        if (sourceTypeId == undefined || sourceTypeId == 0) {
+            alertError('Bạn chưa chọn kiểu nguồn để bàn giao');
+            return;
+        }
+        if (channelIds.length <= 0) {
+            alertError('Bạn chưa chọn kênh để bàn giao');
+            return;
+        }
+        if (schoolIds.length <= 0) {
+            alertError('Bạn chưa chọn trường để bàn giao');
+            return;
+        }
+        var total;
+        try {
+            total = parseInt($("#Total").val());
+            if (total == 0) {
+                alertError("Số lượng bàn giao không hợp lệ");
+                return;
+            }
+        }
+        catch (err) {
+            alertError("Số lượng bàn giao không hợp lệ");
+            return;
+        }
+
+        alertProcess();
+        $.ajax({
+            type: 'POST',
+            url: '/admin/api/contact/HandoverToDistributor',
+            data: {
+                sourceTypeId: sourceTypeId,
+                statusMapIds: statusMapIds,
+                channelIds: channelIds,
+                schoolIds: schoolIds,
+                typeCc: typeCc,
+                from: fromDate,
+                total: total,
+                to: toDate
+            },
+            success: function (data) {
+                alertSuccess("Đã bàn giao thành công " + data + " contact");
+                $('#divTypeCC').css('display', 'none');
+                $('#gofilterform').trigger("reset");
+                $("#spanFilterCount").html('0');
+                $('#tbodyChannel').html('');
+                hideReuse();
+            },
+            error: function (request, status, ex) {
+                alertError("Hệ thống bị lỗi, bàn giao không thành công.");
+            }
+        });
+    }
+
+    function hideReuse() {
+        $('#divReuse').css('display', 'none');
+        $('#divReuse input[type=checkbox]').each(function () {
+            $(this).prop('checked', false);
+        });
+    }
+
+    function showReuse() {
+        $('#divReuse').css('display', '');
+    }
+</script>

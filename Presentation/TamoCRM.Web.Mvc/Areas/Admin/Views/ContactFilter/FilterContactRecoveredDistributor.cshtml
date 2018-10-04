@@ -1,0 +1,351 @@
+﻿@using TamoCRM.Domain.StatusMap
+@model TamoCRM.Web.Mvc.Areas.Admin.Models.Contacts.ContactCreateModel
+
+@{
+    ViewBag.Title = "Đã Thu hồi Contact";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+@{
+    // StatusMaps
+    var statusMaps = ((IEnumerable<StatusMapInfo>)ViewBag.StatusMaps)
+       .Where(c => c.StatusMapType == (int)TamoCRM.Core.EmployeeType.Collaborator)
+       .Where(c => c.LevelIdNext <= (int)TamoCRM.Core.LevelType.L1)
+       .OrderBy(c => c.StatusCareId).ToList();
+    statusMaps.RemoveAll(c => c.Id == 0);
+    statusMaps.Insert(0, new StatusMapInfo { Id = 0, Name = "Tất cả" });
+    var lstStatusMaps = new SelectList(statusMaps, "Id", "Name");
+}
+
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        }
+        catch (e) {
+
+        }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Contact</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>Danh sách contact thu hồi từ Lọc</h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            @using (Ajax.BeginForm("FilterContactRecoveredDistributor", "Contact", new AjaxOptions { HttpMethod = "POST" }, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "filter_contact_recovered_form" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <div class="col-sm-12" id="alert">
+                    </div>
+                </div>
+                <div style="border-bottom: 1px solid #c5d0dc; padding: 0 0 15px 0;">
+                    <div class="form-group">
+                        @*<div class="col-sm-2" style="padding-left: 0;">
+                            <label class="bolder">Trạng thái chăm sóc</label>
+                        </div>
+                        <div class="col-sm-2">
+                            @Html.DropDownList("ddlStatusCare", lstStatusCares, new { @class = "form-control" })
+                        </div>*@
+                        <div class="col-sm-1">&nbsp;</div>
+                        <div class="col-sm-2">
+                            <label class="bolder">Trạng thái nghiệm thu</label>
+                        </div>
+                        <div class="col-sm-3">
+                            @Html.DropDownList("ddlStatusMap", lstStatusMaps, new { @class = "form-control" })
+                        </div>
+                    </div>
+                   @* <div class="row">
+                        <div class="col-sm-1" style="padding-left: 5px;">
+                            <label class="bolder">Trùng MO</label>
+                        </div>
+                        <div class="col-sm-1">
+                            <input type="radio" name='chkDuplicateMo' id='chkDuplicateMoAll' checked />
+                            <label>Tất cả</label>
+                        </div>
+                        <div class="col-sm-1">
+                            <input type="radio" name="chkDuplicateMo" id="chkDuplicateMo" />
+                            <label for="chkDuplicateMo">Trùng</label>
+                        </div>
+                        <div class="col-sm-2">
+                            <input type="radio" name="chkDuplicateMo" id="chkDuplicateMoNot" />
+                            <label for="chkDuplicateMoNot">Không trùng</label>
+                        </div>
+                    </div>*@
+                    @*<div class="row">
+                        <div class="col-sm-1" style="padding-left: 5px;">
+                            <label class="bolder">Nguồn</label>
+                        </div>
+                        <div class="col-sm-1">
+                            <input type="checkbox" name='chkSourceTypes' id='chkSourceTypes' checked />
+                            <label>Tất cả</label>
+                        </div>
+                        @for (var i = 0; i < lstSourceTypes.Count; i++)
+                        {
+                            var item = lstSourceTypes[i];
+                            if (i > 0 && i % 5 == 0)
+                            {
+                                <div class="col-sm-2"></div>   
+                            }
+                            <div class="col-sm-2">
+                                <input type="checkbox" name='chkSourceTypes' id='@(item.SourceTypeId)_chkSourceType' />
+                                <label for="@(item.SourceTypeId)_chkSourceType">@item.Name</label>
+                            </div>
+                        }
+                    </div>*@
+                    @*<div class="row">
+                        <div class="col-sm-1" style="padding-left: 5px;">
+                            <label class="bolder">Level</label>
+                        </div>
+                        <div class="col-sm-1">
+                            <input type="checkbox" name='chkLevels' id='chkLevels' checked />
+                            <label>Tất cả</label>
+                        </div>
+                        @for (var i = 0; i < lstLevels.Count; i++)
+                        {
+                            var item = lstLevels[i];
+                            if (i > 0 && i % 10 == 0)
+                            {
+                                <div class="col-sm-2"></div>   
+                            }
+                            <div class="col-sm-1">
+                                <input type="checkbox" name='@(item.LevelId)_chkLevel' id='@(item.LevelId)_chkLevel' />
+                                <label for="@(item.LevelId)_chkLevel">@item.Name</label>
+                            </div>
+                        }
+                    </div>*@
+                    @*<div class="row">
+                        <div class="col-sm-1" style="padding-left: 5px;">
+                            <label class="bolder">Đối tượng</label>
+                        </div>
+                        <div class="col-sm-1">
+                            <input type="checkbox" name='chkEducationLevels' id='chkEducationLevels' checked />
+                            <label>Tất cả</label>
+                        </div>
+                        @foreach (var item in lstEducationLevels)
+                        {
+                            <div class="col-sm-1">
+                                <input type="checkbox" name='chkEducationLevels' id='@(item.EducationLevelId)_chkEducationLevel' />
+                                <label for="@(item.EducationLevelId)_chkEducationLevel">@item.Name</label>
+                            </div>
+                        }
+                    </div>*@
+                    @*<div class="row">
+                        <div class="col-sm-1" style="padding-left: 5px;">
+                            <label class="bolder">Trường</label>
+                        </div>
+                        <div class="col-sm-1">
+                            <input type="checkbox" name='chkSchools' id='chkSchools' checked />
+                            <label>Tất cả</label>
+                        </div>
+                        @foreach (var item in lstSchools)
+                        {
+                            if (@item.Name.Length > 4)
+                            {
+                            <div class="col-sm-2">
+                                <input type="checkbox" name='@(item.SchoolId)_chkSchool' id='@(item.SchoolId)_chkSchool' />
+                                <label for="@(item.SchoolId)_chkSchool">@item.Name</label>
+                            </div>
+                            }
+                            else
+                            {
+                            <div class="col-sm-1">
+                                <input type="checkbox" name='@(item.SchoolId)_chkSchool' id='@(item.SchoolId)_chkSchool' />
+                                <label for="@(item.SchoolId)_chkSchool">@item.Name</label>
+                            </div>
+                            }
+                        }
+                    </div>*@
+                    @*<div class="row">
+                        <div class="col-sm-1" style="padding-left: 5px;">
+                            <label class="bolder">Ngành</label>
+                        </div>
+                        <div class="col-sm-1">
+                            <input type="checkbox" name='chkMajors' id='chkMajors' checked />
+                            <label>Tất cả</label>
+                        </div>
+                        @foreach (var item in lstMajors)
+                        {
+                            if (@item.Name.Length > 4)
+                            {
+                            <div class="col-sm-2">
+                                <input type="checkbox" name='@(item.MajorId)_chkMajor' id='@(item.MajorId)_chkMajor' />
+                                <label for="@(item.MajorId)_chkMajor">@item.Name</label>
+                            </div>
+                            }
+                            else
+                            {
+                            <div class="col-sm-1">
+                                <input type="checkbox" name='@(item.MajorId)_chkMajor' id='@(item.MajorId)_chkMajor' />
+                                <label for="@(item.MajorId)_chkMajor">@item.Name</label>
+                            </div>
+                            }
+                        }
+                    </div>*@
+                </div>
+            }
+
+            <div class="space-6"></div>
+            <button id="btnSubmitAll" class="btn-primary" style="float: right; margin-right: 10px;">Tái sử dụng Tất cả</button>
+            <button id="btnSubmit" class="btn-primary" style="float: right; margin-right: 10px;">Tái sử dụng Contact</button>
+            <button id="btnGoFilter" class="btn-primary" style="float: right; margin-right: 10px;">Lọc Contact</button>
+            <div class="clearfix"></div>
+
+            <div class="space-6"></div>
+            <table id="grid-table"></table>
+            <div id="grid-pager"></div>
+
+            <!-- PAGE CONTENT ENDS -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+
+<script type="text/javascript">
+    var url = 'admin/api/contact/filterrecovered?sourcetypes={0}&levels={1}&educationlevels={2}&statusMapId={3}&statusCareId={4}&schools={5}&majors={6}&duplicate={7}&branchId={8}';
+    var grid_selector = "#grid-table";
+    var heades = ['Id', 'Họ và tên', 'SĐT', 'Email', 'Trường tốt nghiệp', 'Ngành đăng ký', 'Trạng thái chăm sóc', 'Trạng thái gọi', 'Level', 'Nơi sống', 'Ghi chú', 'Điểm tuyển sinh/CTV gọi', 'Ngày tìm nguồn', 'Trường', 'Ngày phân contact', '<input type="checkbox" id="chkContacts" onclick="fixCheckBoxGrid(event)" />'];
+    var model = [
+        { name: 'Id', index: 'Id', editable: false, sorttype: 'string', editoptions: { disabled: true }, width: '0px' },
+        { name: 'Fullname', index: 'Fullname', editable: false, sorttype: 'string', width: '70px' },
+        { name: 'Mobile', index: 'Mobile', editable: false, sorttype: 'string', width: '70px' },
+        { name: 'Email', index: 'Email', editable: false, sorttype: 'string', width: '70px' },
+        { name: 'SchoolName', index: 'SchoolName', editable: false, sorttype: 'string', width: '70px' },
+        { name: 'MajorName', index: 'MajorName', editable: false, sorttype: 'string', width: '70px' },
+        { name: 'StatusCare', index: 'StatusCare', editable: false, sorttype: 'string', width: '70px' },
+        { name: 'StatusMap', index: 'StatusMap', editable: false, sorttype: 'string', width: '70px' },
+        { name: 'Level', index: 'Level', editable: false, sorttype: 'string', width: '50px' },
+        { name: 'LocationName', index: 'LocationName', editable: false, sorttype: 'string', width: '70px' },
+        { name: 'Notes', index: 'Notes', editable: false, sorttype: 'string', width: '100px' },
+        { name: 'ChannelName', index: 'ChannelName', editable: false, sorttype: 'string', width: '70px' },
+        { name: 'RegisteredDate', index: 'RegisteredDate', editable: false, sorttype: 'string', width: '60px' },
+        { name: 'School', index: 'School', editable: false, sorttype: 'string', width: '60px' },
+        { name: 'HandoverDate', index: 'HandoverDate', editable: false, sorttype: 'string', width: '60px' },
+        { name: 'chkContact', index: 'chkContact', editable: true, edittype: 'checkbox', align: 'center', width: '40px', editoptions: { value: "True:False" }, formatter: checkboxFomatter, formatoptions: { disabled: false } }
+    ];
+
+    $(document).ready(function () {
+        var branchId = '@ViewBag.BranchId';
+        loadStatusMap();
+
+        setupGridWithoutEdit("#grid-table", "#grid-pager", url.format('', '', '', 0, 0, '', '', 2, branchId), "admin/api/contact/edit", "Id", "Danh sách Contact đã thu hồi", heades, model);
+        $("#btnGoFilter").click(function (e) {
+            e.preventDefault();
+
+            // Param
+            var statusMapId = $('#ddlStatusMap').val();
+            var statusCareId = $('#ddlStatusCare').val();
+            var levels = $('#chkLevels').is(':checked') ? '' : buildParamLevels();
+            var majors = $('#chkMajors').is(':checked') ? '' : buildParamMajors();
+            var schools = $('#chkSchools').is(':checked') ? '' : buildParamSchools();
+            var sourceTypes = $('#chkSourceTypes').is(':checked') ? '' : buildParamSourceTypes();
+            var educationLevels = $('#chkEducationLevels').is(':checked') ? '' : buildParamEducationLevels();
+            var duplicate = $('#chkDuplicateMoNot').is(':checked') ? '0' : $('#chkDuplicateMo').is(':checked') ? '1' : '2';
+
+            // Format Url
+            var newUrl = '/' + url.format(sourceTypes, levels, educationLevels, statusMapId, statusCareId, schools, majors, duplicate, branchId);
+            jQuery(grid_selector).jqGrid().setGridParam({ url: newUrl }).trigger("reloadGrid");
+        });
+        $("#btnSubmit").click(function (e) {
+            e.preventDefault();
+
+            var ids = '';
+            var items = $("#grid-table td input");
+            for (var i = 0; i < items.length; i++) {
+                if ($(items[i]).is(':checked')) {
+                    ids += ids.length == 0
+                        ? $('#grid-table').jqGrid('getCell', i + 1, 'Id')
+                        : ',' + $('#grid-table').jqGrid('getCell', i + 1, 'Id');
+                }
+            }
+            if (ids.length == 0) {
+                alertError('Bạn chưa chọn contact để tái sử dụng');
+                return;
+            }
+
+            $.ajax({
+                type: 'GET',
+                data: { ids: ids },
+                url: '/admin/api/contact/reuse',
+                success: function (response) {
+                    alertError("Tái sử dụng thành công " + response + " contacts");
+                    $("#btnGoFilter").click();
+                },
+                error: function (request, status, ex) {
+                    alertError("Hệ thống bị lỗi, Tái sử dụng không thành công.");
+                }
+            });
+        });
+        $("#btnSubmitAll").click(function (e) {
+            e.preventDefault();
+
+            // Param
+            var statusMapId = $('#ddlStatusMap').val();
+            var statusCareId = $('#ddlStatusCare').val();
+            var levels = $('#chkLevels').is(':checked') ? '' : buildParamLevels();
+            var majors = $('#chkMajors').is(':checked') ? '' : buildParamMajors();
+            var schools = $('#chkSchools').is(':checked') ? '' : buildParamSchools();
+            var sourceTypes = $('#chkSourceTypes').is(':checked') ? '' : buildParamSourceTypes();
+            var educationLevels = $('#chkEducationLevels').is(':checked') ? '' : buildParamEducationLevels();
+            var duplicate = $('#chkDuplicateMoNot').is(':checked') ? '0' : $('#chkDuplicateMo').is(':checked') ? '1' : '2';
+
+            var items = $("#grid-table td input");
+            if (items.length == 0) {
+                alertError('Bạn chưa lọc contact để tái sử dụng, vui lòng lọc!');
+                return;
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: '/admin/api/contact/ReuseAll',
+                data: {
+                    levels: levels,
+                    majors: majors,
+                    schools: schools,
+                    branchId: branchId,
+                    duplicate: duplicate,
+                    sourceTypes: sourceTypes,
+                    statusMapId: statusMapId,
+                    statusCareId: statusCareId,
+                    educationLevels: educationLevels
+                },
+                beforeSend: function () {
+                    alertProcess();
+                },
+                success: function (response) {
+                    alertSuccess("Tái sử dụng thành công " + response + " contacts");
+                    $("#btnGoFilter").click();
+                },
+                error: function (request, status, ex) {
+                    alertError("Hệ thống bị lỗi, Tái sử dụng không thành công.");
+                }
+            });
+        });
+        $("#chkContacts").click(function () {
+            checkAll('chkContacts', 'checkbox');
+        });
+
+        // StatusCare
+        $("#ddlStatusCare").change(function () {
+            loadStatusMap();
+        });
+    });
+</script>

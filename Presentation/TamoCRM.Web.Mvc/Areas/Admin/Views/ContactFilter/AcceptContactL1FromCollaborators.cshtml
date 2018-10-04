@@ -1,0 +1,222 @@
+﻿@using TamoCRM.Core
+@using TamoCRM.Domain.PrintForCollaboratorPages
+@using TamoCRM.Domain.StatusMap
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    var statusMaps = ((IEnumerable<StatusMapInfo>)ViewBag.StatusMaps)
+        .Where(c => c.LevelId == (int)LevelType.L1)
+        .Where(c => c.StatusMapType == (int)EmployeeType.Collaborator);
+
+    var pages = ViewBag.PrintedPages;
+    ((List<PrintForCollaboratorPageInfo>)pages).RemoveAll(c => c.Id == 0);
+    ((List<PrintForCollaboratorPageInfo>)pages).Insert(0, new PrintForCollaboratorPageInfo { Id = int.MaxValue, PageCode = "--- Chọn ---" });
+    var lstPages = new SelectList(((List<PrintForCollaboratorPageInfo>)pages).OrderByDescending(c => c.Id), "PageCode", "PageCode");
+}
+<style type="text/css">
+    .acceptl1-table thead tr {
+        height: 47px;
+    }
+
+    .acceptl1-table tbody tr td {
+        vertical-align: middle !important;
+    }
+</style>
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        } catch (e) { }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Contact</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>Nghiệm thu L1 từ CTV								
+        </h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div id="spiner"></div>
+        </div>
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            @using (Ajax.BeginForm("AcceptContactL1FromCollaborators", "ContactFilter", new AjaxOptions { HttpMethod = "POST" }, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "frmAcceptContactL1" }))
+            {
+                @Html.AntiForgeryToken()
+                <input type="hidden" id="txtContactCount" name="txtContactCount" value="0" />
+                <div class="space-4"></div>                
+                <div class="form-group">
+                    <label class="col-sm-2 control-label no-padding-right" for="form-field-1" style="text-align: left !important;">Chọn mã trang </label>
+                    <div class="col-sm-3">
+                        @Html.DropDownList("dropPrintedPage", lstPages, new { @style = "width: 220px;" })
+                    </div>
+                    <div class="col-sm-4">
+                        <input type="button" class="btn-primary" value="Lọc Contact" id="btnGoFilter" style="margin-right: 10px;" />
+                        <input type="submit" class="btn-primary" value="Nghiệm thu" id="btnAccept" />
+                    </div>
+                </div>
+
+                <div class="space-4"></div>                
+                <div class="form-group">
+                    <div class="col-sm-12">
+                        <table border="1" class="table table-striped table-bordered table-hover acceptl1-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px;">STT</th>
+                                    <th style="width: 140px;">Trạng thái</th>
+                                    <th>Họ tên</th>
+                                    <th style="width: 178px">Điện thoại 1</th>
+                                    <th style="width: 178px">Điện thoại 2</th>
+                                    <th style="width: 227px">Trạng thái gọi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="acceptl1-form">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+            <table id="grid-table"></table>
+
+            <div id="grid-pager"></div>
+
+
+            <!-- PAGE CONTENT ENDS -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+<!-- /.page-content -->
+
+<!-- inline scripts related to this page -->
+<script type="text/x-jquery-tmpl" id="tplAcceptL1">
+    <tr>
+        <td style="text-align: center;">${$item.dataArrayIndex($item.data) + 1}<input id="${$item.dataArrayIndex($item.data) + 1}_txtContactId" name="${$item.dataArrayIndex($item.data) + 1}_txtContactId" type="hidden" value="${Id}" /></td>
+        <td id="${$item.dataArrayIndex($item.data) + 1}_tdContactStatus">${StatusName}</td>
+        <td>${Fullname}</td>
+        <td>${Mobile}</td>
+        <td>
+            <input tabindex="${$item.dataArrayIndex($item.data) + 1000}" id="${$item.dataArrayIndex($item.data) + 1}_Mobile2" name="${$item.dataArrayIndex($item.data) + 1}_Mobile2" type="text" value="${Mobile2}" />
+        </td>
+        <td>
+            <select tabindex="${$item.dataArrayIndex($item.data) + 1100}" id="${$item.dataArrayIndex($item.data) + 1}_dropStatusMap" name="${$item.dataArrayIndex($item.data) + 1}_dropStatusMap" class="dropStatusMap">
+                <option value="0">--</option>
+                @foreach (var info in statusMaps)
+                {
+                    <text>
+                    {{if StatusMapId == "@info.Id"}}
+                    </text>
+                    <option selected="selected" value="@info.Id">@info.Name</option>
+                    <text>
+                    {{else}}
+                    </text>
+                    <option value="@info.Id">@info.Name</option>
+                    <text>
+                    {{/if}}
+                    </text>
+                }
+            </select>
+        </td>
+    </tr>
+</script>
+<script type="text/javascript">
+    function bindContactList() {
+        if ($("#dropPrintedPage").val().trim() == '') return;
+        $("#acceptl1-form").html("<tr><td colspan='6'><i class='icon-spinner icon-spin orange bigger-125'></i>Đang tải dữ liệu...</td></tr>");
+        $.ajax({
+            type: "POST",
+            url: "/admin/api/contact/getforacceptance",
+            data: { pageCode: $("#dropPrintedPage").val(), levelId: 1, page: 1, rows: 10000 },
+            success: function (lstContacts) {
+                //console.log(lstContacts);
+                $("#acceptl1-form").html("");
+                var contacts = lstContacts.Rows;
+                $("#txtContactCount").val(contacts.length);
+                $("#tplAcceptL1").tmpl(contacts, {
+                    dataArrayIndex: function (item) {
+                        return $.inArray(item, contacts);
+                    }
+                }).appendTo("#acceptl1-form");
+
+                var elements = document.getElementsByClassName('dropStatusMap');
+                for (var i = 0; i < elements.length; i++) {
+                    if (parseInt($(elements[i]).val()) > 0) {
+                        $(elements[i]).attr('readonly', 'readonly');
+                        $(elements[i]).attr('onfocus', 'this.defaultIndex=this.selectedIndex;');
+                        $(elements[i]).attr('onchange', 'this.selectedIndex=this.defaultIndex;');
+                    }
+                }
+            }
+        });
+    }
+    $(document).ready(function () {
+        $('#dropPrintedPage').chosen();
+        $(window).keydown(function (event) {
+            if (event.keyCode == 13) {
+                event.preventDefault();
+                return false;
+            }
+        });
+        $("#dropPrintedPage").change(function () {
+            bindContactList();
+        });
+        $('#frmAcceptContactL1').ajaxForm({
+            beforeSend: function () {
+                $("#spiner").removeClass("alert");
+                $("#spiner").removeClass("alert-block");
+                $("#spiner").removeClass("alert-danger");
+                $("#spiner").removeClass("alert-success");
+                $("#spiner").html("<i class='icon-spinner icon-spin orange bigger-125'></i>Đang xử lý...");
+            },
+            success: function (data) {
+                $("#spiner").addClass("alert alert-block alert-success");
+                var htmlError = '';
+                var countSuccess = 0;
+                if (data == null || data.length == 0) {
+                    $("#spiner").html("Không có contact nào được nghiệm thu");
+                    return;
+                }
+
+                for (var i = 0; i < data.length; i++) {
+                    var icon = '';
+                    if (data[i].Status == 0) {
+                        countSuccess += 1;
+                    }
+                    else {
+                        htmlError += '(' + i + ') ' + data[i].StatusText + "<br />";
+                    }
+                    $("#" + (i + 1) + "_tdStatus").html(icon);
+                }
+                var htmlMessage = "Đã nghiệm thu thành công " + countSuccess + " contacts. Kiểm tra cột trạng thái để biết chi tiết";
+                if (htmlError.length > 0) htmlMessage += "<br />" + htmlError;
+                $("#spiner").html(htmlMessage);
+
+                // Reload
+                bindContactList();
+            },
+            complete: function (xhr) {
+
+            }
+        });
+        $("#btnGoFilter").click(function (e) {
+            e.preventDefault();
+            bindContactList();
+        });
+
+    });
+</script>

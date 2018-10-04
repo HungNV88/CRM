@@ -1,0 +1,85 @@
+﻿@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        } catch (e) { }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Repair Call History</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>Sửa danh sách cuộc gọi								
+        </h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            <div class="form-group">
+                <div class="col-sm-12" id="alert">
+                </div>
+            </div>
+            <button id="btnSubmit" class="btn-primary" style="float: right; margin-right: 10px;">Sửa cuộc gọi</button>
+            <div class="clearfix"></div>
+            <div class="space-6"></div>
+
+            <table id="grid-table"></table>
+
+
+            <!-- PAGE CONTENT ENDS -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+<!-- /.page-content -->
+
+<!-- inline scripts related to this page -->
+
+<script type="text/javascript">
+    var grid_selector = "#grid-table";
+    var heades = ['Id', 'ContactId', 'Thòi gian gọi', 'Nội dung', 'Số điện thoại', 'Người gọi'];
+    var model = [
+			{ name: 'CallHistoryId', index: 'CallHistoryId', width: 60, editable: true, sorttype: 'int', editoptions: { disabled: 'true' } },
+			{ name: 'ContactId', index: 'ContactId', editable: true, sorttype: 'string' },
+			{ name: 'CallTime', index: 'CallTime', editable: true, sorttype: 'string', formatter: 'date', formatoptions: { srcformat: 'Y-m-dTH:i:s', newformat: 'd/m/Y H:i' } },
+			{ name: 'CallCenterInfo', index: 'CallCenterInfo', editable: true, sorttype: 'string' },
+			{ name: 'MobilePhone', index: 'MobilePhone', editable: true, sorttype: 'string' },
+			{ name: 'AgentCode', index: 'MobilePhone', editable: true, sorttype: 'string' }
+    ];
+    $(document).ready(function () {
+        setupGridWithoutEdit("#grid-table", "#grid-pager", "admin/api/callhistory/GetCallError", "admin/api/callhistory/edit", "CallHistoryId", "CallHistories", heades, model);
+        $("#btnSubmit").click(function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                type: 'GET',
+                url: '/admin/api/callhistory/RepairCall',
+                success: function (response) {
+                    alertSuccess("Sửa thành công " + response + " cuộc gọi");
+                    jQuery(grid_selector).jqGrid().trigger("reloadGrid");
+                },
+                error: function (request, status, ex) {
+                    alertError("Hệ thống bị lỗi, sửa không thành công.");
+                }
+            });
+        });
+    });
+</script>

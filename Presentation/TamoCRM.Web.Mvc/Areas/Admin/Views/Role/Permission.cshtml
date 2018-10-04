@@ -1,0 +1,78 @@
+﻿@using MvcCheckBoxList.Model
+@model TamoCRM.Web.Mvc.Areas.Admin.Models.Roles.PermissionModel
+@{
+    ViewBag.Title = "Permission";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .styled_checkbox {
+        cursor: pointer;
+        border-radius: 5px;
+        margin: 3px;
+        padding: 0px 10px 0 2px;
+    }
+
+    .styled_list {
+        margin-left: 25px;
+        padding: 3px 5px 3px 5px;
+    }
+</style>
+
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed'); } catch (e) { }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Phân quyền</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>Phân quyền chức năng</h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        @using (Html.BeginForm("Permission", "Role", FormMethod.Post, new { @id = "frmpermission" }))
+        {
+        @Html.AntiForgeryToken()
+        <div class="col-xs-12">
+            Nhóm người dùng @Html.DropDownListFor(x => x.SelectedRoleID, Model.Roles)
+        </div>
+        <div class="col-xs-12">Danh sách chức năng
+            </div>
+            <div class="col-xs-12">
+                @Html.CheckBoxListFor(x => x.PostedFunction.FunctionID, x => x.Functions.OrderBy(c => c.Name), role => role.FunctionID, role => role.Name, x => x.FunctionsSelected, new { @class = "styled_checkbox" }, new HtmlListInfo(HtmlTag.table, 5, new { @class = "styled_list" }), null, x => x.FunctionID)
+            </div>
+            <div class="col-xs-12">
+                <input type="submit" class="btn btn-sm btn-primary" id="btnsave" name="btnsave" value="Save"/>
+            </div>
+       }
+            <!-- /.col -->
+        </div>
+    <!-- /.row -->
+</div>
+<!-- /.page-content -->
+
+<!-- inline scripts related to this page -->
+
+<script type="text/javascript">
+    $(document).ready(function() {
+
+        $('#SelectedRoleID').change(function() {
+            window.location = '/admin/role/permission/' + $(this).val();
+        });
+    });
+ </script>

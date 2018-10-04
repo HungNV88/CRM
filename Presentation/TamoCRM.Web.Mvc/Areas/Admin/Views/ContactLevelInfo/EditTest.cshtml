@@ -1,0 +1,2797 @@
+﻿@using TamoCRM.Core
+@using TamoCRM.Core.Commons.Extensions
+@using TamoCRM.Domain.Catalogs
+@using TamoCRM.Domain.StatusMap
+@using TamoCRM.Web.Framework
+@using System.Linq;
+
+@model TamoCRM.Web.Mvc.Areas.Admin.Models.ContactLevelInfos.ContactLevelInfoModel
+@{
+    ViewBag.Title = "Trang test, deo phai trang that";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutSingle.cshtml";
+}
+@{
+    var lstGenders = Util.SelectedList<GenderType>();
+    //////
+    var products = ViewBag.Products;
+    var packages = ((List<PackagePriceListed>)ViewBag.PackagePriceListed)
+                   .Where(c => c.Nation == 1)
+                   .OrderBy(c => c.Poistion)
+                   .ToList();
+
+    var listPackages = new SelectList(packages, "Name", "Value");
+    var lstProducts = new SelectList(products, "Id", "Name");
+    //////
+    var lstAppointments = Util.SelectedList<AppointmentType>();
+    //////
+
+    //FeeMoneyTypes List
+    var FeeMoneyTypes = ViewBag.FeeMoneyType;
+    var lstFeeMoneyTypes = new SelectList(FeeMoneyTypes, "Id", "Name");
+
+    //////
+    //PackageFeeEdus List
+    var PackageFeeEdus = ViewBag.PackageFeeEdu;
+    var lstPackageFeeEdus = new SelectList(PackageFeeEdus, "Id", "Name");
+    ////////
+
+    //TimeSlots List
+    var TimeSlots = ViewBag.TimeSlots;
+    ((List<TimeSlotInfo>)TimeSlots).RemoveAll(c => c.Id == 0);
+    ((List<TimeSlotInfo>)TimeSlots).Insert(0, new TimeSlotInfo { Id = 0, Name = "-" });
+    var listTimeSlots = new SelectList(TimeSlots, "Id", "Name");
+
+    //TeacherTypes List
+    var TeacherTypes = ViewBag.TeacherTypes;
+    ((List<TeacherTypeInfo>)TeacherTypes).RemoveAll(c => c.Id == 0);
+    ((List<TeacherTypeInfo>)TeacherTypes).Insert(0, new TeacherTypeInfo { Id = 0, Name = "-" });
+    var listTeacherTypes = new SelectList(TeacherTypes, "Id", "Name");
+
+    //LevelTester List
+    var LevelTester = ViewBag.LevelTester;
+    ((List<LevelTesterInfo>)LevelTester).RemoveAll(c => c.Id == 0);
+    ((List<LevelTesterInfo>)LevelTester).Insert(0, new LevelTesterInfo { Id = 0, Name = "-" });
+    var listLevelTester = new SelectList(LevelTester, "Id", "Name");
+
+    //Qualities List
+    var Qualities = ViewBag.Quality;
+    ((List<QualityInfo>)Qualities).RemoveAll(c => c.Id == 0);
+    ((List<QualityInfo>)Qualities).Insert(0, new QualityInfo { Id = 0, Name = "-" });
+    var lstQualities = new SelectList(Qualities, "Id", "Name");
+
+    //StatusCares List
+    var StatusCares = ViewBag.StatusCares;
+    ((List<StatusCareInfo>)StatusCares).RemoveAll(c => c.Id == 0);
+    ((List<StatusCareInfo>)StatusCares).Insert(0, new StatusCareInfo { Id = 0, Name = "-" });
+    var lstStatusCares = new SelectList(StatusCares, "Id", "Name");
+
+    var statusMaps = ((IEnumerable<StatusMapInfo>)ViewBag.StatusMaps)
+        .Where(c => c.IsShow)
+        .Where(c => c.Name.ToLower() != "chưa gọi")
+        .Where(c => c.StatusMapType == (int)EmployeeType.Consultant)
+        .Where(c => c.LevelId == 0 || c.LevelId == Model.ContactInfo.LevelId)
+        .OrderBy(c => c.Name)
+        .OrderBy(c => c.StatusCareId)
+        .ToList();
+    statusMaps.Insert(0, new StatusMapInfo
+                         {
+                             Id = 0,
+                             LevelId = 0,
+                             Name = "-",
+                         });
+
+    var lstStatusMaps = new SelectList(statusMaps, "Id", "Name");
+
+}
+<style>
+    .widget-body label {
+        padding-top: 0;
+    }
+</style>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>
+            
+        </h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="form-group">
+            <div class="col-sm-12" id="alert">
+            </div>
+        </div>
+        <div class="col-xs-12">
+            @using (Html.BeginForm("Edit", "ContactLevelInfo", FormMethod.Post, new { id = "formChamSoc" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(x => x.ContactInfo.Id)
+                @Html.HiddenFor(x => x.ContactInfo.LevelId)
+                @Html.HiddenFor(x => x.ContactInfo.StatusId)
+                @Html.HiddenFor(x => x.ContactInfo.CallCount)
+                @Html.HiddenFor(x => x.ContactInfo.HandoverHistoryConsultantId)
+                @Html.HiddenFor(x => x.ContactLevelInfo.HandoverAdvisor)
+                @Html.HiddenFor(x => x.ContactInfo.UserConsultantId)
+                @Html.CheckBox("chkReSchedule", new { @style = "display: none;" })
+                @Html.CheckBoxFor(x => x.ContactLevelInfo.HasSetSb100Hidden, new { @style = "display: none;" })
+                @Html.CheckBoxFor(x => x.ContactLevelInfo.HasLinkSb100Hidden, new { @style = "display: none;" })
+                @Html.CheckBoxFor(x => x.ContactLevelInfo.HasCasecAccountHidden, new { @style = "display: none;" })
+                @Html.CheckBoxFor(x => x.ContactLevelInfo.HasPointTestCasecHidden, new { @style = "display: none;" })
+                @Html.CheckBoxFor(x => x.ContactLevelInfo.HasPointInterviewHidden, new { @style = "display: none;" })
+                @Html.CheckBoxFor(x => x.ContactLevelInfo.HasAppointmentInterviewHidden, new { @style = "display: none;" })
+                @Html.CheckBoxFor(x => x.ContactLevelInfo.HasAccPayment, new { @style = "display: none;" })
+                <div class="widget-box" id="divL1">
+                    <div class="widget-header">
+                        <h4>Thông tin L1</h4>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="col-xs-1" style="width: 11%;">
+                                    <label>Họ Tên</label>
+                                </div>
+                                <div class="col-xs-3" style="width: 22%;">
+                                    <div class="clearfix">
+                                        @Html.TextBoxFor(x => x.ContactInfo.Fullname, new { @style = "width: 100%", @required = "required", error = "Họ và tên rỗng", @id = "hocvien_ten" })
+                                    </div>
+                                </div>
+                                <div class="col-xs-1">
+                                    <label>Giới tính</label>
+                                </div>
+                                <div class="col-xs-3" style="width: 22%;">
+                                    @Html.DropDownListFor(x => x.ContactInfo.Gender, lstGenders, new { @style = "width: 100%" })
+                                </div>
+                                <div class="col-xs-1" style="width: 12%;">
+                                    <label>Ngày sinh</label>
+                                </div>
+                                <div class="col-xs-3" style="width: 24%;">
+                                    <div class="clearfix">
+                                        @Html.TextBoxFor(x => x.Birthday, new { @style = "width: 100%" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-4"></div>
+                            <div class="row">
+                                <div class="col-xs-1" style="width: 11%;">
+                                    <label>SĐT 1</label>
+                                </div>
+                                <div class="col-xs-3" style="width: 22%;">
+                                    <div class="input-group clearfix">
+                                        <span class="input-group-addon" style="padding: 0;">
+                                            <button id="btnCall1" type="button" class="btn-primary icon-phone" style="height: 26px; width: 30px;"></button>
+                                        </span>
+                                        @Html.TextBoxFor(x => x.ContactInfo.Mobile1, new { @style = "width: 100%", @readonly = "readonly" })
+                                    </div>
+                                </div>
+                                <div class="col-xs-1">
+                                    <label>SĐT 2</label>
+                                </div>
+                                <div class="col-xs-3" style="width: 22%;">
+                                    <div class="input-group clearfix">
+                                        <span class="input-group-addon" style="padding: 0;">
+                                            <button id="btnCall2" type="button" class="btn-primary icon-phone" style="height: 26px; width: 30px;"></button>
+                                        </span>
+                                        @Html.TextBoxFor(x => x.ContactInfo.Mobile2, new { @style = "width: 100%", @pattern = "^(?!0)((\\d{3}-\\d{3}-\\d{4,5})|\\d{9,10})$", error = "Số điện thoại không đúng định dạng" })
+                                    </div>
+                                </div>
+                                <div class="col-xs-1" style="width: 12%;">
+                                    <label>SĐT 3</label>
+                                </div>
+                                <div class="col-xs-3" style="width: 24%;">
+                                    <div class="input-group clearfix">
+                                        <span class="input-group-addon" style="padding: 0;">
+                                            <button id="btnCall3" type="button" class="btn-primary icon-phone" style="height: 26px; width: 30px;"></button>
+                                        </span>
+                                        @Html.TextBoxFor(x => x.ContactInfo.Mobile3, new { @style = "width: 100%", @pattern = "^(?!0)((\\d{3}-\\d{3}-\\d{4,5})|\\d{9,10})$", error = "Số điện thoại không đúng định dạng" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-4"></div>
+                            <div class="row">
+                                <div class="col-xs-1" style="width: 11%;">
+                                    <label>Email 1</label>
+                                </div>
+                                <div class="col-xs-3" style="width: 22%;">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">
+                                            <i class="icon-envelope" style="width: 11px;"></i>
+                                        </span>
+                                        @Html.TextBoxFor(x => x.ContactInfo.Email, new { @style = "width: 100%", @type = "email", error = "Email không đúng định dạng" })
+                                    </div>
+                                </div>
+                                <div class="col-xs-1">
+                                    <label>Email 2</label>
+                                </div>
+                                <div class="col-xs-3" style="width: 22%;">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">
+                                            <i class="icon-envelope" style="width: 11px;"></i>
+                                        </span>
+                                        @Html.TextBoxFor(x => x.ContactInfo.Email2, new { @style = "width: 100%", @type = "email", error = "Email không đúng định dạng" })
+                                    </div>
+                                </div>
+                                <div class="col-xs-1" style="width: 12%;">
+                                    <label>Định bán</label>
+                                </div>
+                                <div class="col-xs-3" style="width: 24%;">
+                                    @Html.DropDownListFor(x => x.ContactInfo.ProductSellId, lstProducts, new { style = "width: 100%" })
+                                </div>
+                            </div>
+                            <div class="space-4"></div>
+                            <div class="row">
+                                <div class="col-xs-1" style="width: 11%;">
+                                    <label>Contact ID</label>
+                                </div>
+                                <div class="col-xs-11" style="width: 88.33%;">
+                                    <div class="clearfix">
+                                        @Html.TextBoxFor(x => x.ContactInfo.Code, new { @style = "width: 100%", @readonly = "readonly" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-4"></div>
+                            <div class="row">
+                                <div class="col-xs-1" style="width: 11%;">
+                                    <label>Địa chỉ liên hệ</label>
+                                </div>
+                                <div class="col-xs-11" style="width: 88.33%;">
+                                    <div class="clearfix">
+                                        @Html.TextBoxFor(x => x.ContactInfo.Address, new { @style = "width: 100%" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-4"></div>
+                            <div class="row">
+                                <div class="col-xs-1" style="width: 11%;">
+                                    <div style="background: yellow"> <b> Phản ánh chất lượng contacts  </b> </div>
+                                </div>
+                                <div class="col-xs-11" style="width: 88.33%;">
+                                    @Html.TextAreaFor(x => x.ContactInfo.Notes, new { @class = "autosize-transition form-control" })
+                                </div>
+                            </div>
+                            <div class="space-4"></div>
+                            <div class="row">
+                                <div class="col-xs-1" style="width: 11%;"></div>
+                                <div class="col-xs-7" style="width: 59%;">
+                                    <i class="icon-envelope icon-2x"></i>
+                                    <a style="cursor: pointer;font-weight: bold; font-size: 14px;" onclick="return openMail(1)">Mail chào hỏi</a>
+                                </div>
+                                <div class="col-xs-4" style="width: 30%;">
+                                    <button id="btnUpdateL1" type="button" class="btn-primary" style="float: right; margin: 10px 10px 0 0; width: 160px;" onclick="return updateL1();">Cập nhật thông tin L1</button>
+                                    <div class="clear-fix"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-6"></div>
+                <div class="widget-box" id="divL2">
+                    <div class="widget-header">
+                        <h4>Thông tin L2</h4>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="col-xs-4">
+                                    @Html.CheckBoxFor(x => x.ContactLevelInfo.WantStudyEnglish)
+                                    <label for="ContactLevelInfo_WantStudyEnglish" style="cursor: pointer;">Có muốn học tiếng anh không? </label>
+                                </div>
+                                <div class="col-xs-4">
+                                    <i class="icon-envelope icon-2x"></i>
+                                    <a style="cursor: pointer;font-weight: bold; font-size: 14px;" onclick="return openMail(2)">Mail giới thiệu sản phẩm v2A</a>
+                                </div>
+                                <div class="col-xs-4">
+                                    <i class="icon-envelope icon-2x"></i>
+                                    <a style="cursor: pointer;font-weight: bold; font-size: 14px;" onclick="return openMail(3)">Mail giới thiệu sản phẩm v2B</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-6"></div>
+                <div class="widget-box" id="divL3">
+                    <div class="widget-header">
+                        <h4>Thông tin L3 - L6</h4>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="col-xs-2">
+                                    @Html.CheckBoxFor(x => x.ContactLevelInfo.HasAppointment)
+                                    <label for="ContactLevelInfo_HasAppointment" style="cursor: pointer;">Lịch hẹn - L3</label>
+                                </div>
+                                <div class="col-xs-2">
+                                    @Html.TextBoxFor(x => x.AppointmentTime, new { disabled = "disabled" })
+                                </div>
+                                <div class="col-xs-2">
+                                    @Html.DropDownListFor(x => x.ContactLevelInfo.ApointmentType, lstAppointments, new { disabled = "disabled" })
+                                </div>
+                                <div class="col-xs-1">
+                                    <label>Ghi chú </label>
+                                </div>
+                                <div class="col-xs-5">
+                                    @Html.TextBoxFor(x => x.ContactLevelInfo.ApointmentNotes, new { @style = "width: 100%" })
+                                </div>
+                            </div>
+                            <div class="space-6"></div>
+                            <div class="row">
+                                <div class="col-xs-3">
+                                    @Html.CheckBoxFor(x => x.ContactLevelInfo.HasAppointmentInterview)
+                                    <label for="ContactLevelInfo_HasAppointmentInterview" style="cursor: pointer;">Lịch hẹn phỏng vấn</label>
+                                </div>
+                                <div class="col-xs-9">
+                                    <a id="iconSchedule" class="icon-search" style="cursor: pointer; margin-left: 10px; font-size: 15px; color: #444;"><span style="padding-left: 3px;">Xem khung giờ phỏng vấn</span></a>
+                                    <a id="iconInterviewSchedule" class="icon-search" style="cursor: pointer; margin-left: 10px; font-size: 15px; color: #444;"><span style="padding-left: 3px;">Xem lịch học viên phỏng vấn</span></a>
+                                    <a id="iconCancelSchedule" class="icon-remove" style="cursor: pointer; margin-left: 10px; font-size: 15px; color: #444;"><span style="padding-left: 3px;">Hủy lịch phỏng vấn</span></a>
+                                    <a id="iconReSchedule" class="icon-refresh" style="cursor: pointer; margin-left: 10px; font-size: 15px; color: #444;"><span style="padding-left: 3px;">Đặt lại lịch phỏng vấn</span></a>
+                                    <a id="iconHistorySchedule" class="icon-list" style="cursor: pointer; margin-left: 10px; font-size: 15px; color: #444;"><span style="padding-left: 3px;">Mở lịch sử đặt lịch</span></a>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-12" style="display: none;" id="divAppointmentInterview">
+                                    <table border="1" class="table table-striped table-bordered table-hover" style="margin-bottom: 0;">
+                                        <thead>
+                                            <tr>
+                                                <th style="text-align: center; width: 12%;">Ngày</th>
+                                                <th style="text-align: center; width: 12%;">Khung giờ</th>
+                                                <th style="text-align: center; width: 12%;">Giáo viên</th>
+                                                <th style="text-align: center; width: 12%;">Dự kiến trình độ học viên</th>
+                                                <th style="text-align: center; width: 20%;">Ghi chú</th>
+                                                <th style="text-align: center; width: 20%;">Ghi chú (CM)</th>
+                                                <th style="text-align: center; width: 20%;">Trạng thái</th>
+                                                <th style="text-align: center; width: 4%;">Đặt lịch</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    @Html.TextBoxFor(x => x.AppointmentInterviewInfo.AppointmentDateString, new { @style = "width: 100%" })
+                                                </td>
+                                                <td>
+                                                    @Html.DropDownListFor(x => x.AppointmentInterviewInfo.TimeSlotId, listTimeSlots, new { @style = "width: 100%" })
+                                                </td>
+                                                <td>
+                                                    @Html.DropDownListFor(x => x.AppointmentInterviewInfo.TeacherTypeId, listTeacherTypes, new { @style = "width: 100%" })
+                                                </td>
+                                                <td>
+                                                    @Html.DropDownListFor(x => x.AppointmentInterviewInfo.LevelTesterId, listLevelTester, new { @style = "width: 100%" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(x => x.AppointmentInterviewInfo.Notes, new { @style = "width: 100%" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(x => x.AppointmentInterviewInfo.NotesCM, new { @style = "width: 100%;", @readonly = "readonly" })
+                                                </td>
+                                                <td>
+                                                    @Html.DropDownListFor(x => x.AppointmentInterviewInfo.StatusInterviewId, Util.SelectedList<StatusInterviewType>(true, string.Empty), new { @style = "width: 100%" })
+                                                </td>
+                                                <td>
+                                                    <button type="button" id="iconAppointment" class="icon-ok btn-danger" style="width: 32px; height: 28px; "></button>
+                                                    <button type="button" id="iconAppointmentTest" class="icon-ok btn-danger" style="width: 32px; height: 28px; display: none"></button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="space-6"></div>
+
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    @Html.CheckBoxFor(x => x.ContactLevelInfo.HasTopicaAccount)
+                                    <label for="ContactLevelInfo_HasTopicaAccount" style="cursor: pointer;">Lấy thông tin tài khoản test tiếng anh Topica</label>
+                                </div>
+                                <div class="col-xs-14">
+                                    <a id="AccTopica" class="icon-user" style="cursor: pointer; margin-left: 10px; font-size: 15px; color: #444;"><span style="padding-left: 3px;">Cấp lại tài khoản</span></a>
+                                    <a id="HistoryTopica" class="icon-list" style="cursor: pointer; margin-left: 10px; font-size: 15px; color: #444;"><span style="padding-left: 3px;">Mở lịch sử tài khoản</span></a>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-8" id="divTopicaAccount"></div>
+                            </div>
+                            <div class="space-6"></div>
+                            <div class="row">
+                                <div class="col-xs-2"></div>
+                                <div class="col-xs-4">
+                                    <i class="icon-envelope icon-2x"></i>
+                                    <a style="cursor: pointer;font-weight: bold; font-size: 14px;" onclick="return openMail(7)">Mail hướng dẫn làm test hệ thống tiếng anh topica</a>
+                                </div>
+                            </div>
+                            <div class="space-6"></div>
+
+                            <div class="row">
+                                <div class="col-xs-3">
+                                    @Html.CheckBoxFor(x => x.ContactLevelInfo.HasPointTestTopica, new { @disabled = "disabled" })
+                                    <label>Đã có điểm test tiếng anh Topica</label>
+                                </div>
+                                <div class="col-xs-9">
+                                    <a id="iconHistoryPointTestTopica" class="icon-list" style="cursor: pointer; margin-left: 10px; font-size: 15px; color: #444;"><span style="padding-left: 3px;">Mở lịch sử test tiếng anh topica</span></a>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-12" style="display: none;" id="divPointTestTopica">
+                                    <table border="1" class="table table-striped table-bordered table-hover" style="margin-bottom: 0;">
+                                        <thead>
+                                            <tr>
+                                                <th style="text-align: center; width: 9%;">Ngày thi</th>
+                                                <th style="text-align: center; width: 8%;">Tài khoản</th>
+                                                <th style="text-align: center; width: 8%;">Mật khẩu</th>
+                                                <th style="text-align: center; width: 15%;">Tên sinh viên</th>
+                                                <th style="text-align: center; width: 8%;">S1: Từ vựng</th>
+                                                <th style="text-align: center; width: 8%;">S2: Ngữ pháp</th>
+                                                <th style="text-align: center; width: 8%;">S3: Nghe hiểu</th>
+                                                <th style="text-align: center; width: 8%;">S4: Chính tả</th>
+                                                <th style="text-align: center; width: 8%;">Total</th>
+                                                <th style="text-align: center; width: 8%;">TOEIC</th>
+                                                <th style="text-align: center; width: 12%;">Level Topica</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    @Html.TextBoxFor(x => x.TestResultTopicaInfo.TestDateString, new { @style = "width: 100%", @readonly = "readonly" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(x => x.TestResultTopicaInfo.Account, new { @style = "width: 100%", @readonly = "readonly" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(x => x.TestResultTopicaInfo.Password, new { @style = "width: 100%", @readonly = "readonly" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(x => x.TestResultTopicaInfo.FullName, new { @style = "width: 100%", @readonly = "readonly" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(x => x.TestResultTopicaInfo.S1, new { @style = "width: 100%", @readonly = "readonly" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(x => x.TestResultTopicaInfo.S2, new { @style = "width: 100%", @readonly = "readonly" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(x => x.TestResultTopicaInfo.S3, new { @style = "width: 100%", @readonly = "readonly" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(x => x.TestResultTopicaInfo.S4, new { @style = "width: 100%", @readonly = "readonly" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(x => x.TestResultTopicaInfo.TotalTopica, new { @style = "width: 100%", @readonly = "readonly" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(x => x.TestResultTopicaInfo.Toeic, new { @style = "width: 100%", @readonly = "readonly" })
+                                                </td>
+                                                <td>
+                                                    @Html.DropDownListFor(x => x.TestResultTopicaInfo.LevelTopicaId, Util.SelectedList<LevelTopicaType>(), new { @style = "width: 100%", @disabled = "disabled" })
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <b><hr /></b>
+                            <div class="space-6"></div>
+                            <div class="row">
+                                <div class="col-xs-3">
+                                    @Html.CheckBoxFor(x => x.ContactLevelInfo.HasCasecAccount)
+                                    <label for="ContactLevelInfo_HasCasecAccount" style="cursor: pointer;">Lấy thông tin tài khoản CASEC</label>
+                                </div>
+                                <div class="col-xs-9">
+                                    <a id="iconUser" class="icon-user" style="cursor: pointer; margin-left: 10px; font-size: 15px; color: #444;"><span style="padding-left: 3px;">Cấp lại tài khoản</span></a>
+                                    <a id="iconHistory" class="icon-list" style="cursor: pointer; margin-left: 10px; font-size: 15px; color: #444;"><span style="padding-left: 3px;">Mở lịch sử tài khoản</span></a>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-xs-8" id="divCasecAccount"></div>
+                            </div>
+                            <div class="space-6"></div>
+                            <div id="divL41">
+                                <div class="row">
+                                    <div class="col-xs-2"></div>
+                                    <div class="col-xs-4">
+                                        <i class="icon-envelope icon-2x"></i>
+                                        <a style="cursor: pointer;font-weight: bold; font-size: 14px;" onclick="return openMail(4)">Mail hướng dẫn làm test</a>
+                                    </div>
+                                    @if (Model.TestResultLinkSb100Info != null && !Model.TestResultLinkSb100Info.LinkSb100.IsStringNullOrEmpty())
+                                    {
+                                        <div class="col-xs-4">
+                                            <i class="icon-envelope icon-2x"></i>
+                                            <a style="cursor: pointer;font-weight: bold; font-size: 14px;" onclick="return openMail(6)">Mail trả điểm và lộ trình học tập</a>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            <div id="divL51">
+                                <div class="space-4"></div>
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        @Html.CheckBoxFor(x => x.ContactLevelInfo.HasPointTestCasec, new { @disabled = "disabled" })
+                                        <label>Đã có điểm test CASEC</label>
+                                    </div>
+                                    <div class="col-xs-9">
+                                        <a id="iconHistoryPointTestCasec" class="icon-list" style="cursor: pointer; margin-left: 10px; font-size: 15px; color: #444;"><span style="padding-left: 3px;">Mở lịch sử test casec</span></a>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-12" style="display: none;" id="divPointTestCasec">
+                                        <table border="1" class="table table-striped table-bordered table-hover" style="margin-bottom: 0;">
+                                            <thead>
+                                                <tr>
+                                                    <th style="text-align: center; width: 9%;">Ngày thi</th>
+                                                    <th style="text-align: center; width: 8%;">Tài khoản</th>
+                                                    <th style="text-align: center; width: 8%;">Mật khẩu</th>
+                                                    <th style="text-align: center; width: 15%;">Tên sinh viên</th>
+                                                    <th style="text-align: center; width: 8%;">S1: Từ vựng</th>
+                                                    <th style="text-align: center; width: 8%;">S2: Ngữ pháp</th>
+                                                    <th style="text-align: center; width: 8%;">S3: Nghe hiểu</th>
+                                                    <th style="text-align: center; width: 8%;">S4: Chính tả</th>
+                                                    <th style="text-align: center; width: 8%;">Total</th>
+                                                    <th style="text-align: center; width: 8%;">TOEIC</th>
+                                                    <th style="text-align: center; width: 12%;">Level CASEC</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        @Html.TextBoxFor(x => x.TestResultCasecInfo.TestDateString, new { @style = "width: 100%", @readonly = "readonly" })
+                                                    </td>
+                                                    <td>
+                                                        @Html.TextBoxFor(x => x.TestResultCasecInfo.Account, new { @style = "width: 100%", @readonly = "readonly" })
+                                                    </td>
+                                                    <td>
+                                                        @Html.TextBoxFor(x => x.TestResultCasecInfo.Password, new { @style = "width: 100%", @readonly = "readonly" })
+                                                    </td>
+                                                    <td>
+                                                        @Html.TextBoxFor(x => x.TestResultCasecInfo.FullName, new { @style = "width: 100%", @readonly = "readonly" })
+                                                    </td>
+                                                    <td>
+                                                        @Html.TextBoxFor(x => x.TestResultCasecInfo.S1, new { @style = "width: 100%", @readonly = "readonly" })
+                                                    </td>
+                                                    <td>
+                                                        @Html.TextBoxFor(x => x.TestResultCasecInfo.S2, new { @style = "width: 100%", @readonly = "readonly" })
+                                                    </td>
+                                                    <td>
+                                                        @Html.TextBoxFor(x => x.TestResultCasecInfo.S3, new { @style = "width: 100%", @readonly = "readonly" })
+                                                    </td>
+                                                    <td>
+                                                        @Html.TextBoxFor(x => x.TestResultCasecInfo.S4, new { @style = "width: 100%", @readonly = "readonly" })
+                                                    </td>
+                                                    <td>
+                                                        @Html.TextBoxFor(x => x.TestResultCasecInfo.TotalCasec, new { @style = "width: 100%", @readonly = "readonly" })
+                                                    </td>
+                                                    <td>
+                                                        @Html.TextBoxFor(x => x.TestResultCasecInfo.Toeic, new { @style = "width: 100%", @readonly = "readonly" })
+                                                    </td>
+                                                    <td>
+                                                        @Html.DropDownListFor(x => x.TestResultCasecInfo.LevelCasecId, Util.SelectedList<LevelCasecType>(), new { @style = "width: 100%", @disabled = "disabled" })
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="space-4"></div>
+                                <hr />
+                                <div class="space-4"></div>
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        @Html.CheckBoxFor(x => x.ContactLevelInfo.HasPointInterview, new { @disabled = "disabled" })
+                                        <label>Đã có điểm phỏng vấn</label>
+                                    </div>
+                                    <div class="col-xs-9">
+                                        <a id="iconHistoryPointTestInterview" class="icon-list" style="cursor: pointer; margin-left: 10px; font-size: 15px; color: #444;"><span style="padding-left: 3px;">Mở lịch sử test phỏng vấn</span></a>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-12" style="display: none;" id="divHasPointInterview">
+                                        <table border="1" class="table table-striped table-bordered table-hover" style="margin-bottom: 0;">
+                                            <thead>
+                                                <tr>
+                                                    <th style="text-align: center; width: 9%;">Ngày thi</th>
+                                                    <th style="text-align: center; width: 16%;">PV mạch lạc</th>
+                                                    <th style="text-align: center; width: 15%;">PV từ vựng</th>
+                                                    <th style="text-align: center; width: 16%;">PV ngữ pháp</th>
+                                                    <th style="text-align: center; width: 16%;">PV ngữ âm</th>
+                                                    <th style="text-align: center; width: 16%;">Tổng điểm</th>
+                                                    <th style="text-align: center; width: 13%;">Level Speaking</th>
+                                                    <th style="text-align: center; width: 13%;">Tester</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        @Html.TextBoxFor(x => x.TestResultInterviewInfo.TestDateString, new { @style = "width: 100%", @readonly = "readonly" })
+                                                    </td>
+                                                    <td>
+                                                        @Html.TextBoxFor(x => x.TestResultInterviewInfo.I1, new { @style = "width: 100%", @readonly = "readonly" })
+                                                    </td>
+                                                    <td>
+                                                        @Html.TextBoxFor(x => x.TestResultInterviewInfo.I2, new { @style = "width: 100%", @readonly = "readonly" })
+                                                    </td>
+                                                    <td>
+                                                        @Html.TextBoxFor(x => x.TestResultInterviewInfo.I3, new { @style = "width: 100%", @readonly = "readonly" })
+                                                    </td>
+                                                    <td>
+                                                        @Html.TextBoxFor(x => x.TestResultInterviewInfo.I4, new { @style = "width: 100%", @readonly = "readonly" })
+                                                    </td>
+                                                    <td>
+                                                        @Html.TextBoxFor(x => x.TestResultInterviewInfo.TotalInterview, new { @style = "width: 100%", @readonly = "readonly" })
+                                                    </td>
+                                                    <td>
+                                                        @Html.DropDownListFor(x => x.TestResultInterviewInfo.LevelSpeakingId, Util.SelectedList<LevelSpeakingType>(), new { @style = "width: 100%", @disabled = "disabled" })
+                                                    </td>
+                                                    <td>
+                                                        @Html.TextBoxFor(x => x.TestResultInterviewInfo.AgentUser, new { @style = "width: 100%", @readonly = "readonly" })
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div class="space-4"></div>
+                                <div class="row">
+                                    <div class="col-xs-2">
+                                        @Html.CheckBoxFor(x => x.ContactLevelInfo.HasSetSb100)
+                                        <label for="ContactLevelInfo_HasSetSb100" style="cursor: pointer;">Đặt hàng SB100</label>
+                                    </div>
+                                    <div class="col-xs-2">
+                                        <label>Kiểu đóng học phí </label>
+                                    </div>
+                                    <div class="col-xs-2">
+                                        @Html.DropDownListFor(x => x.ContactLevelInfo.FeePackageType, lstPackageFeeEdus, new { @style = "width: 100%" })
+                                    </div>
+                                </div>
+
+                                <div class="space-4"></div>
+                                <div class="row">
+                                    <div class="col-xs-4">
+                                        @Html.CheckBoxFor(x => x.ContactLevelInfo.HasSetSb100Topica)
+                                        <label for="ContactLevelInfo_HasSetSb100Topica" style="cursor: pointer;">Đặt hàng SB100 (Cho hệ thống tiếng anh Topica)</label>
+                                    </div>
+                                    <div class="col-xs-2">
+                                        <label>Kiểu đóng học phí </label>
+                                    </div>
+                                    <div class="col-xs-2">
+                                        @Html.DropDownListFor(x => x.ContactLevelInfo.FeePackageType, lstPackageFeeEdus, new { @style = "width: 100%", @id = "FeePackageTypeSB100Topica" })
+                                    </div>
+                                </div>
+                                <br />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-6"></div>
+                <div class="widget-box" id="divL61">
+                    <div class="widget-header">
+                        <h4>Thông tin L7 - L8</h4>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <div class="col-xs-2">
+                                    @Html.CheckBoxFor(x => x.ContactLevelInfo.HasLinkSb100, new { @disabled = "disabled" })
+                                    <label for="ContactLevelInfo_HasLinkSb100" style="cursor: pointer;">Đã có SB100</label>
+                                </div>
+                                @if (Model.TestResultLinkSb100Info != null && !Model.TestResultLinkSb100Info.LinkSb100.IsStringNullOrEmpty())
+                                {
+                                    <div class="col-xs-1">
+                                        <a target="_blank" href="@Model.TestResultLinkSb100Info.LinkSb100">Link SB100 </a>
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="space-4"></div>
+                            <div class="row">
+                                <div class="col-xs-2"></div>
+                                <div class="col-xs-4">
+                                    <i class="icon-envelope icon-2x"></i>
+                                    <a style="cursor: pointer;font-weight: bold; font-size: 14px;" onclick="return openMail(5)">Mail hướng dẫn học phí</a>
+                                </div>
+                            </div>
+                            <hr />
+
+                            @* Phan mo dau cua form nap tien sang ben Advisor *@
+                            <div id="naptienL7L8">
+                                <div class="row">
+                                    <div class="col-xs-2">
+                                        <label>Đóng học phí</label>
+                                    </div>
+                                    <div class="col-xs-2">
+                                        <label>Quốc tịch : </label>
+                                    </div>
+                                    <div class="col-xs-2">
+                                        @Html.DropDownListFor(c => c.ContactInfo.NationId, Util.SelectedList<DiaPhuong>(), new { @style = "width: 100%" })
+                                    </div>
+                                </div>
+
+                                <div class="space-4"></div>
+
+                                <div class="row">
+                                    <div class="col-xs-2">
+                                    </div>
+                                    <div class="col-xs-2">
+                                        Đơn vị tiền tệ:
+                                    </div>
+                                    <div class="col-xs-2">
+                                        @Html.DropDownList("DonViTienTe", Util.SelectedList<MoneyUnit>())
+                                    </div>
+                                </div>
+
+                                <div class="space-4"></div>
+
+                                <div class="row">
+                                    <div class="col-xs-2"></div>
+                                    <div class="col-xs-2">
+                                        <label>Đơn vị tuyển sinh : </label>
+                                    </div>
+                                    <div class="col-xs-2">
+                                        @Html.DropDownList("ChuDuToan", Util.SelectedList<EstimateOwner>())
+                                    </div>
+                                </div>
+                                <div class="space-4"></div>
+                                <div class="row">
+                                    <div class="col-xs-2">
+
+                                    </div>
+                                    <div class="col-xs-2">
+                                        <label>Loại gói </label>
+                                    </div>
+                                    <div class="col-xs-2">
+                                        @Html.DropDownListFor(x => x.ContactLevelInfo.FeePackageTypeL7L8, lstPackageFeeEdus, new { @style = "width: 100%" })
+                                    </div>
+                                    <div class="col-xs-2">
+                                        @Html.DropDownListFor(x => x.ContactLevelInfo.LearnNumberDay, Util.SelectedList<GoiThoaThich>())
+                                    </div>
+                                </div>
+
+                                <hr width="50%">
+
+                                <div class="row">
+                                    <div class="col-xs-2"></div>
+                                    <div class="col-xs-2">
+                                        <label>Học phí niêm yết</label>
+                                    </div>
+                                    <div class="col-xs-2">
+                                        @Html.DropDownListFor(x => x.ContactLevelInfo.PricePackageListedId, listPackages, new { style = "width: 100%" })
+                                    </div>
+                                </div>
+
+                                <div class="space-4"></div>
+
+                                <div class="row">
+                                    <div class="col-xs-2">
+                                    </div>
+                                    <div class="col-xs-2">
+                                        <label>Sản phẩm</label>
+                                    </div>
+                                    <div class="col-xs-2">
+                                        @Html.DropDownListFor(x => x.ContactInfo.ProductSaleId, lstProducts, new { style = "width: 100%" })
+                                    </div>
+                                </div>
+
+                                <div class="space-4"></div>
+
+                                <div class="row">
+                                    <div class="col-xs-2">
+                                    </div>
+                                    <div class="col-xs-2">
+                                        <label>Học phí phải đóng sau ưu đãi</label>
+                                    </div>
+                                    <div class="col-xs-2">
+                                        @Html.TextBoxFor(x => x.ContactLevelInfo.PackagePriceSale, new { @style = "width: 100%", @class = "number_format", @unit = "VNĐ", @autocomplete = "off" })
+                                    </div>
+                                </div>
+
+                                <div class="space-4"></div>
+                                <div class="row">
+                                    <div class="col-xs-2"></div>
+                                    <div class="col-xs-2">
+                                        <label>Lý do ưu đãi</label>
+                                    </div>
+                                    <div class="col-xs-3">
+                                        @Html.DropDownListFor(x => x.ContactLevelInfo.FeeEduDealsReason, Util.SelectedListWithNone<LyDoBanGoiThap>(true))
+                                    </div>
+                                    <div class="col-xs-2">
+                                        <input id="NoteGiaBanThap" name="NoteGiaBanThap" type="text" value="">
+                                        @Html.DropDownList("UuDaiNhom", Util.SelectedListWithNone<UuDaiNhom>())
+                                    </div>
+                                </div>
+                                <hr width="50%">
+
+                                <div class="space-4"></div>
+
+                                <div class="row">
+                                    <div class="col-xs-2">
+                                        <label></label>
+                                    </div>
+                                    <div class="col-xs-2">
+                                        <label>Số tiền học viên nộp từng lần</label>
+                                    </div>
+                                    <div class="col-xs-2">
+                                        <input id="TienNop" name="TienNop" type="text" value="" class="tiennop" unit="VNĐ" autocomplete="off">
+                                    </div>
+
+                                </div>
+                                <div class="space-4"></div>
+                                <div class="row">
+                                    <div class="col-xs-2"></div>
+                                    <div class="col-xs-2">
+                                        <label>Ngày học viên nộp tiền </label>
+                                    </div>
+                                    <div class="col-xs-2">
+                                        @Html.TextBox("NgayThucThu", string.Empty, new { @class = "input-small timecast", @style = "width:100%;" })
+                                    </div>
+                                    <div class="col-xs-4">
+                                        <label>Hình thức thanh toán: </label>
+                                        @Html.DropDownList("KieuThanhToan", Util.SelectedList<AppointmentType>())
+                                    </div>
+                                    <div class="col-xs-2">
+                                        @Html.DropDownList("NganHang", Util.SelectedList<Bank>())
+                                    </div>
+                                </div>
+                                <div class="space-4"></div>
+                                <div class="row">
+                                    <div class="col-xs-2"></div>
+                                    <div class="col-xs-2">
+                                        <label>Nội dung chuyển khoản</label>
+                                    </div>
+                                    <div class="col-xs-8">
+                                        @Html.TextAreaFor(x => x.ContactLevelInfo.FeeEduNotes, new { @class = "autosize-transition form-control" })
+                                    </div>
+                                </div>
+                                <div class="space-4"></div>
+                                <div class="row">
+                                    <div class="col-xs-2"></div>
+                                    <div class="col-xs-2">
+                                        <label>Tổng số học phí đã nộp</label>
+                                    </div>
+                                    <div class="col-xs-2">
+                                        @Html.TextBoxFor(x => x.ContactLevelInfo.FeeEdu, new { @style = "width: 60%; margin-left: 0px;", @class = "hocphidanop", @readonly = "readonly", @type = "hidden" })
+                                    </div>
+                                </div>
+                                <div class="space-4"></div>
+                                <div class="row">
+                                    <div class="col-xs-2"></div>
+                                    <div class="col-xs-2">
+                                        <label>Số học phí còn phải đóng</label>
+                                    </div>
+                                    <div class="col-xs-2">
+                                        @Html.TextBoxFor(x => x.ContactLevelInfo.FeeEduYet, new { @style = "width: 60%; margin-left: 0px;", @readonly = "readonly", @class = "hocphiconlai", @type = "hidden" })
+                                    </div>
+                                </div>
+                                <div class="space-4"></div>
+                                <hr width="50%">
+                                <div class="row">
+                                    <div class="col-xs-2"></div>
+                                    <div class="col-xs-2">
+                                        <label>Đặc điểm học viên</label>
+                                    </div>
+                                    <div class="col-xs-8">
+                                        @Html.TextAreaFor(x => x.ContactLevelInfo.DacDiemHocVien, new { @class = "autosize-transition form-control" })
+                                    </div>
+                                </div>
+                                @*================End phan form nap tien=========*@
+
+                                @*Phan hien thi lich su nap tien*@
+                                <div class="space-4"></div>
+                                <div class="row">
+                                    <div class="col-xs-2"> <a id="HistoryNapTien" class="icon-list" style="cursor: pointer; margin-left: 10px; font-size: 15px; color: #444;"><span style="padding-left: 3px;"> Mở lịch sử nạp tiền </span></a></div>
+                                </div>
+                                <div class="space-4"></div>
+                                <div class="row">
+
+                                    <div class="col-xs-12" id="divLichSuNapTien"></div>
+
+                                </div>
+                            </div>
+                            @*===============================*@
+                            <hr />
+                            <div class="row">
+                                <div class="col-xs-2">
+                                    <label>Đã bán</label>
+                                </div>
+                                <div class="col-xs-3">
+                                    @Html.DropDownListFor(x => x.ContactInfo.ProductSoldId, lstProducts, new { style = "width: 100%" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-6"></div>
+                <div class="widget-box">
+                    <div class="widget-header">
+                        <h4>Nội dung & kết quả cuộc gọi</h4>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="space-4"></div>
+                            <div class="row">
+                                <div class="col-xs-2" style="width: 11%;">
+                                    <label>Lịch gọi lại</label>
+                                </div>
+                                <div class="col-xs-3">
+                                    @Html.TextBoxFor(x => x.RecallTime, string.Empty, new { @class = "input-small", @style = "width:50%;" })
+                                    <span class="input-append bootstrap-timepicker">
+                                        @Html.TextBoxFor(x => x.RecallTime24h, string.Empty, new { @class = "input-small" })
+                                        <span class="add-on"><i class="icon-time"></i></span>
+                                    </span>
+                                </div>
+                                <div class="col-xs-1"></div>
+                                <div class="col-xs-2">
+                                    <label>Chất lượng cuộc gọi</label>
+                                </div>
+                                <div class="col-xs-3">
+                                    @Html.DropDownListFor(x => x.ContactInfo.QualityId, lstQualities, new { @style = "width: 100%;" })
+                                </div>
+                            </div>
+                            <div class="space-4"></div>
+                            <div class="row">
+                                <div class="col-xs-2" style="width: 11%;">
+                                    <label>Trạng thái gọi </label>
+                                </div>
+                                <div class="col-xs-3">
+                                    @Html.HiddenFor(x => x.CallHistoryId, string.Empty)
+                                    @Html.DropDownListFor(x => x.ContactInfo.StatusMapConsultantId, lstStatusMaps, new { @style = "width: 100%;" })
+                                </div>
+                                <div class="col-xs-1"></div>
+                                <div class="col-xs-2">
+                                    <label>Trạng thái chăm sóc</label>
+                                </div>
+                                <div class="col-xs-3">
+                                    @Html.DropDownList("ContactInfo_StatusCareConsultantId", lstStatusCares, new { @style = "width: 100%;", onfocus = "this.defaultIndex=this.selectedIndex;", onchange = "this.selectedIndex=this.defaultIndex;" })
+                                </div>
+                            </div>
+                            <div class="space-4"></div>
+                            <div class="row">
+                                <div class="col-xs-1" style="width: 11%;">
+                                    <label>Nội dung </label>
+                                </div>
+                                <div class="col-xs-11" style="width: 89%;">
+                                    @Html.TextAreaFor(x => x.ContactInfo.CallInfoConsultant, new { @style = "width: 100%; height: 80px;", @required = "required", error = "Nội dung cuộc gọi không được rỗng" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" name="magoihocadvisor" id="magoihocadvisor">
+                </div>
+
+                <div class="space-6"></div>
+                <a id="clickmodal" href="#" data-toggle="modal" data-target="#myModal">
+                </a>
+            }
+            <button id="btnSubmit" class="btn-primary" style="float: right; width: 100px;" onclick="return submitForm();">Cập nhật</button>
+
+            <div class="clearfix"></div>
+
+            <div class="space-6"></div>
+            <table id="grid-table"></table>
+            <div id="grid-pager"></div>
+
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" style="border-radius: 10px">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h3 class="modal-title" id="myModalLabel" style="color: #790000"><b>Xác nhận nạp tiền</b></h3>
+            </div>
+            <div class="col-sm-20" id="alert">
+                <laber id="alert_payment" />
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-7">
+                        <b>Số tiền nộp trong phiên giao dịch hiện tại: </b>
+                    </div>
+                    <div class="col-sm-5">
+                        <label id="m_fee" />
+                    </div>
+                </div>
+                <div class="space-4"></div>
+                <div class="row">
+                    <div class="col-sm-7">
+                        <b>Tổng số tiền còn phải đóng: </b>
+                    </div>
+                    <div class="col-sm-5">
+                        <label id="m_feeedu_yet" />
+                    </div>
+                </div>
+                <div class="space-4"></div>
+                <div class="row">
+                    <div class="col-sm-7">
+                        <b>Tổng số tiền đã nộp: </b>
+                    </div>
+                    <div class="col-sm-5">
+                        <label id="m_feeedu" />
+                    </div>
+                </div>
+
+                <div class="col-sm-20" id="alert">
+                    <laber id="lich_su_nap_tien" />
+                </div>
+            </div>
+
+            <div class="modal-footer" style="border-radius: 10px">
+                <button id="cancelMoney" type="button" class="btn btn-default" data-dismiss="modal" style="border-radius: 10px" onclick="$('#myModal').modal('hide');">Hủy bỏ</button>
+                <button id="okMoney" type="button" class="btn btn-primary" style="border-radius: 10px" onclick="$('#formChamSoc').submit();">OK, Tôi đồng ý</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/Content/themes/ace/assets/js/jquery.form.js"></script>
+<script src="/Content/themes/ace/assets/js/jquery.validate.min.js"></script>
+<script src="/Content/themes/ace/assets/js/additional-methods.min.js"></script>
+<script src="~/Scripts/jquery.number.js"></script>
+
+<script type="text/javascript">
+    var callCount = '@Model.ContactInfo.CallCount';
+
+    var grid_selector = "#grid-table";
+    var url = 'admin/api/callhistory/GetAllByContactId?contactId={0}';
+    var heades = ['Id', 'CallId', 'CallType', 'UserLogType', 'Thời gian gọi', 'Trạng thái', 'Trạng thái gọi', 'Level', 'Thời gian gọi lại', 'Nội dung', 'Ghi âm','Tải xuống'];
+    var model = [
+        { name: 'CallHistoryId', index: 'CallHistoryId', editable: false, sorttype: 'string', editoptions: { disabled: true }, width: '0px' },
+        { name: 'CallId', index: 'CallType', editable: false, sorttype: 'string', editoptions: { disabled: true }, width: '0px' },
+        { name: 'CallType', index: 'CallType', editable: false, sorttype: 'string', editoptions: { disabled: true }, width: '0px' },
+        { name: 'UserLogType', index: 'UserLogType', editable: false, sorttype: 'string', editoptions: { disabled: true }, width: '0px' },
+        { name: 'CallTime', index: 'CallTime', editable: false, sorttype: 'string', width: '70px', formatter: 'date', formatoptions: { srcformat : 'Y-m-dTH:i:s', newformat : 'd/m/Y H:i' } },
+        { name: 'StatusCareId', index: 'StatusCareId', editable: false, width: '100px', formatter: statusCareFomatter },
+        { name: 'StatusMapId', index: 'StatusMapId', editable: false, width: '100px', formatter: statusMapFomatter },
+        { name: 'LevelId', index: 'LevelId', editable: false, width: '60px', formatter: levelFomatter },
+        { name: 'RecallTime', index: 'RecallTime', editable: false, sorttype: 'string', width: '70px', formatter: 'date', formatoptions: { newformat: 'd/m/Y' } },
+        { name: 'CallCenterInfo', index: 'CallCenterInfo', editable: false, sorttype: 'string', width: '100px' },
+        { name: 'LinkRecord', index: 'LinkRecord', editable: false, align: 'center', width: '100px', formatter: listenFomatter },
+        {
+            name: 'Download', index: 'Download', editable: false, width: '40px', align: 'center', formatter: "dynamicLink",
+            formatoptions: {
+                cellValue: function (cellValue, rowId, rowData, options) {
+                    if (rowData.LinkRecord == null || rowData.LinkRecord.length == 0) {
+                        return '';
+                    }
+                    return '<div style="color:#34810c;margin:5px;"><a href="' + rowData.LinkRecord + '"><img style="width:16px; height:16px;" src="../../../../Images/download-16.png"/></a></div>';
+                }
+            }
+        }
+    ];
+
+    var hasAppointmentInterview =  $('#ContactLevelInfo_HasAppointmentInterview').is(':checked');
+
+    function PlayRecord(id)
+    {
+        $("#ngheghiam_"+id).html("<audio id='audio_listen' controls style='width: 98%'><source src='"+$("#link_record_"+id).val()+"' type='audio/mpeg' /></audio>");
+    }
+
+    $(document).ready(function () {
+
+        initForm();
+        isViewMode();
+        turnOnInput();
+        displayLevel();
+        customValidate();
+        changeStatusMap();
+        changeColorStatusMap();
+        formatMoney();
+
+        $(document).on("keyup", "input.number_format", convert_number);
+        $(document).on("keyup", "input.tiennop", convert_number);
+        $(document).on("keyup", "input.number_format", hocphiconlai);
+        $(document).on("keyup", "input.tiennop", hocphiconlai);
+
+        $('#Birthday').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly:true, endDate: "+0d", todayHighlight: "true" });
+        $('#CompletedTime').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly:true, startDate: "+0d", todayHighlight: "true"  });
+        $('#AppointmentTime').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly:true, startDate: "+0d", todayHighlight: "true"  });
+        $('#RecallTime').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly:true, startDate: "+0d", todayHighlight: "true", orientation: "top"  });
+        $('#RecallTime24h').timepicker({ minuteStep: 5, disableFocus: true, showSeconds: true, showMeridian: false, todayHighlight: "true", defaultTime: false });
+        $('#AppointmentInterviewInfo_AppointmentDateString').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly:true, startDate: "+0d", todayHighlight: "true"  });
+        $('#NgayThucThu').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly:true, todayHighlight: "true", orientation: "top"  });
+        // Call
+        $("#btnCall1").click(function (e) {
+            callMobile('ContactInfo_Mobile1', 'btnCall1');
+        });
+        $("#btnCall2").click(function (e) {
+            callMobile('ContactInfo_Mobile2', 'btnCall2');
+        });
+        $("#btnCall3").click(function (e) {
+            callMobile('ContactInfo_Mobile3', 'btnCall3');
+        });
+        $('#ContactLevelInfo_HasCasecAccount').click(function(e) {
+            if ($('#ContactLevelInfo_HasCasecAccount').is(':checked')) {
+                provideCasecAccount();
+            }
+        });
+
+        $('#ContactLevelInfo_HasTopicaAccount').click(function(e) {
+            if ($('#ContactLevelInfo_HasTopicaAccount').is(':checked')) {
+                provideTopicaAccount();
+            }
+        });
+
+        $('#ContactLevelInfo_HasSetSb100').click(function(e) {
+            if ($('#ContactLevelInfo_HasSetSb100').is(':checked')) {
+                var testCasec = $('#ContactLevelInfo_HasPointTestCasec').is(':checked');
+                var testInterview = $('#ContactLevelInfo_HasPointInterview').is(':checked');
+                if (testCasec || testInterview) {
+                    provideRequestSb100();
+                } else {
+                    alert('Học viên này chưa có điểm casec hoặc điểm phỏng vấn, nên chưa thể đặt hàng SB100');
+                    $('#ContactLevelInfo_HasSetSb100').prop('checked', false);
+                }
+            }
+        });
+
+        $('#ContactLevelInfo_HasSetSb100Topica').click(function(e) {
+            if ($('#ContactLevelInfo_HasSetSb100Topica').is(':checked')) {
+                var testTopica = $('#ContactLevelInfo_HasPointTestTopica').is(':checked');
+                var testInterview = $('#ContactLevelInfo_HasPointInterview').is(':checked');
+                if (testTopica || testInterview) {
+                    provideRequestSb100Topica();
+                } else {
+                    alert('Học viên này chưa có điểm test topica hoặc điểm phỏng vấn, nên chưa thể đặt hàng SB100');
+                    $('#ContactLevelInfo_HasSetSb100Topica').prop('checked', false);
+                }
+            }
+        });
+
+
+        $('#ContactLevelInfo_HasLinkSb100').click(function(e) {
+            if ($('#ContactLevelInfo_HasLinkSb100').is(':checked')) {
+                provideRequestLinkSb100();
+            }
+        });
+        $('#iconAppointment').click(function(e) {
+            provideSchedule();
+        });
+
+        $('#iconAppointmentTest').click(function(e) {
+            provideScheduleTest();
+        });
+
+        // Change disable
+        $("#divL3 :input").change(function () {
+            if (this.id == 'ContactLevelInfo_HasAppointment') displayAppointment();
+            if (this.id == 'ContactLevelInfo_HasPointTestCasec') {
+                displayHasPointTestCasec();
+                $('#ContactLevelInfo_HasPointTestCasecHidden').prop('checked', $('#ContactLevelInfo_HasPointTestCasec').is(':checked'));
+            }
+            if (this.id == 'ContactLevelInfo_HasPointInterview'){
+                displayHasPointInterview();
+                $('#ContactLevelInfo_HasPointInterviewHidden').prop('checked', $('#ContactLevelInfo_HasPointInterview').is(':checked'));
+            }
+            if (this.id == 'ContactLevelInfo_HasAppointmentInterview') {
+                displayHasAppointmentInterview();
+                $('#ContactLevelInfo_HasAppointmentInterviewHidden').prop('checked', $('#ContactLevelInfo_HasAppointmentInterview').is(':checked'));
+            }
+        });
+
+        $("#divL6 :input").change(function () {
+
+        });
+
+        $('#ContactInfo_StatusMapConsultantId').change(function () {
+            changeStatusMap();
+        });
+
+        $('#ContactLevelInfo_FeeTuitionType').change(function() {
+            changeFeeTuitionType();
+        });
+
+        $('#KieuThanhToan').change(function() {
+            changeBank();
+        });
+
+        if ($('#ContactLevelInfo_FeePackageTypeL7L8').val() == 29) {
+            $('#ContactLevelInfo_LearnNumberDay').css('display', 'none');
+        }
+
+        $('#ContactLevelInfo_FeePackageTypeL7L8').change(function() {
+            changeFeePackageTypeL7L8();
+        });
+
+        $('#ContactLevelInfo_PackagePriceSale').change(function() {
+            if(parseInt($('#ContactLevelInfo_PackagePriceSale').val()) > parseInt($('#ContactLevelInfo_PricePackageListedId').val()))
+            {
+                alert("Số tiền học phí phải đóng lớn hơn giá niêm yết!");
+            }
+
+            if(!$.isNumeric($('#ContactLevelInfo_PackagePriceSale').val()))
+            {
+                alert("Có ký tự đặc biệt. Vui lòng chỉ nhập số!");
+            }
+        });
+
+        $('#TienNop').change(function() {
+
+            if(!$.isNumeric($('#TienNop').val()))
+            {
+                alert("Có ký tự đặc biệt. Vui lòng chỉ nhập số!");
+            }
+        });
+
+        $('#ContactLevelInfo_FeeEduDealsReason').change(function() {
+            showNoteGiaBanThap();
+        });
+
+        $('#ContactInfo_NationId').change(function() {
+
+            if($('#ContactInfo_NationId').val() == 1)
+            {
+                $('#DonViTienTe').val(1);
+                $(".e_convert_num_value").each(function(){
+                    var tien = $(this).html();
+                    tien = tien.replace("Baht", "VND");
+                    $(this).html(tien);
+                });
+            }
+            else
+            {
+                $('#DonViTienTe').val(2);
+                $(".e_convert_num_value").each(function(){
+                    var tien = $(this).html();
+                    tien = tien.replace("VND","Baht");
+                    $(this).html(tien);
+                });
+            }
+        });
+
+        $('#ContactInfo_StatusCareConsultantId').attr('readonly', 'readonly');
+    });
+
+
+    function formatMoney() {
+        $("input.number_format").each(function() {
+            var value = $.number($(this).val(), 0, ",", ".");
+            if($("#ContactInfo_NationId").val() == 1)
+            {
+                $(this).after('<div class="e_convert_num_value" style="font-weight: bold; color: rgb(129, 12, 21); display: block; font-size: 20px;">' + value + ' VND</div>');
+            }
+            else{
+                $(this).after('<div class="e_convert_num_value" style="font-weight: bold; color: rgb(129, 12, 21); display: block; font-size: 20px;">' + value + ' Baht</div>');
+            }
+
+        })
+        $("input.hocphidanop").each(function() {
+            var value = $.number($(this).val(), 0, ",", ".");
+            if($("#ContactInfo_NationId").val() == 1)
+            {
+                $(this).after('<div class="e_convert_num_value" style="font-weight: bold; color: rgb(129, 12, 21); display: block; font-size: 20px;">' + value + ' VND</div>');
+            }
+            else{
+                $(this).after('<div class="e_convert_num_value" style="font-weight: bold; color: rgb(129, 12, 21); display: block; font-size: 20px;">' + value + ' Baht</div>');
+            }
+        })
+        $("input.hocphiconlai").each(function() {
+            var value = $.number($(this).val(), 0, ",", ".");
+            if($("#ContactInfo_NationId").val() == 1)
+            {
+                $(this).after('<div class="e_convert_num_value e_hocphiconlai" style="font-weight: bold; color: rgb(129, 12, 21); display: block; font-size: 20px;">' + value + ' VND</div>');
+            }
+            else{
+                $(this).after('<div class="e_convert_num_value e_hocphiconlai" style="font-weight: bold; color: rgb(129, 12, 21); display: block; font-size: 20px;">' + value + ' Baht</div>');
+            }
+        })
+
+        if($('#ContactInfo_NationId').val() == 1)
+        {
+            $('#DonViTienTe').val(1);
+        }
+        else
+        {
+            $('#DonViTienTe').val(2);
+        }
+    }
+
+
+    function hocphiconlai(){
+        var PackagePriceSale = $('#ContactLevelInfo_PackagePriceSale').val();
+        var TienNop = $('#TienNop').val();
+        var TienDaDong = $("#ContactLevelInfo_FeeEdu");
+        var tiente;
+        if($("#ContactInfo_NationId").val() == 1) {
+            tiente = "VND";
+        }
+        else {
+            tiente = "Baht";
+        }
+
+        $('.e_hocphiconlai').html($.number(PackagePriceSale - TienDaDong - TienNop, 0, ",", ".") + ' ' + tiente);
+    }
+
+    function convert_number() {
+        var soure_obj = $(this);
+        if (!soure_obj.hasClass('e_not_number')) {
+            var unit = $(this).attr('unit');
+            var val_obj = soure_obj.val();
+            var val_convert = $.number(val_obj, 0, ",", ".");
+            var e_convert_num_value = soure_obj.siblings('.e_convert_num_value');
+            if (!e_convert_num_value.length) {
+                soure_obj.after('<div class="e_convert_num_value" style="font-weight:bold;color:#34810c"></div>')
+            }
+            if (unit == undefined) {
+                unit = '';
+            }
+
+            if($('#ContactInfo_NationId').val() == 2){
+                unit = 'Baht';
+            }
+            e_convert_num_value.html(val_convert + ' ' + unit);
+            if (!parseInt(val_convert)) {
+                e_convert_num_value.hide();
+            } else {
+                e_convert_num_value.show();
+            }
+        }
+    }
+
+
+    function checkLevel2() {
+        var checkEducationLevel = false;
+        var elements = document.getElementsByName('PostedEducationLevels.EducationLevelIds');
+        for (var i = 0; i < elements.length; i++) {
+            if ($(elements[i]).is(':checked')) {
+                checkEducationLevel = true;
+                break;
+            }
+        }
+
+        var checkSchool = false;
+        if ($('#ContactLevelInfo_MajorGrad').val() != '') checkSchool = true;
+
+        var checkMajor = false;
+        elements = document.getElementsByName('PostedMajors.MajorIds');
+        for (var i = 0; i < elements.length; i++) {
+            if ($(elements[i]).is(':checked')) {
+                checkMajor = true;
+                break;
+            }
+        }
+
+        var check = checkEducationLevel && checkSchool && checkMajor;
+        if (!check) {
+            var error = 'Thông tin L2 đang bị thiếu, thông tin gồm:';
+            if (!checkEducationLevel || !checkSchool) error += "<br />- Thông tin trường tốt nghiệp, ngành";
+            if (!checkMajor) error += "<br />- Thông tin ngành muốn học tiếp";
+            alertError(error);
+        }
+        return check;
+    }
+
+    function checkLevel3() {
+        var checkAppointmentTime = false;
+        if ($('#AppointmentTime').val() != '') checkAppointmentTime = true;
+
+        var check = checkAppointmentTime;
+        if (!check) {
+            var error = 'Thông tin L3 đang bị thiếu, thông tin gồm:';
+            if (!checkAppointmentTime) error += "<br />- Thông tin lịch hẹn (ngày hẹn)";
+            alertError(error);
+        }
+        return check;
+    }
+
+    function checkLevel5B() {
+        var checkAddress = false;
+        if ($('#ContactInfo_Address').val() != '') checkAddress = true;
+
+        var checkBirthday = false;
+        if ($('#Birthday').val() != '') checkBirthday = true;
+
+        var check = checkSubmitedForm && checkFeeReview && checkAddress && checkBirthday;
+        if (!check) {
+            var error = 'Thông tin L5B đang bị thiếu, thông tin gồm:';
+            if (!checkAddress) error += "<br />- Địa chỉ liên hệ";
+            if (!checkBirthday) error += "<br />- Ngày sinh";
+            alertError(error);
+        }
+        return check;
+    }
+    //kiem tra thong tin nop hoc phi truoc khi day hoc vien len L7 hoac L8
+    function checkL7L8()
+    {
+        var checkTienBanGoi = false;
+        if ($('#ContactLevelInfo_PackagePriceSale').val() != '' && $('#ContactLevelInfo_PackagePriceSale').val() != '0') checkTienBanGoi = true;
+
+        var checkTienNop = false;
+        if ($('#TienNop').val() != '' && $('#TienNop').val() != '0') checkTienNop = true;
+
+        var checkNgayThucThu = false;
+        if($('#NgayThucThu').val() != '') checkNgayThucThu = true;
+
+        var checkContactLevelInfo_FeeEduNotes = false;
+        if($('#ContactLevelInfo_FeeEduNotes').val() != '') checkContactLevelInfo_FeeEduNotes = true;
+
+        var check = checkTienBanGoi && checkTienNop && checkNgayThucThu && checkContactLevelInfo_FeeEduNotes;
+        if(!check) {
+            var error = 'Bạn muốn nâng contact lên L7 hoặc L8 thì cần điền các thông tin sau: ';
+            if(!checkTienBanGoi) error += "<br />- Học phí phải đóng sau ưu đãi";
+            if(!checkTienNop) error += "<br />- Số tiền học viên nộp từng lần";
+            if(!checkNgayThucThu) error += "<br />- Ngày học viên nộp tiền";
+            if(!checkContactLevelInfo_FeeEduNotes) error += "<br />- Nội dung chuyển khoản";
+            alertError(error);
+        }
+        return check;
+    }
+
+    function checkLevel8() {
+        var checkFeeEdu = false;
+        if ($('#ContactLevelInfo_FeeEdu').is(':checked')) checkFeeEdu = true;
+
+        var check = checkFeeEdu;
+        if (!check) {
+            var error = 'Thông tin L8 đang bị thiếu, thông tin gồm:';
+            if (!checkFeeEdu) error += "<br />- Đã nộp học phí";
+            alertError(error);
+        }
+        return check;
+    }
+
+    function checkStatusDontCall() {
+        return $('#ContactInfo_StatusCareConsultantId').val() == '@((int)StatusCareType.DontCall)';
+    }
+
+    function checkStatusUnknown() {
+        return $('#ContactInfo_StatusCareConsultantId').val() == '@((int)StatusCareType.UnKnown)';
+    }
+
+    function checkLevelNext(levelId) {
+        if (levelId == '@((int)LevelType.L1)' ||
+            levelId == '@((int)LevelType.L5)' ||
+            levelId == '@((int)LevelType.L8)')
+            return true;
+        return false;
+    }
+
+    function checkLevelCurrent(levelId) {
+        if (levelId == '@((int)LevelType.L8)' ||
+            levelId == '@((int)LevelType.L9)')
+            return true;
+        return false;
+    }
+
+    function submitForm() {
+
+        var feeEdu  = parseInt('@Model.ContactLevelInfo.FeeEdu');
+        var value = parseInt($('#TienNop').val());
+        var tienDaNop = feeEdu + value;
+        var tienConLai = parseInt($('#ContactLevelInfo_PackagePriceSale').val()) - tienDaNop;
+        var pricePackage = $("#ContactLevelInfo_PackagePriceSale").val().replaceAll('.','');
+
+        document.getElementById('m_fee').innerHTML = "<b><font size=\"3\" color=\"brown\">" + commaSeparateNumber(value) + " VND </font><b>";
+        document.getElementById('m_feeedu').innerHTML = "<b><font size=\"3\" color=\"brown\">" + commaSeparateNumber(tienDaNop) + " VND </font><b>";
+        document.getElementById('m_feeedu_yet').innerHTML = "<b><font size=\"3\" color=\"brown\">" + commaSeparateNumber(tienConLai) + " VND </font><b>";
+
+        var giaBanGoit = parseInt($('#ContactLevelInfo_PackagePriceSale').val());
+
+        if(parseInt(tienDaNop) > giaBanGoit) {
+            document.getElementById('alert_payment').innerHTML = "<b><font size=\"3\" color=\"red\"><br/> &nbsp &nbsp Chú ý: Tồng số tiền đã đóng đang \"LỚN HƠN\" số tiền bán gói.</font></b>";
+        }
+        else if(parseInt(tienDaNop) < giaBanGoit) {
+            document.getElementById('alert_payment').innerHTML = "<b><font size=\"3\" color=\"red\"><br/> &nbsp &nbsp Chú ý: Tồng số tiền đã đóng đang \"NHỎ HƠN\" số tiền bán gói.</font></b>";
+        }
+        else {
+            document.getElementById('alert_payment').innerHTML = "<b><font size=\"3\"><br/> &nbsp &nbsp Bạn đã đóng đủ tiền</font></b>";
+        }
+
+        if (!checkDuplicate())
+            return false;
+
+        var statusMapId = $('#ContactInfo_StatusMapConsultantId').val();
+        if (statusMapId == '' || statusMapId == '0') {
+            alertError("Cập nhật contact bị lỗi do không tìm thấy trạng thái chăm sóc");
+            return false;
+        }
+
+        var array = jQuery.parseJSON('@Html.Raw(Json.Encode(((IEnumerable<StatusMapInfo>)ViewBag.StatusMaps).Select(c => new
+                                 {
+                                     Id = c.Id,
+                                     Name = c.Name,
+                                     LevelIdNext = c.LevelIdNext,
+                                     StatusCareId = c.StatusCareId
+                                 })))');
+
+        var levelIdNext = 0;
+        for (var i = 0; i < array.length; i++) {
+            if (array[i].Id == statusMapId) {
+                levelIdNext = array[i].LevelIdNext;
+                break;
+            }
+        }
+
+        if (levelIdNext == 7 && tienDaNop != 0 && tienDaNop >= pricePackage)
+        {
+            alert("Học viên đã nộp đủ tiền, bạn có thể nâng lên L8!");
+            return false;
+        }
+
+        if(levelIdNext == 8 && tienDaNop < pricePackage)
+        {
+            alertError("Bạn ko thể nâng học viên lên L8 do học viên chưa đóng đủ tiền");
+            return false;
+        }
+
+        if (callCount >= 10 && checkStatusUnknown()) {
+            return true;
+        }
+
+        // Check L5
+        var levelIdCurent = '@Model.ContactInfo.LevelId';
+
+        if (levelIdNext == 0) levelIdNext = '@Model.ContactInfo.LevelId';
+        if (!checkStatusDontCall()) {
+            if (!checkLevelNext(levelIdNext)) {
+                if ($('#RecallTime').val() == '') {
+                    alertError('Thông tin ngày hẹn không được rỗng');
+                    return false;
+                }
+            }
+        }
+
+        //giai đoạn test với 5 tvts, check id của 5 tvts này
+        var userIdTestBanGiaoKeToan  =  parseInt('@Model.ContactInfo.UserConsultantId');
+        var arr = [219, 205, 337, 265, 317, 212, 216, 239, 241, 242, 243, 244, 264, 266, 332, 335, 356, 362, 379, 391, 415, 423, 442, 445, 446, 471, 472, 485, 486, 500, 501, 504, 505, 506];
+
+        if ( (jQuery.inArray( userIdTestBanGiaoKeToan, arr) != -1) && (statusMapId == 29 || statusMapId == 47 || statusMapId == 65 || statusMapId == 74 || statusMapId == 77 || statusMapId == 103 || statusMapId == 142 || levelIdNext == 8) && levelIdCurent != 8)
+        {
+            if(!checkL7L8()) {
+                return false;
+            }
+            var id = $('#ContactInfo_Id').val();
+
+            $.ajax({
+                type: 'GET',
+                data: { contactId: id },
+                url: '/admin/api/HistoryMoney/GetAllByContactId',
+                success: function (data) {
+                    document.getElementById('lich_su_nap_tien').innerHTML = "";
+                    for (var i = 0; i < data.length; i++) {
+                        var item = data[i];
+                        document.getElementById('lich_su_nap_tien').innerHTML += "<br>Lần " + parseInt(i+1) + ": " + commaSeparateNumber(item.TienHVNop) + " VND";
+                    }
+                }
+            });
+
+            $('#m_fee').val(commaSeparateNumber(value) + " VND");
+            $('#m_feeedu').val(commaSeparateNumber(tienDaNop) + " VND");
+            $('#m_feeedu_yet').val(commaSeparateNumber(tienConLai) + " VND");
+
+            $('#myModal').modal('show');
+        }
+        else
+        {
+            $("#formChamSoc").submit();
+        }
+        return true;
+    }
+
+    function displayAppointment() {
+        if ($('#ContactLevelInfo_HasAppointment').is(':checked')) {
+            $("#AppointmentTime").removeAttr("disabled");
+            $("#ContactLevelInfo_ApointmentType").removeAttr("disabled");
+            $("#ContactLevelInfo_ApointmentNotes").removeAttr("disabled");
+        } else {
+            $("#AppointmentTime").attr("disabled", "disabled");
+            $("#ContactLevelInfo_ApointmentType").attr("disabled", "disabled");
+            $("#ContactLevelInfo_ApointmentNotes").attr("disabled", "disabled");
+        }
+    }
+
+    function displayHasPointInterview() {
+        if ($('#ContactLevelInfo_HasPointInterview').is(':checked')) {
+            $("#divHasPointInterview").css("display", "");
+            $('#iconHistoryPointTestInterview').css("display", "");
+        } else {
+            $("#divHasPointInterview").css("display", "none");
+            $('#iconHistoryPointTestInterview').css("display", "none");
+        }
+    }
+
+    function displayHasPointTestCasec() {
+
+        if ($('#ContactLevelInfo_HasPointTestCasec').is(':checked')) {
+            $("#divPointTestCasec").css("display", "");
+            $('#iconHistoryPointTestCasec').css("display", "");
+        } else {
+            $("#divPointTestCasec").css("display", "none");
+            $('#iconHistoryPointTestCasec').css("display", "none");
+        }
+    }
+
+    function displayHasPointTestTopica() {
+        if ($('#ContactLevelInfo_HasPointTestTopica').is(':checked')) {
+            $("#divPointTestTopica").css("display", "");
+            $('#iconHistoryPointTestTopica').css("display", "");
+        } else {
+            $("#divPointTestTopica").css("display", "none");
+            $('#iconHistoryPointTestTopica').css("display", "none");
+        }
+    }
+
+    function displayHasAppointmentInterview() {
+        if ($('#ContactLevelInfo_HasAppointmentInterview').is(':checked')) {
+            $("#divAppointmentInterview").css("display", "");
+            $('#iconSchedule').css("display", "");
+            $('#iconInterviewSchedule').css("display", "");
+            if (hasAppointmentInterview) {
+                $('#iconReSchedule').css("display", "");
+                $('#iconCancelSchedule').css("display", "");
+            } else {
+                $('#iconReSchedule').css("display", "none");
+                $('#iconCancelSchedule').css("display", "none");
+            }
+            $('#iconHistorySchedule').css("display", "");
+        } else {
+            $("#divAppointmentInterview").css("display", "none");
+            $('#iconSchedule').css("display", "none");
+            $('#iconInterviewSchedule').css("display", "none");
+            $('#iconReSchedule').css("display", "none");
+            $('#iconCancelSchedule').css("display", "none");
+            $('#iconHistorySchedule').css("display", "none");
+        }
+    }
+
+    function displayLevel() {
+        // Level
+        var levelId = '@Model.ContactInfo.LevelId';
+        switch (levelId) {
+            case '@((int)LevelType.L1)':
+            case '@((int)LevelType.L2)':
+                $('#divL3 h4').html('Thông tin L3 - L6');
+                $("#divL4").css("display", "none");
+                $("#divL5").css("display", "none");
+                $("#divL6").css("display", "none");
+                $("#divL9").css("display", "none");
+                break;
+            case '@((int)LevelType.L3)':
+            case '@((int)LevelType.L4)':
+                $("#divL6").css("display", "none");
+                $("#divL9").css("display", "none");
+                break;
+        }
+
+        displayAppointment();
+        displayHasPointTestCasec();
+        displayHasPointTestTopica();
+        displayHasPointInterview();
+        displayHasAppointmentInterview();
+    }
+
+    function turnOnInput() {
+        $("#btnCall1").removeAttr("disabled");
+        $("#btnCall2").removeAttr("disabled");
+        $("#btnCall3").removeAttr("disabled");
+
+        // L3
+        if ($('#ContactLevelInfo_Appointment').is(':checked')) {
+            $("#AppointmentTime").removeAttr("disabled");
+            $("#ContactLevelInfo_ApointmentType").removeAttr("disabled");
+        } else {
+            $("#ContactLevelInfo_ApointmentType").attr("disabled", "disabled");
+            $("#AppointmentTime").attr("disabled", "disabled");
+        }
+    }
+
+    function callMobile(name, button) {
+        if ($('#' + name).val() == '') {
+            alertError("Số điện thoại không được rỗng");
+            return;
+        }
+        if ($('#' + name)[0].checkValidity()) {
+            $("#" + button).attr("disabled", "disabled");
+
+            var id = '@ViewBag.Id';
+            var mobile = $('#' + name).val();
+            var newUrl = '/admin/api/callhistory/call?id={0}&mobile={1}';
+            $.ajax({
+                type: 'GET',
+                url: newUrl.format(id, mobile),
+                success: function (data) {
+                    alertSuccess("Gọi điện thành công.");
+                    if (data != null && data.CallHistoryId != null)
+                        $('#CallHistoryId').val(data.CallHistoryId);
+
+                    jQuery(grid_selector).jqGrid().trigger("reloadGrid");
+                },
+                error: function (request, status, ex) {
+                    $('#' + name).removeAttr("disabled");
+                    $("#" + button).removeAttr("disabled");
+                    alertError("Gọi điện không thành công.");
+                }
+            });
+        }
+    }
+
+    function changeStatusMap() {
+        var array = @Html.Raw(Json.Encode(((IEnumerable<StatusMapInfo>)ViewBag.StatusMaps).Select(c => new { Id = c.Id, Name = c.Name, StatusCareId = c.StatusCareId })));
+        var statusMapId = $('#ContactInfo_StatusMapConsultantId').val();
+
+        if(statusMapId == 30 || statusMapId == 48 || statusMapId == 66 || statusMapId == 75 || statusMapId == 78 || statusMapId == 80) alert("Bạn thực sự muốn đẩy học viên này lên L8?");
+        if (statusMapId == '' || statusMapId == '0')  $('#ContactInfo_StatusCareConsultantId').val(0);
+
+        for (var i = 0; i < array.length; i++) {
+            if (statusMapId == array[i].Id) {
+                var statusCareId = array[i].StatusCareId;
+                $('#ContactInfo_StatusCareConsultantId').val(statusCareId);
+            }
+        }
+    }
+
+    function changeBank() {
+        if ($('#KieuThanhToan').val() == '@((int)AppointmentType.BANKING)') {
+            $('#NganHang').css('display', '');
+        } else {
+            $('#NganHang').css('display', 'none');
+        }
+    }
+
+    function changeFeePackageTypeL7L8() {
+        if ($('#ContactLevelInfo_FeePackageTypeL7L8').val() == 28) { //28 la goi thoa thich
+            $('#ContactLevelInfo_LearnNumberDay').css('display', '');
+        } else {
+            $('#ContactLevelInfo_LearnNumberDay').css('display', 'none');
+        }
+    }
+
+    function showNoteGiaBanThap() {
+
+        if ($('#ContactLevelInfo_FeeEduDealsReason').val() == '@((int)LyDoBanGoiThap.Khac)') {
+            $('#NoteGiaBanThap').css('display', '');
+        } else {
+            $('#NoteGiaBanThap').css('display', 'none');
+        }
+
+        if ($('#ContactLevelInfo_FeeEduDealsReason').val() == '@((int)LyDoBanGoiThap.Nhom)') {
+            $('#UuDaiNhom').css('display', '');
+        } else {
+            $('#UuDaiNhom').css('display', 'none');
+        }
+    }
+
+    function changeColorStatusMap() {
+        var array = @Html.Raw(Json.Encode(((IEnumerable<StatusMapInfo>)ViewBag.StatusMaps).Select(c => new { Id = c.Id, Name = c.Name, StatusCareId = c.StatusCareId })))
+        $("#ContactInfo_StatusCareConsultantId option").each(function()
+        {
+            var id = $(this).val();
+            if (id == 1) {
+                $(this).css("background-color", "YellowGreen");
+            } else  if (id == 2) {
+                $(this).css("background-color", "Yellow");
+            } else  if (id == 3) {
+                $(this).css("background-color", "Orange");
+            } else  if (id == 4) {
+                $(this).css("background-color", "Violet");
+            }
+
+            for (var i = 0; i < array.length; i++) {
+                $("#ContactInfo_StatusMapConsultantId option").each(function() {
+                    if ($(this).val() == array[i].Id) {
+                        var id = array[i].StatusCareId;
+
+                        if (id == 1) {
+                            $(this).css("background-color", "YellowGreen");
+                        } else if (id == 2) {
+                            $(this).css("background-color", "Yellow");
+                        } else if (id == 3) {
+                            $(this).css("background-color", "Orange");
+                        } else if (id == 4) {
+                            $(this).css("background-color", "Violet");
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    function isViewMode() {
+        var mode = '@ViewBag.IsView';
+        if (mode == 1) {
+            $('#btnCall1').css('display', 'none');
+            $('#btnCall2').css('display', 'none');
+            $('#btnCall3').css('display', 'none');
+            $('#btnSubmit').css('display', 'none');
+            $('#btnUpdateL1').css('display', 'none');
+        }
+    }
+
+    var message = '@ViewBag.Message';
+    if (message == null || message == '') {
+        $("#alert").removeClass();
+        $("#alert").html('');
+    }
+    else {
+        $("#alert").addClass("alert alert-block alert-success");
+        $("#alert").html(message);
+        if ('@ViewBag.Close' == '1')
+            window.close();
+    }
+
+    function requestFullScreen(element) {
+        // Supports most browsers and their versions.
+        var requestMethod = element.requestFullScreen || element.webkitRequestFullScreen || element.mozRequestFullScreen || element.msRequestFullScreen;
+
+        if (requestMethod) { // Native full screen.
+            requestMethod.call(element);
+        } else if (typeof window.ActiveXObject !== "undefined") { // Older IE.
+            var wscript = new ActiveXObject("WScript.Shell");
+            wscript.SendKeys("{F11}");
+        }
+    }
+
+    function initForm() {
+        changeBank();
+        $('#iconUser').css('display', 'none');
+        $('#iconHistory').css('display', 'none');
+        $('#AccTopica').css('display', 'none');
+        $('#HistoryTopica').css('display', 'none');
+        $('#NganHang').css('display', 'none');
+        $('#NoteGiaBanThap').css('display', 'none');
+        $('#UuDaiNhom').css('display','none');
+
+        var userIdTestBanGiaoKeToan  =  parseInt('@Model.ContactInfo.UserConsultantId');
+        //var arr = [ 219, 205, 216, 265, 337, 317];
+        var arr = [202, 219, 205, 337, 265, 317, 212, 216, 239, 241, 242, 243, 244, 264, 266, 332, 335, 356, 362, 379, 391, 415, 423, 442, 445, 446, 471, 472, 485, 486, 500, 501, 504, 505, 506, 441, 391, 380];
+        if (jQuery.inArray(userIdTestBanGiaoKeToan, arr) != -1) {
+            $('#naptienL7L8').css('display', '');
+        }
+        else {
+            $('#naptienL7L8').css('display', 'none');
+        }
+
+
+        if ($('#ContactLevelInfo_HasLinkSb100').is(':checked'))
+        {
+            $('#ContactLevelInfo_HasLinkSb100').attr("disabled", "disabled");
+        }
+
+        if ($('#ContactLevelInfo_HasLinkSb100Topica').is(':checked')) {
+            $('#ContactLevelInfo_HasLinkSb100Topica').attr("disabled", "disabled");
+        }
+
+        if ($('#ContactLevelInfo_HasCasecAccount').is(':checked')) {
+            var id = $('#ContactInfo_Id').val();
+            $.ajax({
+                type: 'GET',
+                data: { contactId: id },
+                url: '/admin/api/CasecAccount/GetAllByContactId',
+                success: function (data) {
+                    loadCasecAccount(data, false);
+                }
+            });
+            $('#ContactLevelInfo_HasCasecAccount').attr("disabled", "disabled");
+        }
+
+        if ($('#ContactLevelInfo_HasTopicaAccount').is(':checked')) {
+            var id = $('#ContactInfo_Id').val();
+
+            $.ajax({
+                type: 'GET',
+                data: { contactId: id },
+                url: '/admin/api/TopicaAccount/GetAllByContactId',
+                success: function (data) {
+                    loadTopicaAccount(data, false);
+                }
+            });
+            $('#ContactLevelInfo_HasTopicaAccount').attr("disabled", "disabled");
+        }
+
+        if ($('#ContactLevelInfo_HasPointTestCasec').is(':checked')) $('#ContactLevelInfo_HasPointTestCasec').attr("disabled", "disabled");
+        if ($('#ContactLevelInfo_HasPointTestTopica').is(':checked')) $('#ContactLevelInfo_HasPointTestTopica').attr("disabled", "disabled");
+
+        if ($('#ContactLevelInfo_HasPointInterview').is(':checked')) $('#ContactLevelInfo_HasPointInterview').attr("disabled", "disabled");
+        if ($('#ContactLevelInfo_HasAppointmentInterview').is(':checked')) {
+            $('#divAppointmentInterview input').attr('disabled', 'disabled');
+            $('#divAppointmentInterview button').attr('disabled', 'disabled');
+            $('#divAppointmentInterview select').attr('disabled', 'disabled');
+            $('#ContactLevelInfo_HasAppointmentInterview').attr("disabled", "disabled");
+        }
+        if ($('#ContactLevelInfo_HasSetSb100').is(':checked')) {
+            $('#ContactLevelInfo_HasSetSb100').attr("disabled", "disabled");
+            $('#ContactLevelInfo_HasSetSb100Topica').attr("disabled", "disabled");
+        }
+        if ($('#ContactLevelInfo_HasSetSb100Topica').is(':checked')) {
+            $('#ContactLevelInfo_HasSetSb100Topica').attr("disabled", "disabled");
+            $('#ContactLevelInfo_HasSetSb100').attr("disabled", "disabled");
+        }
+
+        $('#AppointmentInterviewInfo_StatusInterviewId').attr('onfocus', 'this.defaultIndex=this.selectedIndex;');
+        $('#AppointmentInterviewInfo_StatusInterviewId').attr('onchange', 'this.selectedIndex=this.defaultIndex;');
+
+        // Grid
+        setupGridTable("#grid-table", "", url.format('@ViewBag.Id'), "", "Id", "Lịch sử các cuộc gọi", heades, model, "", 1000, '350px');
+        $("#grid-table").hideCol("CallId");
+        $("#grid-table").hideCol("CallType");
+        $("#grid-table").hideCol("UserLogType");
+        $("#grid-table").hideCol("CallHistoryId");
+
+        $("#TienNop").val(commaSeparateNumber($("#TienNop").val()));
+
+    }
+
+    $("#ContactLevelInfo_FeeEdu").change(function() {
+        $(this).val(commaSeparateNumber($(this).val()));
+    });
+
+    $("#ContactLevelInfo_FeeEduYet").change(function() {
+        $(this).val(commaSeparateNumber($(this).val()));
+    });
+
+    $('#iconHistory').click(function(e) {
+        var id = $('#ContactInfo_Id').val();
+        var html = $('#iconHistory').html();
+        $.ajax({
+            type: 'GET',
+            data: { contactId: id },
+            url: '/admin/api/CasecAccount/GetAllByContactId',
+            success: function (data) {
+                if (html.indexOf("Mở") > 0) {
+                    $('#iconHistory').html(' Đóng lịch sử tài khoản');
+                    loadCasecAccount(data, true);
+                } else {
+                    $('#iconHistory').html(' Mở lịch sử tài khoản');
+                    loadCasecAccount(data, false);
+                }
+            }
+        });
+    });
+
+    $('#HistoryTopica').click(function(e) {
+        var id = $('#ContactInfo_Id').val();
+        var html = $('#HistoryTopica').html();
+        $.ajax({
+            type: 'GET',
+            data: { contactId: id },
+            url: '/admin/api/TopicaAccount/GetAllByContactId',
+            success: function (data) {
+                if (html.indexOf("Mở") > 0) {
+                    $('#HistoryTopica').html(' Đóng lịch sử tài khoản');
+                    loadTopicaAccount(data, true);
+                } else {
+                    $('#HistoryTopica').html('Mở lịch sử tài khoản');
+                    loadTopicaAccount(data, false);
+                }
+            }
+        });
+    });
+
+    $('#HistoryNapTien').click(function(e) {
+        var id = $('#ContactInfo_Id').val();
+        var html = $('#HistoryNapTien').html();
+        $.ajax({
+            type: 'GET',
+            data: { contactId: id },
+            url: '/admin/api/HistoryMoney/GetAllByContactId',
+            success: function (data) {
+                if (html.indexOf("Mở") > 0) {
+                    $('#HistoryNapTien').html(' Đóng lịch sử nạp tiền');
+                    loadHistoryMoney(data, true);
+                } else {
+                    $('#HistoryNapTien').html(' Mở lịch sử nạp tiền');
+                    loadHistoryMoney(data, false);
+                }
+            }
+        });
+    });
+
+    $('#iconUser').click(function(e) {
+        provideCasecAccount();
+    });
+
+    $('#AccTopica').click(function(e) {
+        provideTopicaAccount();
+    });
+
+    $('#iconSchedule').click(function(e) {
+        var top = 100;
+        var left = (screen.width/2)-(1100/2);
+        window.open('/admin/interviewschedule', null, "width=1100,height=500,modal=yes,alwaysRaised=yes,top=" + top + ",left="+ left, null);
+    });
+
+    $('#iconInterviewSchedule').click(function(e) {
+        var top = 100;
+        var left = (screen.width/2)-(1100/2);
+        window.open('http://crmtpets8.topica.vn/View_status_result.aspx', null, "width=1100,height=500,modal=yes,alwaysRaised=yes,top=" + top + ",left="+ left, null);
+    });
+
+    function openMail(typeId) {
+        var emailTo = '';
+        var email1 = '@Model.ContactInfo.Email';
+        var email2 = '@Model.ContactInfo.Email2';
+        if (email1 != '' || email1 == null) emailTo += email1;
+        if (email2 != '' || email2 == null) emailTo += ";" + email2;
+        var link = "/admin/sendmail/SendEmailWithAttachment/?mailTo=" + emailTo + "&contactid=" + '@Model.ContactInfo.Id' + "&type=" + typeId;
+        var top = 100;
+        var left = (screen.width/2)-(1100/2);
+        if(emailTo = null)
+        {
+            alert("Mail chưa tải kịp, vui lòng thử lại");
+        }
+        window.open(link, null, "width=1100,height=500,modal=yes,alwaysRaised=yes,top=" + top + ",left="+ left, null);
+    }
+
+    $('#iconCancelSchedule').click(function(e) {
+        var r = confirm("Có phải bạn muốn hủy lịch phỏng vấn cho học viên này?");
+        if (r == true) {
+            var id = $('#ContactInfo_Id').val();
+            $.ajax({
+                type: 'POST',
+                data: { contactId: id },
+                url: '/admin/api/AppointmentInterview/CancelSchedule',
+                success: function (data) {
+                    if (data == null || data.Code > 0) {
+                        if (data != null) alert(data.Description);
+                        return;
+                    } else {
+
+                        displayHasAppointmentInterview();
+
+                        $('#divAppointmentInterview input').val('');
+                        $('#divAppointmentInterview input').removeAttr('disabled');
+                        $('#divAppointmentInterview button').removeAttr('disabled');
+                        $('#divAppointmentInterview select').removeAttr('disabled');
+
+                        $('#iconReSchedule').css("display", "none");
+                        $('#iconCancelSchedule').css("display", "none");
+                    }
+                },
+                error: function (request, status, ex) {
+                    alert('Hủy lịch phỏng vấn không thành công, vui lòng thử lại sau');
+                }
+            });
+        }
+    });
+
+    $('#iconReSchedule').click(function(e) {
+        var r = confirm("Có phải bạn muốn đặt lại lịch phỏng vấn cho học viên này?");
+        if (r == true) {
+            $('#chkReSchedule').prop('checked', true);
+            $('#divAppointmentInterview input').val('');
+            $('#divAppointmentInterview select').val(0);
+            $('#divAppointmentInterview input').removeAttr('disabled');
+            $('#divAppointmentInterview button').removeAttr('disabled');
+            $('#divAppointmentInterview select').removeAttr('disabled');
+        } else $('#chkReSchedule').prop('checked', false);
+    });
+
+    function provideCasecAccount() {
+        var r = confirm("Có phải bạn muốn cấp tài khoản casec cho học viên này?");
+        if (r == true) {
+            var id = $('#ContactInfo_Id').val();
+            $.ajax({
+                type: 'POST',
+                data: { contactId: id },
+                url: '/admin/api/CasecAccount/Provide',
+                success: function(data) {
+                    if (data == null || data.length == 0) {
+                        $('#ContactLevelInfo_HasCasecAccountHidden').prop('checked', false);
+                        $('#ContactLevelInfo_HasCasecAccount').removeAttr("disabled");
+                        $('#ContactLevelInfo_HasCasecAccount').prop('checked', false);
+                        alert('Tài khoản cấp đã hết, vui lòng thử lại sau');
+                        $('#iconHistory').css('display', 'none');
+                        $('#iconUser').css('display', 'none');
+                        return;
+                    }
+                    loadCasecAccount(data, false);
+                },
+                error: function(request, status, ex) {
+                    $('#ContactLevelInfo_HasCasecAccountHidden').prop('checked', false);
+                    $('#ContactLevelInfo_HasCasecAccount').removeAttr("disabled");
+                    $('#ContactLevelInfo_HasCasecAccount').prop('checked', false);
+                    alert('Tài khoản cấp đã hết, vui lòng thử lại sau');
+                    $('#iconHistory').css('display', 'none');
+                    $('#iconUser').css('display', 'none');
+                    return;
+                }
+            });
+        } else {
+            $('#ContactLevelInfo_HasCasecAccountHidden').prop('checked', false);
+            $('#ContactLevelInfo_HasCasecAccount').removeAttr("disabled");
+            $('#ContactLevelInfo_HasCasecAccount').prop('checked', false);
+        }
+    }
+
+    function provideTopicaAccount() {
+        var r = confirm("Có phải bạn muốn cấp tài khoản test Topica cho học viên này?");
+        if (r == true) {
+            var id = $('#ContactInfo_Id').val();
+            $.ajax({
+                type: 'POST',
+                data: { contactId: id },
+                url: '/admin/api/TopicaAccount/Provide',
+                success: function(data) {
+                    if (data == null || data.length == 0) {
+                        $('#ContactLevelInfo_HasTopicaAccountHidden').prop('checked', false);
+                        $('#ContactLevelInfo_HasTopicaAccount').removeAttr("disabled");
+                        $('#ContactLevelInfo_HasTopicaAccount').prop('checked', false);
+                        alert('Tài khoản cấp đã hết, vui lòng thử lại sau');
+                        $('#HistoryTopica').css('display', 'none');
+                        $('#AccTopica').css('display', 'none');
+                        return;
+                    }
+                    loadTopicaAccount(data, false);
+                },
+                error: function(request, status, ex) {
+                    $('#ContactLevelInfo_HasTopicaAccountHidden').prop('checked', false);
+                    $('#ContactLevelInfo_HasTopicaAccount').removeAttr("disabled");
+                    $('#ContactLevelInfo_HasTopicaAccount').prop('checked', false);
+                    alert('Tài khoản cấp đã hết, vui lòng thử lại sau');
+                    $('#HistoryTopica').css('display', 'none');
+                    $('#AccTopica').css('display', 'none');
+                    return;
+                }
+            });
+        } else {
+            $('#ContactLevelInfo_HasTopicaAccountHidden').prop('checked', false);
+            $('#ContactLevelInfo_HasTopicaAccount').removeAttr("disabled");
+            $('#ContactLevelInfo_HasTopicaAccount').prop('checked', false);
+        }
+    }
+
+    function provideSchedule() {
+        var appointmentDate = $('#AppointmentInterviewInfo_AppointmentDateString').val();
+        if (appointmentDate.length == 0) {
+            alert("Bạn phải chọn ngày phỏng vấn trước khi đặt lịch");
+            return;
+        }
+        var timeSlotId = $('#AppointmentInterviewInfo_TimeSlotId').val();
+        if (timeSlotId == '' || timeSlotId == 0) {
+            alert("Bạn phải chọn khung giờ phỏng vấn trước khi đặt lịch");
+            return;
+        }
+        var level_TesterId = $('#AppointmentInterviewInfo_LevelTesterId').val();
+        if (level_TesterId == '' || level_TesterId == 0) {
+            alert("Bạn phải chọn trình độ học viên");
+            return;
+        }
+        var r = confirm("Có phải bạn muốn đặt lịch phỏng vấn cho học viên này?");
+        if (r == true) {
+            var id = $('#ContactInfo_Id').val();
+            var reSchedule = $('#chkReSchedule').is(':checked');
+            appointmentDate = appointmentDate.replaceAll('/', '');
+            var notes = $('#AppointmentInterviewInfo_Notes').val();
+            var notesCM = $('#AppointmentInterviewInfo_NotesCM').val();
+            var teacherTypeId = $('#AppointmentInterviewInfo_TeacherTypeId').val();
+            var levelTesterId = $('#AppointmentInterviewInfo_LevelTesterId').val();
+            var statusInterviewId = $('#AppointmentInterviewInfo_StatusInterviewId').val();
+            $.ajax({
+                type: 'POST',
+                url: '/admin/api/AppointmentInterview/Schedule',
+                data: {
+                    notes: notes,
+                    contactId: id,
+                    notesCM: notesCM,
+                    timeSlotId: timeSlotId,
+                    reSchedule: reSchedule,
+                    teacherTypeId: teacherTypeId,
+                    levelTesterId: levelTesterId,
+                    appointmentDate: appointmentDate,
+                    statusInterviewId: statusInterviewId,
+                },
+                success: function(data) {
+                    if (data == null || data.Code > 0) {
+                        if (data != null) alert(data.Description);
+                        $('#ContactLevelInfo_HasAppointmentInterviewHidden').prop('checked', false);
+                        $('#ContactLevelInfo_HasAppointmentInterview').removeAttr("disabled");
+                        $('#ContactLevelInfo_HasAppointmentInterview').prop('checked', false);
+                        return;
+                    } else {
+                        $('#ContactLevelInfo_HasAppointmentInterviewHidden').prop('checked', true);
+                        $('#ContactLevelInfo_HasAppointmentInterview').attr("disabled", "disabled");
+                        $('#ContactLevelInfo_HasAppointmentInterview').prop('checked', true);
+
+                        $('#divAppointmentInterview input').attr('disabled', 'disabled');
+                        $('#divAppointmentInterview button').attr('disabled', 'disabled');
+                        $('#divAppointmentInterview select').attr('disabled', 'disabled');
+
+                        $('#iconReSchedule').css("display", "");
+                        $('#iconCancelSchedule').css("display", "");
+                        $('#AppointmentInterviewInfo_StatusInterviewId').val(data.Tag);
+                    }
+                },
+                error: function(request, status, ex) {
+                    alert('Đặt lịch phỏng vấn không thành công, vui lòng thử lại sau');
+                    $('#ContactLevelInfo_HasAppointmentInterviewHidden').prop('checked', false);
+                    $('#ContactLevelInfo_HasAppointmentInterview').removeAttr("disabled");
+                    $('#ContactLevelInfo_HasAppointmentInterview').prop('checked', false);
+                }
+            });
+        } else {
+            $('#ContactLevelInfo_HasAppointmentInterviewHidden').prop('checked', false);
+            $('#ContactLevelInfo_HasAppointmentInterview').removeAttr("disabled");
+            $('#ContactLevelInfo_HasAppointmentInterview').prop('checked', false);
+        }
+    }
+
+    function provideRequestSb100() {
+        var r = confirm("Có phải bạn muốn đặt hàng SB100 cho học viên này?");
+        if (r == true) {
+            var id = $('#ContactInfo_Id').val();
+            var feePackageType = $('#ContactLevelInfo_FeePackageType').val();
+            var hocVien_Name = $('#hocvien_ten').val();
+            var tvts_Name = $('#tvts_name').val();
+            $.ajax({
+                type: 'POST',
+                data: {
+                    contactId: id,
+                    feePackageType: feePackageType,
+                    hocvien_name: hocVien_Name,
+                    tvts_name: tvts_Name
+                },
+                url: '/admin/api/AppointmentInterview/RequestSb100',
+                success: function(data) {
+                    if (data == null || data.Code > 0) {
+                        if (data != null) alert(data.Description);
+                        $('#ContactLevelInfo_HasSetSb100Hidden').prop('checked', false);
+                        $('#ContactLevelInfo_HasSetSb100').removeAttr("disabled");
+                        $('#ContactLevelInfo_HasSetSb100').prop('checked', false);
+
+                        $('#ContactLevelInfo_FeePackageType').removeAttr('onfocus');
+                        $('#ContactLevelInfo_FeePackageType').removeAttr('onchange');
+                        return;
+                    } else {
+                        $('#ContactLevelInfo_HasSetSb100').attr("disabled", "disabled");
+                        $('#ContactLevelInfo_HasSetSb100Topica').attr("disabled", "disabled");
+                        $('#ContactLevelInfo_HasSetSb100Hidden').prop('checked', true);
+                        $('#ContactLevelInfo_HasSetSb100').prop('checked', true);
+
+                        $('#ContactLevelInfo_FeePackageType').attr('onfocus', 'this.defaultIndex=this.selectedIndex;');
+                        $('#ContactLevelInfo_FeePackageType').attr('onchange', 'this.selectedIndex=this.defaultIndex;');
+                    }
+                },
+                error: function(request, status, ex) {
+                    alert('Đặt hàng SB100 không thành công, vui lòng thử lại sau');
+                    $('#ContactLevelInfo_HasSetSb100Hidden').prop('checked', false);
+                    $('#ContactLevelInfo_HasSetSb100').removeAttr("disabled");
+                    $('#ContactLevelInfo_HasSetSb100').prop('checked', false);
+
+                    $('#ContactLevelInfo_FeePackageType').removeAttr('onfocus');
+                    $('#ContactLevelInfo_FeePackageType').removeAttr('onchange');
+                }
+            });
+        } else {
+            $('#ContactLevelInfo_HasSetSb100Hidden').prop('checked', false);
+            $('#ContactLevelInfo_HasSetSb100').removeAttr("disabled");
+            $('#ContactLevelInfo_HasSetSb100').prop('checked', false);
+        }
+    }
+
+    function provideRequestSb100Topica()
+    {
+        var r = confirm("Có phải bạn muốn đặt hàng SB100 cho học viên này?");
+        if (r == true) {
+            var id = $('#ContactInfo_Id').val();
+            var feePackageType = $('#FeePackageTypeSB100Topica').val();
+            var hocVien_Name = $('#hocvien_ten').val();
+            var tvts_Name = $('#tvts_name').val();
+
+            $.ajax({
+                type: 'POST',
+                data: {
+                    contactId: id,
+                    feePackageType: feePackageType,
+                    hocvien_name: hocVien_Name,
+                    tvts_name: tvts_Name,
+                },
+                url: '/admin/api/AppointmentInterview/RequestSb100Topica',
+                success: function(data) {
+                    if (data == null || data.Code > 0) {
+                        if (data != null) alert(data.Description);
+                        $('#ContactLevelInfo_HasSetSb100TopicaHidden').prop('checked', false);
+                        $('#ContactLevelInfo_HasSetSb100Topica').removeAttr("disabled");
+                        $('#ContactLevelInfo_HasSetSb100Topica').prop('checked', false);
+
+                        $('#ContactLevelInfo_FeePackageType').removeAttr('onfocus');
+                        $('#ContactLevelInfo_FeePackageType').removeAttr('onchange');
+                        return;
+                    } else {
+                        $('#ContactLevelInfo_HasSetSb100Topica').attr("disabled", "disabled");
+                        $('#ContactLevelInfo_HasSetSb100').attr("disabled", "disabled");
+                        $('#ContactLevelInfo_HasSetSb100HiddenTopica').prop('checked', true);
+                        $('#ContactLevelInfo_HasSetSb100Topica').prop('checked', true);
+
+                        $('#ContactLevelInfo_FeePackageType').attr('onfocus', 'this.defaultIndex=this.selectedIndex;');
+                        $('#ContactLevelInfo_FeePackageType').attr('onchange', 'this.selectedIndex=this.defaultIndex;');
+                    }
+                },
+                error: function(request, status, ex) {
+                    alert('Đặt hàng SB100 không thành công, vui lòng thử lại sau');
+                    $('#ContactLevelInfo_HasSetSb100HiddenTopica').prop('checked', false);
+                    $('#ContactLevelInfo_HasSetSb100Topica').removeAttr("disabled");
+                    $('#ContactLevelInfo_HasSetSb100Topica').prop('checked', false);
+
+                    $('#ContactLevelInfo_FeePackageType').removeAttr('onfocus');
+                    $('#ContactLevelInfo_FeePackageType').removeAttr('onchange');
+                }
+            });
+        } else {
+            $('#ContactLevelInfo_HasSetSb100HiddenTopica').prop('checked', false);
+            $('#ContactLevelInfo_HasSetSb100Topica').removeAttr("disabled");
+            $('#ContactLevelInfo_HasSetSb100Topica').prop('checked', false);
+        }
+    }
+
+    function provideRequestLinkSb100() {
+        var r = confirm("Có phải bạn muốn thiết lập đã có link SB100 cho học viên này?");
+        if (r == true) {
+            var id = $('#ContactInfo_Id').val();
+            $.ajax({
+                type: 'POST',
+                data: {
+                    contactId: id,
+                },
+                url: '/admin/api/AppointmentInterview/RequestLinkSb100',
+                success: function(data) {
+                    if (data == null || data.Code > 0) {
+                        if (data != null) alert(data.Description);
+                        $('#ContactLevelInfo_HasLinkSb100Hidden').prop('checked', false);
+                        $('#ContactLevelInfo_HasLinkSb100').removeAttr("disabled");
+                        $('#ContactLevelInfo_HasLinkSb100').prop('checked', false);
+                        return;
+                    } else {
+                        $('#ContactLevelInfo_HasLinkSb100').attr("disabled", "disabled");
+                        $('#ContactLevelInfo_HasLinkSb100Hidden').prop('checked', true);
+                        $('#ContactLevelInfo_HasLinkSb100').prop('checked', true);
+                    }
+                },
+                error: function(request, status, ex) {
+                    alert('Đặt link SB100 không thành công, vui lòng thử lại sau');
+                    $('#ContactLevelInfo_HasLinkSb100Hidden').prop('checked', false);
+                    $('#ContactLevelInfo_HasLinkSb100').removeAttr("disabled");
+                    $('#ContactLevelInfo_HasLinkSb100').prop('checked', false);
+                }
+            });
+        } else {
+            $('#ContactLevelInfo_HasLinkSb100Hidden').prop('checked', false);
+            $('#ContactLevelInfo_HasLinkSb100').removeAttr("disabled");
+            $('#ContactLevelInfo_HasLinkSb100').prop('checked', false);
+        }
+    }
+
+    function loadCasecAccount(data, all) {
+        var exists = false;
+        if (data != null && data.length > 0) {
+            var html = '<table border="1" class="table table-striped table-bordered table-hover" style="margin-bottom: 0;">' +
+                '<thead>' +
+                '<tr>' +
+                '<th style="text-align: center; width: 25%;">Ngày cấp tài khoản</th>' +
+                '<th style="text-align: center; width: 25%;">Tài khoản CASEC</th>' +
+                '<th style="text-align: center; width: 25%;">Mật khẩu CASEC</th>' +
+                '<th style="text-align: center; width: 25%;">Trạng thái</th>' +
+                '</tr>' +
+                '</thead>' +
+                '<tbody>';
+            for (var i = 0; i < data.length; i++) {
+                var item = data[i];
+                if (!all && item.StatusCasecAccountId != '@((int)StatusCasecType.Used)') continue;
+
+                html += '<tr>' +
+                    '<td><label style="width: 100%;">' + item.DateTimeString + '</label></td>' +
+                    '<td><label style="width: 100%;">' + item.Account + '</label></td>' +
+                    '<td><label style="width: 100%;">' + item.Password + '</label></td>' +
+                    '<td><label style="width: 100%;">' + item.StatusString + '</label></td>' +
+                    '</tr >';
+
+                if (item.StatusCasecAccountId == '@((int)StatusCasecType.Used)') {
+                    exists = true;
+                }
+            }
+            html += '</tbody></table>';
+            $('#divCasecAccount').html(html);
+
+        }
+        if (!exists) {
+            $('#ContactLevelInfo_HasSetSb100Hidden').prop('checked', false);
+            $('#ContactLevelInfo_HasCasecAccount').removeAttr("disabled");
+            $('#ContactLevelInfo_HasCasecAccount').prop('checked', false);
+            alert('Tài khoản cấp đã hết, vui lòng thử lại sau');
+            $('#iconHistory').css('display', 'none');
+            $('#iconUser').css('display', 'none');
+            return;
+        } else {
+            $('#ContactLevelInfo_HasCasecAccount').attr("disabled", "disabled");
+            $('#ContactLevelInfo_HasCasecAccountHidden').prop('checked', true);
+            $('#ContactLevelInfo_HasCasecAccount').prop('checked', true);
+            $('#iconHistory').css('display', '');
+            $('#iconUser').css('display', '');
+        }
+    }
+
+    function loadTopicaAccount(data, all) {
+        var exists = false;
+        if (data != null && data.length > 0) {
+            var html = '<table border="1" class="table table-striped table-bordered table-hover" style="margin-bottom: 0;">' +
+                '<thead>' +
+                '<tr>' +
+                '<th style="text-align: center; width: 25%;">Ngày cấp tài khoản</th>' +
+                '<th style="text-align: center; width: 25%;">Tài khoản Topica</th>' +
+                '<th style="text-align: center; width: 25%;">Mật khẩu Topica</th>' +
+                '<th style="text-align: center; width: 25%;">Trạng thái</th>' +
+                '</tr>' +
+                '</thead>' +
+                '<tbody>';
+            for (var i = 0; i < data.length; i++) {
+                var item = data[i];
+                if (!all && item.StatusTopicaAccountId != '@((int)StatusTopicaType.Used)') continue;
+                html += '<tr>' +
+                    '<td><label style="width: 100%;">' + item.DateTimeString + '</label></td>' +
+                    '<td><label style="width: 100%;">' + item.Account + '</label></td>' +
+                    '<td><label style="width: 100%;">' + item.Password + '</label></td>' +
+                    '<td><label style="width: 100%;">' + item.StatusString + '</label></td>' +
+                    '</tr >';
+
+                if (item.StatusTopicaAccountId == '@((int)StatusTopicaType.Used)') {
+                    exists = true;
+                }
+            }
+            html += '</tbody></table>';
+            $('#divTopicaAccount').html(html);
+
+        }
+        if (!exists) {
+            $('#ContactLevelInfo_HasSetSb100Hidden').prop('checked', false);
+            $('#ContactLevelInfo_HasTopicaAccount').removeAttr("disabled");
+            $('#ContactLevelInfo_HasTopicaAccount').prop('checked', false);
+            alert('Tài khoản cấp đã hết, vui lòng thử lại sau');
+            $('#AccTopica').css('display', 'none');
+            $('#HistoryTopica').css('display', 'none');
+            return;
+        } else {
+            $('#ContactLevelInfo_HasTopicaAccount').attr("disabled", "disabled");
+            $('#ContactLevelInfo_HasTopicaAccountHidden').prop('checked', true);
+            $('#ContactLevelInfo_HasTopicaAccount').prop('checked', true);
+            $('#AccTopica').css('display', '');
+            $('#HistoryTopica').css('display', '');
+        }
+    }
+
+    function updateL1() {
+        if (!checkDuplicate())
+            return false;
+
+        $.ajax({
+            type: 'POST',
+            url: '/admin/api/contact/updatel1',
+            data: {
+                id: $('#ContactInfo_Id').val(),
+                birthday: $('#Birthday').val(),
+                notes: $('#ContactInfo_Notes').val(),
+                email1: $('#ContactInfo_Email').val(),
+                email2: $('#ContactInfo_Email2').val(),
+                //name: $('#ContactInfo_Fullname').val(),
+                name: $('#hocvien_ten').val(),
+                gender: $('#ContactInfo_Gender').val(),
+                mobile1: $('#ContactInfo_Mobile1').val(),
+                mobile2: $('#ContactInfo_Mobile2').val(),
+                mobile3: $('#ContactInfo_Mobile3').val(),
+                address: $('#ContactInfo_Address').val(),
+                productSellId: $('#ContactInfo_ProductSellId').val(),
+            },
+            beforeSend: function () {
+                alertProcess();
+            },
+            success: function (message) {
+                window.location.reload(true);
+                alertSuccess(message);
+            },
+            error: function (request, status, ex) {
+                alertError("Cập nhật contact bị lỗi, vui lòng thử lại sau");
+            }
+        });
+
+        return false;
+    }
+
+    var htmlSchedule = '';
+    $('#iconHistorySchedule').click(function(e) {
+        var id = $('#ContactInfo_Id').val();
+        var html = $('#iconHistorySchedule').html();
+        if (html.indexOf("Đóng") > 0) {
+            $('#iconHistorySchedule').html(' Mở lịch sử đặt lịch');
+            loadAppointmentInterView(null, false);
+            return;
+        }
+        $.ajax({
+            type: 'GET',
+            data: { contactId: id },
+            url: '/admin/api/AppointmentInterview/GetAllByContactId',
+            success: function(data) {
+                if (html.indexOf("Mở") > 0) {
+                    $('#iconHistorySchedule').html(' Đóng lịch sử đặt lịch');
+                    loadAppointmentInterView(data, true);
+                } else {
+                    $('#iconHistorySchedule').html(' Mở lịch sử đặt lịch');
+                    loadAppointmentInterView(data, false);
+                }
+            }
+        });
+    });
+    function loadAppointmentInterView(data, all) {
+        if (htmlSchedule.length == 0) htmlSchedule = $('#divAppointmentInterview').html();
+        if (!all) {
+            $('#divAppointmentInterview').html(htmlSchedule);
+            return;
+        }
+        if (data != null && data.length > 0) {
+            var html = '<table border="1" class="table table-striped table-bordered table-hover" style="margin-bottom: 0;">' +
+                '<thead>' +
+                '<tr>' +
+                '<th style="text-align: center; width: 13%;">Ngày</th>' +
+                '<th style="text-align: center; width: 13%;">Khung giờ</th>' +
+                '<th style="text-align: center; width: 13%;">Giáo viên</th>' +
+                '<th style="text-align: center; width: 24%;">Ghi chú</th>' +
+                '<th style="text-align: center; width: 24%;">Ghi chú (CM)</th>' +
+                '<th style="text-align: center; width: 13%;">Trạng thái</th>' +
+                '</tr>' +
+                '</thead>' +
+                '<tbody>';
+            for (var i = 0; i < data.length; i++) {
+                var item = data[i];
+                html += '<tr>' +
+                    '<td><label id="AppointmentInterviewInfo_AppointmentDateString" style="width: 100%;">' + item.AppointmentDateString + '</label></td>' +
+                    '<td><label id="AppointmentInterviewInfo_TimeSlotName" style="width: 100%;">' + item.TimeSlotName + '</label></td>' +
+                    '<td><label id="AppointmentInterviewInfo_TeacherTypeName" style="width: 100%;">' + item.TeacherTypeName + '</label></td>' +
+                    '<td><label id="AppointmentInterviewInfo_Notes" style="width: 100%;">' + item.Notes + '</label></td>' +
+                    '<td><label id="AppointmentInterviewInfo_NotesCM" style="width: 100%;">' + item.NotesCM + '</label></td>' +
+                    '<td><label id="AppointmentInterviewInfo_StatusInterviewName" style="width: 100%;">' + item.StatusInterviewName + '</label></td>' +
+                    '</tr>';
+            }
+            html += '</tbody></table>';
+            $('#divAppointmentInterview').html(html);
+        }
+    }
+
+    var htmlPointTestCasec = '';
+    $('#iconHistoryPointTestCasec').click(function(e) {
+        var id = $('#ContactInfo_Id').val();
+        var html = $('#iconHistoryPointTestCasec').html();
+        if (html.indexOf("Đóng") > 0) {
+            $('#iconHistoryPointTestCasec').html(' Mở lịch sử test casec');
+            loadPointTestCasec(null, false);
+            return;
+        }
+        $.ajax({
+            type: 'GET',
+            data: { contactId: id },
+            url: '/admin/api/TestResult/GetAllResultCasecByContactId',
+            success: function(data) {
+                if (html.indexOf("Mở") > 0) {
+                    $('#iconHistoryPointTestCasec').html(' Đóng lịch sử test casec');
+                    loadPointTestCasec(data, true);
+                } else {
+                    $('#iconHistoryPointTestCasec').html(' Mở lịch sử test casec');
+                    loadPointTestCasec(data, false);
+                }
+            }
+        });
+    });
+    function loadPointTestCasec(data, all) {
+
+        if (htmlPointTestCasec.length == 0) htmlPointTestCasec = $('#divPointTestCasec').html();
+        if (!all) {
+            $('#divPointTestCasec').html(htmlPointTestCasec);
+            return;
+        }
+        if (data != null && data.length > 0) {
+            var html = '<table border="1" class="table table-striped table-bordered table-hover" style="margin-bottom: 0;">' +
+                '<thead>' +
+                '<tr>' +
+                '<th style="text-align: center; width: 9%;">Ngày thi</th>' +
+                '<th style="text-align: center; width: 8%;">Tài khoản</th>' +
+                '<th style="text-align: center; width: 8%;">Mật khẩu</th>' +
+                '<th style="text-align: center; width: 15%;">Tên sinh viên</th>' +
+                '<th style="text-align: center; width: 8%;">S1: Từ vựng</th>' +
+                '<th style="text-align: center; width: 8%;">S2: Ngữ pháp</th>' +
+                '<th style="text-align: center; width: 8%;">S3: Nghe hiểu</th>' +
+                '<th style="text-align: center; width: 8%;">S4: Chính tả</th>' +
+                '<th style="text-align: center; width: 8%;">Total</th>' +
+                '<th style="text-align: center; width: 8%;">TOEIC</th>' +
+                '<th style="text-align: center; width: 12%;">Level CASEC</th>' +
+                '</tr>' +
+                '</thead>' +
+                '<tbody>';
+            for (var i = 0; i < data.length; i++) {
+                var item = data[i];
+                if (item.S1 != null) {
+                    html += '<tr>' +
+                        '<td><label id="TestResultInfo_TestDateString" style="width: 100%;">' + item.TestDateString + '</label></td>' +
+                        '<td><label id="TestResultInfo_Account" style="width: 100%;">' + item.Account + '</label></td>' +
+                        '<td><label id="TestResultInfo_Password" style="width: 100%;">' + item.Password + '</label></td>' +
+                        '<td><label id="TestResultInfo_FullName" style="width: 100%;">' + item.FullName + '</label></td>' +
+                        '<td><label id="TestResultInfo_S1" style="width: 100%;">' + item.S1 + '</label></td>' +
+                        '<td><label id="TestResultInfo_S2" style="width: 100%;">' + item.S2 + '</label></td>' +
+                        '<td><label id="TestResultInfo_S3" style="width: 100%;">' + item.S3 + '</label></td>' +
+                        '<td><label id="TestResultInfo_S4" style="width: 100%;">' + item.S4 + '</label></td>' +
+                        '<td><label id="TestResultInfo_TotalCasec" style="width: 100%;">' + item.TotalCasec + '</label></td>' +
+                        '<td><label id="TestResultInfo_Toeic" style="width: 100%;">' + item.Toeic + '</label></td>' +
+                        '<td><label id="TestResultInfo_LevelCasecName" style="width: 100%;">' + item.LevelCasecName + '</label></td>' +
+                        '</tr>';
+                }
+            }
+            html += '</tbody></table>';
+            $('#divPointTestCasec').html(html);
+        }
+    }
+    //=============================
+    var htmlPointTestTopica = '';
+    $('#iconHistoryPointTestTopica').click(function(e) {
+        var id = $('#ContactInfo_Id').val();
+        var html = $('#iconHistoryPointTestTopica').html();
+        if (html.indexOf("Đóng") > 0) {
+            $('#iconHistoryPointTestTopica').html(' Mở lịch sử test tiếng anh topica');
+            loadPointTestTopica(null, false);
+            return;
+        }
+        $.ajax({
+            type: 'GET',
+            data: { contactId: id },
+            url: '/admin/api/TestResult/GetAllResultTopicaByContactId',
+            success: function(data) {
+                if (html.indexOf("Mở") > 0) {
+                    $('#iconHistoryPointTestTopica').html(' Đóng lịch sử test tiếng anh topica');
+                    loadPointTestTopica(data, true);
+                } else {
+                    $('#iconHistoryPointTestTopica').html(' Mở lịch sử test tiếng anh topica');
+                    loadPointTestTopica(data, false);
+                }
+            }
+        });
+    });
+    function loadPointTestTopica(data, all) {
+
+        if (htmlPointTestTopica.length == 0) htmlPointTestTopica = $('#divPointTestTopica').html();
+        if (!all) {
+            $('#divPointTestTopica').html(htmlPointTestTopica);
+            return;
+        }
+        if (data != null && data.length > 0) {
+            var html = '<table border="1" class="table table-striped table-bordered table-hover" style="margin-bottom: 0;">' +
+                '<thead>' +
+                '<tr>' +
+                '<th style="text-align: center; width: 9%;">Ngày thi</th>' +
+                '<th style="text-align: center; width: 8%;">Tài khoản</th>' +
+                '<th style="text-align: center; width: 8%;">Mật khẩu</th>' +
+                '<th style="text-align: center; width: 15%;">Tên sinh viên</th>' +
+                '<th style="text-align: center; width: 8%;">S1: Từ vựng</th>' +
+                '<th style="text-align: center; width: 8%;">S2: Ngữ pháp</th>' +
+                '<th style="text-align: center; width: 8%;">S3: Nghe hiểu</th>' +
+                '<th style="text-align: center; width: 8%;">S4: Chính tả</th>' +
+                '<th style="text-align: center; width: 8%;">Total</th>' +
+                '<th style="text-align: center; width: 8%;">TOEIC</th>' +
+                '<th style="text-align: center; width: 12%;">Level Topica</th>' +
+                '</tr>' +
+                '</thead>' +
+                '<tbody>';
+            for (var i = 0; i < data.length; i++) {
+                var item = data[i];
+                if (item.S1 != null) {
+                    html += '<tr>' +
+                        '<td><label id="TestResultInfo_TestDateString" style="width: 100%;">' + item.TestDateString + '</label></td>' +
+                        '<td><label id="TestResultInfo_Account" style="width: 100%;">' + item.Account + '</label></td>' +
+                        '<td><label id="TestResultInfo_Password" style="width: 100%;">' + item.Password + '</label></td>' +
+                        '<td><label id="TestResultInfo_FullName" style="width: 100%;">' + item.FullName + '</label></td>' +
+                        '<td><label id="TestResultInfo_S1" style="width: 100%;">' + item.S1 + '</label></td>' +
+                        '<td><label id="TestResultInfo_S2" style="width: 100%;">' + item.S2 + '</label></td>' +
+                        '<td><label id="TestResultInfo_S3" style="width: 100%;">' + item.S3 + '</label></td>' +
+                        '<td><label id="TestResultInfo_S4" style="width: 100%;">' + item.S4 + '</label></td>' +
+                        '<td><label id="TestResultInfo_TotalCasec" style="width: 100%;">' + item.TotalTopica + '</label></td>' +
+                        '<td><label id="TestResultInfo_Toeic" style="width: 100%;">' + item.Toeic + '</label></td>' +
+                        '<td><label id="TestResultInfo_LevelTopicaName" style="width: 100%;">' + item.LevelTopicaName + '</label></td>' +
+                        '</tr>';
+                }
+            }
+            html += '</tbody></table>';
+            $('#divPointTestTopica').html(html);
+        }
+    }
+    //==============================
+    var htmlPointTestInterview = '';
+    $('#iconHistoryPointTestInterview').click(function(e) {
+        var id = $('#ContactInfo_Id').val();
+        var html = $('#iconHistoryPointTestInterview').html();
+        if (html.indexOf("Đóng") > 0) {
+            $('#iconHistoryPointTestInterview').html(' Mở lịch sử test phỏng vấn');
+            loadPointTestInterview(null, false);
+            return;
+        }
+        $.ajax({
+            type: 'GET',
+            data: { contactId: id },
+            url: '/admin/api/TestResult/GetAllResultInterviewByContactId',
+            success: function(data) {
+                if (html.indexOf("Mở") > 0) {
+                    $('#iconHistoryPointTestInterview').html(' Đóng lịch sử test phỏng vấn');
+                    loadPointTestInterview(data, true);
+                } else {
+                    $('#iconHistoryPointTestInterview').html(' Mở lịch sử test phỏng vấn');
+                    loadPointTestInterview(data, false);
+                }
+            }
+        });
+    });
+    function loadPointTestInterview(data, all) {
+        if (htmlPointTestInterview.length == 0) htmlPointTestInterview = $('#divHasPointInterview').html();
+        if (!all) {
+            $('#divHasPointInterview').html(htmlPointTestInterview);
+            return;
+        }
+        if (data != null && data.length > 0) {
+            var html = '<table border="1" class="table table-striped table-bordered table-hover" style="margin-bottom: 0;">' +
+                '<thead>' +
+                '<tr>' +
+                '<th style="text-align: center; width: 9%;">Ngày thi</th>' +
+                '<th style="text-align: center; width: 16%;">PV mạch lạc</th>' +
+                '<th style="text-align: center; width: 15%;">PV từ vựng</th>' +
+                '<th style="text-align: center; width: 16%;">PV ngữ pháp</th>' +
+                '<th style="text-align: center; width: 16%;">PV ngữ âm</th>' +
+                '<th style="text-align: center; width: 16%;">Tổng điểm</th>' +
+                '<th style="text-align: center; width: 13%;">Level Speaking</th>' +
+                '<th style="text-align: center; width: 13%;">Tester</th>' +
+                '</tr>' +
+                '</thead>' +
+                '<tbody>';
+            for (var i = 0; i < data.length; i++) {
+                var item = data[i];
+                if (item.I1 != null) {
+                    html += '<tr>' +
+                        '<td><label id="TestResultInfo_TestDateInterviewString" style="width: 100%;">' + item.TestDateInterviewString + '</label></td>' +
+                        '<td><label id="TestResultInfo_I1" style="width: 100%;">' + item.I1 + '</label></td>' +
+                        '<td><label id="TestResultInfo_I2" style="width: 100%;">' + item.I2 + '</label></td>' +
+                        '<td><label id="TestResultInfo_I3" style="width: 100%;">' + item.I3 + '</label></td>' +
+                        '<td><label id="TestResultInfo_I4" style="width: 100%;">' + item.I4 + '</label></td>' +
+                        '<td><label id="TestResultInfo_TotalInterview" style="width: 100%;">' + item.TotalInterview + '</label></td>' +
+                        '<td><label id="TestResultInfo_LevelSpeakingName" style="width: 100%;">' + item.LevelSpeakingName + '</label></td>' +
+                        '<td><label id="TestResultInfo_LevelSpeakingName" style="width: 100%;">' + item.AgentUser + '</label></td>' +
+                        '</tr>';
+                }
+            }
+            html += '</tbody></table>';
+            $('#divHasPointInterview').html(html);
+        }
+    }
+
+    function commaSeparateNumber(val) {
+        if (val == null || val.length == 0) return '';
+        while (/(\d+)(\d{3})/.test(val.toString())){
+            val = val.toString().replace(/(\d+)(\d{3})/, '$1'+'.'+'$2');
+        }
+        return val;
+    }
+
+    function loadHistoryMoney(data, all) {
+        var exists = false;
+        if(!all) {
+            $('#divLichSuNapTien').html('');
+            return;
+        }
+        if (data != null && data.length > 0) {
+            var html = '<table border="1" class="table table-striped table-bordered table-hover" style="margin-bottom: 0;">' +
+                '<thead>' +
+                '<tr>' +
+                '<th style="text-align: center; width: 20%;">Số tiền bán gói</th>' +
+                '<th style="text-align: center; width: 20%;">Tiền thu của học viên</th>' +
+                '<th style="text-align: center; width: 20%;">Hình thức thanh toán</th>' +
+                '<th style="text-align: center; width: 20%;">Ngày thực thu</th>' +
+                '<th style="text-align: center; width: 20%;">Nội dung chuyển khoản</th>' +
+                '</tr>' +
+                '</thead>' +
+                '<tbody>';
+            for (var i = 0; i < data.length; i++) {
+                var item = data[i];
+
+                html += '<tr>' +
+                    '<td><label style="width: 100%;">' + commaSeparateNumber(item.TienBanGoi) + '</label></td>' +
+                    '<td><label style="width: 100%;">' + commaSeparateNumber(item.TienHVNop) + '</label></td>' +
+                    '<td><label style="width: 100%;">' + item.sKieuThanhToan + '</label></td>' +
+                    '<td><label style="width: 100%;">' + item.sNgayThucThu + '</label></td>' +
+                    '<td><label style="width: 100%;">' + item.NoteChuyenKhoan + '</label></td>' +
+                    '</tr >';
+            }
+            html += '</tbody></table>';
+            $('#divLichSuNapTien').html(html);
+        }
+    }
+</script>
+

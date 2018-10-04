@@ -1,0 +1,360 @@
+﻿@using TamoCRM.Core
+@using TamoCRM.Domain.Groups
+@using TamoCRM.Domain.UserRole
+@model TamoCRM.Web.Mvc.Areas.Admin.Models.Contacts.ContactCreateModel
+
+@{
+    ViewBag.Title = "Tìm kiếm và chuyển giao contact cho Đội Lọc";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+
+    var branches = ViewBag.Branches;
+    var lstBranches = new SelectList(branches, "BranchId", "Name");
+
+    // Group
+    var groups = ViewBag.Groups;
+    ((List<GroupInfo>)groups).RemoveAll(c => c.GroupId == 0);
+    ((List<GroupInfo>)groups).Insert(0, new GroupInfo { GroupId = 0, Name = "Tất cả" });
+    var lstGroups = new SelectList(((List<GroupInfo>)groups).Where(c => c.GroupId == 0), "GroupId", "Name");
+
+    // User
+    var users = ViewBag.Users;
+    ((List<UserInfo>)users).RemoveAll(c => c.UserID == 0);
+    ((List<UserInfo>)users).Insert(0, new UserInfo { UserID = 0, FullName = "Tất cả" });
+    var lstUsers = new SelectList(((List<UserInfo>)users).Where(c => c.UserID == 0), "UserID", "FullName");
+}
+
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        }
+        catch (e) {
+
+        }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Contact</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>Tìm kiếm và chuyển giao contact cho Đội Lọc</h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="form-group">
+            <div class="col-sm-12" id="alert">
+            </div>
+        </div>
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            @using (Ajax.BeginForm("FilterContactForChange", "ContactFilter", new AjaxOptions { HttpMethod = "POST" }, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "filter_contact_search_fast_form" }))
+            {
+                @Html.AntiForgeryToken()
+                
+                <div class="row">
+                    <label class="col-sm-1 control-label no-padding-right" style="text-align: left !important;" for="form-field-2">Từ ngày </label>
+                    <div class="col-sm-2">
+                        @Html.TextBox("FromDate", DateTime.Now.ToString("dd/MM/yyyy"), new { @class = "form-control" })
+                    </div>
+                    <label class="col-sm-1 control-label no-padding-right" style="text-align: left !important;" for="form-field-2">Vùng </label>
+                    <div class="col-sm-3">
+                        @Html.DropDownList("BranchId", lstBranches, new { @class = "form-control" })
+                    </div>
+                    <label class="col-sm-1 control-label no-padding-right" style="text-align: left !important;" for="form-field-2">Nhóm </label>
+                    <div class="col-sm-4">
+                        @Html.DropDownList("GroupId", lstGroups, new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="space-4"></div>
+                <div class="row">
+                    <label class="col-sm-1 control-label no-padding-right" style="text-align: left !important;" for="form-field-3">Đến ngày </label>
+                    <div class="col-sm-2">
+                        @Html.TextBox("ToDate", DateTime.Now.ToString("dd/MM/yyyy"), new { @class = "form-control" })
+                    </div>
+                    <div class="col-sm-4"></div>
+                    <label class="col-sm-1 control-label no-padding-right" style="text-align: left !important;" for="form-field-2">TVTS</label>
+                    <div class="col-sm-4">
+                        @Html.DropDownList("UserId", lstUsers, new { @class = "form-control" })
+                    </div>
+                </div>
+                <hr />
+                <div class="space-6"></div>
+                <div class="row" style="text-align: right; margin-right: 0;">
+                    <button id="btnGoFilter" class="btn-primary" style="float: right; margin-left: 10px;">Lọc contact</button>
+                </div>
+            }
+
+            <div class="space-6"></div>
+            <div class="row" style="margin-right: 0;">
+                <table id="grid-table"></table>
+                <div id="grid-pager"></div>
+            </div>
+            <div class="space-6"></div>
+            <div class="row">
+                <div class="col-sm-7"></div>
+                <div class="col-sm-5">
+                    <h3 class="header smaller lighter blue">
+                        <i class="icon-user"></i>
+                        Chuyển giao cho Đội Lọc vùng khác
+                    </h3>
+                    <div class="col-sm-2">
+                        <label class="control-label" style="text-align: left !important;">Vùng </label>
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.DropDownList("TargetBranchId", lstBranches, new { @style = "width: 100%; height:26px;" })
+                    </div>
+                    <div class="col-sm-6" style="text-align: right;">
+                        <button id="btnForward" class="btn-primary" style="margin-right: 10px;">Chuyển</button>
+                        <button id="btnForwardAll" class="btn-primary">Chuyển tất cả</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div>
+    <!-- /.col -->
+</div>
+<!-- /.row -->
+
+<script type="text/javascript">
+    var grid_selector = "#grid-table";
+    var groupType = '@ViewBag.GroupType';
+    var url = 'admin/api/contact/FilterContactForChange?branchId={0}&levelId={1}&statusMapId={2}&statusCareId={3}&groupId={4}&userId={5}&fromDate={6}&toDate={7}';
+    var heades = ['Id', 'Họ và tên', 'Điện thoại', 'Level', 'Ngày', 'Giờ', 'Nội dung cuộc gọi gần nhất', 'Trạng thái chăm sóc', 'Tổng số cuộc gọi', 'TVTS', 'Ngày phân contact', 'Kiểu nguồn', '<input type="checkbox" id="chkSelectAll" onclick="fixCheckBoxGrid(event)" />'];
+    var model = [
+        { name: 'Id', index: 'Id', editable: false, sorttype: 'string', editoptions: { disabled: true }, width: '0px' },
+        { name: 'Fullname', index: 'Fullname', editable: false, width: '90px', sorttype: 'string' },
+        { name: 'Mobile', index: 'Mobile', editable: false, width: '80px', sorttype: 'string' },
+        { name: 'LevelId', index: 'LevelId', editable: false, width: '40px', sorttype: 'string', align: 'center', formatter: levelFomatter },
+        { name: 'AppointmentDate', index: 'AppointmentDate', editable: false, width: '65px', align: 'center', formatter: 'date', formatoptions: { srcformat: 'Y-m-dTH:i:s', newformat: 'd/m/Y' } },
+        { name: 'AppointmentTime', index: 'AppointmentDate', editable: false, width: '40px', align: 'center', formatter: 'date', formatoptions: { srcformat: 'Y-m-dTH:i:s', newformat: 'H:i' } },
+        { name: 'CallInfo', index: 'CallInfo', editable: false, width: '180px', sorttype: 'string', align: 'left' },
+        { name: 'StatusCareId', index: 'StatusCareId', editable: false, width: '120px', formatter: statusCareFomatter },
+        { name: 'CallAmount', index: 'CallAmount', editable: false, width: '60px', align: 'center' },
+        { name: 'UserId', index: 'UserId', editable: false, width: '90px', formatter: userFomatter },
+        { name: 'HandoverDate', index: 'HandoverDate', editable: false, formatter: 'date', formatoptions: { newformat: 'd/m/Y' }, width: '80px' },
+        { name: 'TypeId', index: 'TypeId', editable: false, formatter: sourceTypeFomatter },
+        { name: 'chkSelect', index: 'chkSelect', editable: false, edittype: 'checkbox', align: 'center', width: '40px', editoptions: { value: "True:False" }, formatter: checkboxFomatter, formatoptions: { disabled: false } }
+    ];
+
+    $(document).ready(function () {
+        loadUserByGroupId($("#GroupId").val(), "UserId");
+        loadGroupByBranchId($("#BranchId").val(), "GroupId");
+        if ($("#GroupId").val() == 0) loadUserByBranchId($("#BranchId").val(), "UserId");
+        $('#ToDate').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly: true, endDate: "+0d" });
+        $('#FromDate').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly: true, endDate: "+0d" });
+        setupGridWithoutEditPageSize("#grid-table", "#grid-pager", '', '', "Id", "Danh sách Contact", heades, model, 'GET', 100);
+        $(grid_selector).jqGrid("setGroupHeaders", {
+            useColSpanStyle: true,
+            groupHeaders: [
+                { startColumnName: "Fullname", numberOfColumns: 3, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;height:40px;"><b>Thông tin Contact</b></td></tr></table>' },
+                { startColumnName: "AppointmentDate", numberOfColumns: 2, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;"><b>Thông tin lịch hẹn gọi lại</b></td></tr></table>' },
+                { startColumnName: "CallInfo", numberOfColumns: 2, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;"><b>Tình trạng chăm sóc</b></td></tr></table>' }
+            ]
+        });
+
+        $("#BranchId").change(function () {
+            loadGroupByBranchId($(this).val(), "GroupId");
+            if ($("#GroupId").val() == 0) loadUserByBranchId($(this).val(), "UserId");
+        });
+
+        $("#GroupId").change(function () {
+            loadUserByGroupId($(this).val(), "UserId");
+        });
+        
+        $(window).keydown(function (e) {
+            if (e.keyCode == 13) {
+                e.preventDefault();
+                $("#btnGoFilter").click();
+            }
+        });
+
+        $("#btnGoFilter").click(function (e) {
+            e.preventDefault();
+
+            // Param
+            var statusCareId = 0;
+            var userId = $('#UserId').val();
+            var groupId = $('#GroupId').val();
+            var branchId = $('#BranchId').val();
+            var levelId = '@((int)LevelType.L1)';
+            var statusMapId = '@Constant.STATUSMAP_KHACVUNG';
+            var toDate = $('#ToDate').val().replaceAll('/', '');
+            var fromDate = $('#FromDate').val().replaceAll('/', '');
+
+            // Format Url
+            var newUrl = '/' + url.format(branchId, levelId, statusMapId, statusCareId, groupId, userId, fromDate, toDate);
+            jQuery(grid_selector).jqGrid().setGridParam({ url: newUrl }).trigger("reloadGrid");
+        });
+        $("#btnForward").click(function (e) {
+            e.preventDefault();
+
+            // Param
+            var ids = '';
+            var items = $("#grid-table td input");
+            for (var i = 0; i < items.length; i++) {
+                if ($(items[i]).is(':checked')) {
+                    ids += ids.length == 0
+                        ? $('#grid-table').jqGrid('getCell', i + 1, 'Id')
+                        : ',' + $('#grid-table').jqGrid('getCell', i + 1, 'Id');
+                }
+            }
+            if (ids.length == 0) {
+                alertError('Bạn chưa chọn contact để chuyển giao, vui lòng chọn!');
+                return;
+            }
+            var branchId = $('#TargetBranchId').val();
+            if (branchId == 0) {
+                alertError('Bạn chưa chọn vùng cần chuyền giao, vui lòng chọn!');
+                return;
+            }
+            var r = confirm("Có phải bạn muốn chuyển contact đã chọn sang cho Đội Lọc vùng khác?");
+            if (r == true) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/admin/api/contact/ForwardDistributor',
+                    data: {
+                        ids: ids,
+                        branchId: branchId
+                    },
+                    beforeSend: function () {
+                        alertProcess();
+                    },
+                    success: function (response) {
+                        alertSuccess("Chuyển giao thành công " + response + " contacts");
+                        $("#btnGoFilter").click();
+                    },
+                    error: function (request, status, ex) {
+                        alertError("Hệ thống bị lỗi, Chuyển giao không thành công.");
+                    }
+                });
+            }
+        });
+        $("#btnForwardAll").click(function (e) {
+            e.preventDefault();
+
+            var items = $("#grid-table td input");
+            if (items.length == 0) {
+                alertError('Bạn chưa lọc contact để chuyển giao, vui lòng lọc!');
+                return;
+            }
+            var targetBranchId = $('#TargetBranchId').val();
+            if (targetBranchId == 0) {
+                alertError('Bạn chưa chọn vùng cần chuyền giao, vui lòng chọn!');
+                return;
+            }
+            var r = confirm("Có phải bạn muốn chuyển toàn bộ sang cho Đội Lọc vùng khác?");
+            if (r == true) {
+                // Param
+                var statusCareId = 0;
+                var userId = $('#UserId').val();
+                var groupId = $('#GroupId').val();
+                var branchId = $('#BranchId').val();
+                var levelId = '@((int)LevelType.L1)';
+                var targetBranchId = $('#TargetBranchId').val();
+                var statusMapId = '@Constant.STATUSMAP_KHACVUNG';
+                var toDate = $('#ToDate').val().replaceAll('/', '');
+                var fromDate = $('#FromDate').val().replaceAll('/', '');
+
+                // Param
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/admin/api/contact/ForwardAllDistributor',
+                    data: {
+                        toDate: toDate,
+                        userId: userId,
+                        groupId: groupId,
+                        levelId: levelId,
+                        branchId: branchId,
+                        fromDate: fromDate,
+                        statusMapId: statusMapId,
+                        statusCareId: statusCareId,
+                        targetBranchId: targetBranchId,
+                    },
+                    beforeSend: function () {
+                        alertProcess();
+                    },
+                    success: function (response) {
+                        alertSuccess("Chuyển giao thành công " + response + " contacts");
+                        $("#btnGoFilter").click();
+                    },
+                    error: function (request, status, ex) {
+                        alertError("Hệ thống bị lỗi, Chuyển giao không thành công.");
+                    }
+                });
+            }
+        });
+
+        $("#chkSelectAll").click(function () {
+            checkAll('chkSelectAll', 'checkbox');
+        });
+    });
+
+    function loadGroupByBranchId(id, control) {
+        var url = "/admin/api/group/GetByBranchId";
+        return $.ajax({
+            url: url,
+            type: 'GET',
+            data: { branchId: id },
+            success: function (data) {
+                var options = '<option value="0">Tất cả</option>';
+                if (data != null) {
+                    for (var i = 0; i < data.length; i++) {
+                        options += '<option value="' + data[i].GroupId + '">' + data[i].Name + '</option>';
+                    }
+                }
+                $('#' + control).empty().append(options);
+            }
+        });
+    }
+
+    function loadUserByGroupId(id, control) {
+        var url = "/admin/api/user/GetByGroupId";
+        return $.ajax({
+            url: url,
+            type: 'GET',
+            data: { groupId: id },
+            success: function (data) {
+                var options = '<option value="0">Tất cả</option>';
+                if (data != null) {
+                    for (var i = 0; i < data.length; i++) {
+                        options += '<option value="' + data[i].UserID + '">' + data[i].FullName + '</option>';
+                    }
+                }
+                $('#' + control).empty().append(options);
+            }
+        });
+    }
+
+    function loadUserByBranchId(id, control) {
+        var url = "/admin/api/user/GetConsultantNomrByBranchId";
+        return $.ajax({
+            url: url,
+            type: 'GET',
+            data: { branchId: id },
+            success: function (data) {
+                var options = '<option value="0">Tất cả</option>';
+                if (data != null) {
+                    for (var i = 0; i < data.length; i++) {
+                        options += '<option value="' + data[i].UserID + '">' + data[i].FullName + '</option>';
+                    }
+                }
+                $('#' + control).empty().append(options);
+            }
+        });
+    }
+</script>

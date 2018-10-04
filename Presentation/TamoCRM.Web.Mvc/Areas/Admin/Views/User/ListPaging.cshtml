@@ -1,0 +1,67 @@
+﻿@using MvcPaging
+@model TamoCRM.Web.Mvc.Areas.Admin.Models.Users.UserListModel     
+ <table id="sample-table-1" class="table table-striped table-bordered table-hover">
+                         <thead>
+                             <tr>
+
+                                 <th>Tên đăng nhập</th>
+                                 <th>Họ và tên</th>
+                                 <th class="hidden-480">Email</th>
+
+                                 <th>Mobile
+                                 </th>
+                                 <th class="hidden-480">Thông tin thêm</th>
+
+                                 <th></th>
+                             </tr>
+                         </thead>
+
+                         <tbody>
+                             @foreach (var item in Model.Rows)
+                             {
+                                 <tr>
+                                     <td>
+                                         @item.UserName
+                                     </td>
+                                     <td>@item.FullName</td>
+                                     <td class="hidden-480">@item.Email</td>
+                                     <td>@item.Mobile</td>
+
+                                     <td class="hidden-480">
+                                         @item.Description
+                                     </td>
+
+                                     <td>
+                                         <a href="/admin/user/edit/@item.UserID" title="Sửa thông tin người dùng">
+                                             <div title="" style="float:left;cursor:pointer;" class="ui-pg-div ui-inline-edit" onmouseover="jQuery(this).addClass('ui-state-hover');" onmouseout="jQuery(this).removeClass('ui-state-hover')" data-original-title="Edit selected row"><span class="ui-icon ui-icon-pencil"></span></div>
+                                         </a>
+                                         @*@Html.ActionLink("Sửa", "edit", new {id = item.UserID})*@
+                                         @*@Html.ActionLink("<i class='blue icon-key bigger-125'></i>", "ChangePassword", new {id = item.UserID})*@
+                                     </td>
+                                 </tr>
+                             }
+
+                         </tbody>
+                     </table>
+        @Html.Raw(Ajax.Pager(
+       new Options
+       {
+           PageSize = Model.Records,
+           TotalItemCount = Model.Total,
+           CurrentPage = Model.Page,
+           ItemTexts = new ItemTexts() { Next = "Next", Previous = "Previous", Page = "P" },
+           ItemIcon = new ItemIcon() { First = "icon-backward", Previous = "icon-chevron-left", Next = "icon-chevron-right", Last = "icon-forward" },
+           TooltipTitles = new TooltipTitles() { Next = "Next page", Previous = "Previous page", Page = "Go to page {0}.", First = "Go To First Page", Last = "Go To Last Page" },
+           Size = Size.normal,
+           Alignment = Alignment.centered,
+           IsShowControls = true,
+           IsShowFirstLast = true
+       },
+       new AjaxOptions
+       {
+           UpdateTargetId = "divlistuser",
+           OnBegin = "beginPaging",
+           OnSuccess = "successPaging",
+           OnFailure = "failurePaging"
+       }, new { controller = "User", action = "ListPaging" }))
+              

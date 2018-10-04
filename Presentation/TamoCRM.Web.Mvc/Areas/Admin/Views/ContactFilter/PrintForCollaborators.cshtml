@@ -1,0 +1,272 @@
+﻿@{
+    ViewBag.Title = "PrintForCollaborators";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+@using TamoCRM.Core
+@using TamoCRM.Web.Framework.Users
+@model TamoCRM.Web.Mvc.Areas.Admin.Models.ContactFilter.PrintForCollaboratorsModel
+
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed'); } catch (e) { }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Xuất in L1 cho CTV</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>Xuất in L1 cho CTV
+        </h1>
+    </div>
+    <!-- /.page-header -->
+
+
+
+    <div class="row">
+        <div class="form-group">
+            <div class="col-sm-12" id="alert">
+            </div>
+        </div>
+        <div class="col-xs-12">
+            <div id="spiner"></div>
+        </div>
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+
+            @using (Ajax.BeginForm("PrintForCollaborators", "ContactFilter", new AjaxOptions { HttpMethod = "POST" }, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "printForm" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <div class="col-sm-3" style="font-weight: bold;">
+                        Ngày nhận
+                    </div>
+                    <div class="col-sm-6" style="font-weight: bold;">
+                        Chọn kênh
+                    </div>
+                    <div class="col-sm-3">
+                        &nbsp;
+                    </div>
+                </div>
+
+                <div class="space-4"></div>
+                <div class="form-group">
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <div class="col-sm-4" style="font-weight: bold;">Từ ngày</div>
+                            <div class="col-sm-6">
+                                @Html.TextBoxFor(x => x.FromDate)
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-4" style="font-weight: bold;">Đến ngày</div>
+                            <div class="col-sm-6">
+                                @Html.TextBoxFor(x => x.ToDate)
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-sm-6" id="channelCheckBoxList" style="height: 200px; overflow-y: auto;">
+                        
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <input type="submit" id="btnPrint" class="btn-primary" value="Xuất L1, In cho CTV" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                Mỗi tờ tối đa @Html.TextBoxFor(x => x.MaxRowsPerPage, new { @style = "width: 50px; font-weight: bold;", @value = "50" }) bản ghi
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            <div class="space-4"></div>
+            <div>Danh sách trang L1 đã xuất</div>
+            <div class="space-4"></div>
+            <table id="grid-table"></table>
+
+            <div id="grid-pager"></div>
+
+            <!-- PAGE CONTENT ENDS -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+<!-- /.page-content -->
+
+<script type="text/javascript">
+    function updateContactCount() {
+        var toDate = $("#ToDate").val();
+        var fromDate = $("#FromDate").val();
+        var sourceTypeId = '@((int)SourceType.CC)';
+        var branchId = '@UserContext.GetDefaultBranch()';
+        var statusId = '@((int)StatusType.HandoverCollaborator)';
+        
+        $.get("/admin/api/channel/FilterCountForCollaborator", {
+            branchId: branchId,
+            sourceTypeId: sourceTypeId,
+            statusId: statusId,
+            from: fromDate,
+            to: toDate
+        }).done(function (data) {
+            $.each($(".chkChannel"), function(index) {
+                var channelId = $(this).attr("value");
+                $("#" + channelId + "_divChannel").hide();
+            });
+            $('#channelCheckBoxList').html('');
+            if (data != null && data.length > 0) {
+                var html = '';
+                for (var i = 0; i < data.length; i++) {
+                    var item = data[i];
+                    html += '<div class="form-group" id="' + item.ChannelId + '_divChannel">';
+                    html += '<div class="col-sm-10">';
+                    html += '<input type="checkbox" name="' + item.ChannelId + '_chkChannel" id="' + item.ChannelId + '_chkChannel" value="' + item.ChannelId + '" class="chkChannel" />';
+                    html += '<label for="' + item.ChannelId + '_chkChannel" id="' + item.ChannelId + '_lblChannel"> ' + item.Name + '</label>';
+                    html += '<span class="' + item.ChannelId + '_lblChannelCount"> (<b>' + item.Amount + '</b>)</span>';
+                    html += '</div>';
+                    html += '<div class="col-sm-2">';
+                    html += '<input type="text" style="width: 40px;font-weight: bold;" name="' + item.ChannelId + '_txtChannelItems" id="' + item.ChannelId + '_txtChannelItems"/>';
+                    html += '</div>';
+                    html += '</div>';
+                }
+                $('#channelCheckBoxList').html(html);
+            }
+        });     
+    }
+    
+    function validateForm() {
+        if($("#FromDate").val() == ''){
+            alert("Chưa nhập ngày bắt đầu");
+            return false;
+        }
+        if($("#ToDate").val() == ''){
+            alert("Chưa nhập ngày kết thúc");
+            return false;
+        }
+        
+        var oneCheck = false;
+        var checkBoxSelectionValid = true;
+        $.each($("#channelCheckBoxList input[type=checkbox]"), function (i) {            
+            if ($(this).is(':checked')) {
+                oneCheck = true;
+                var chkId = $(this).attr("id");
+                
+                var txtId = chkId.replace("_chkChannel", "_txtChannelItems");
+                var lblId = chkId.replace("_chkChannel", "_lblChannel");
+                if ($("#" + txtId).val() == '') {
+                    alert("Chưa nhập số lượng cho kênh: " + $("#" + lblId).html());
+                    checkBoxSelectionValid = false;
+                    return false;
+                } else if (!$.isNumeric($("#" + txtId).val())) {
+                    alert("Số lượng cho kênh: " + $("#" + lblId).html() + " không hợp lệ");
+                    checkBoxSelectionValid = false;
+                    return false;
+                }
+            }
+        });
+        if (!checkBoxSelectionValid) return false;
+        if (!oneCheck) {
+            alertError('Bạn chưa chọn kênh nào');
+            return false;
+        }
+        if ($("#MaxRowsPerPage").val() == '') {
+            alertError('Bạn chưa nhập số lượng bản ghi trên 1 trang');
+            return false;
+        } else {
+            try {
+                var max = parseInt($("#MaxRowsPerPage").val());
+                if (max > 50) {
+                    alertError("Số bản ghi không được quá 50");
+                    return false;
+                }
+            }catch(ex)
+            {
+                alertError('Chưa nhập số lượng bản ghi trên 1 trang');
+                return false;
+            }
+        }
+        return true;
+    }
+    var grid_selector = "#grid-table";
+    var heades = [ 'Mã trang', 'Thời gian in', 'Thời gian nghiệm thu', 'SL L1',"SL nghiệm thu", ''];
+    var model = [
+			{ name: 'PageCode', index: 'PageCode', editable: false, sorttype: 'string' },
+			{ name: 'CreatedDate', index: 'CreatedDate', editable: false, formatter: 'date', formatoptions: { srcformat : 'Y-m-dTH:i:s', newformat : 'd/m/Y H:i' } },
+            { name: 'AcceptanceDate', index: 'AcceptanceDate', editable: false, formatter: 'date', formatoptions: { srcformat : 'Y-m-dTH:i:s', newformat : 'd/m/Y H:i' } },
+            { name: 'TotalContacts', index: 'TotalContacts', editable: false, sorttype: 'int', width: 50, align: 'center' },
+            { name: 'AcceptanceCount', index: 'AcceptanceCount', editable: false, sorttype: 'int', width: 80, align: 'center'},
+            { name: 'Function', index: 'Function', editable: false, align: 'center', width: 50, formatter: "dynamicLink",
+                formatoptions: {
+                    cellValue: function (cellValue, rowId, rowData, options) {
+                        return "<i class='icon-print bigger-160'></i>";
+                    },
+                    url: function (cellValue, rowId, rowData) {
+                        return "/admin/contactfilter/DoPrintForCollaborators?printId=0&pageCode=" + rowData.PageCode;
+                    },
+                    target : '_blank'
+                } }
+    ];
+    $(document).ready(function () {
+        bindgrid();
+        $("#FromDate").change(function(e){
+            e.preventDefault();
+            if($("#ToDate").val().length > 0)
+            {
+                updateContactCount();
+            }
+        });
+        $("#ToDate").change(function(e){
+            e.preventDefault();
+            if($("#FromDate").val().length > 0)
+            {
+                updateContactCount();
+            }
+        });
+        $("#FromDate").datepicker({ format: 'dd/mm/yyyy', autoclose: true });
+        $("#ToDate").datepicker({ format: 'dd/mm/yyyy', autoclose: true });
+        $("#btnPrint").click(function (e) {
+            e.preventDefault();
+            if (validateForm()) {
+                $('#printForm').submit();
+            }
+        });
+        $('#printForm').ajaxForm({
+            beforeSend: function () {
+                $("#spiner").html("<i class='icon-spinner icon-spin orange bigger-125'></i>Đang xử lý...");
+            },
+            uploadProgress: function (event, position, total, percentComplete) {
+
+            },
+            success: function () {
+                //bindgrid();
+            },
+            complete: function (xhr) {
+                jQuery(grid_selector).jqGrid().trigger("reloadGrid");
+                $("#spiner").addClass("alert alert-block alert-success");
+                $("#spiner").html("Chuyển giao thành công.");
+
+                updateContactCount();
+                window.open("/admin/contactfilter/DoPrintForCollaborators?pageCode=&printid=" + xhr.responseText, "_blank");
+            }
+        });
+    });
+    function bindgrid() {
+        setupGridWithoutEdit("#grid-table", "#grid-pager", "admin/api/PrintForCollaboratorPage/get", "", "Id", "Các trang đã in", heades, model);        
+    }
+</script>

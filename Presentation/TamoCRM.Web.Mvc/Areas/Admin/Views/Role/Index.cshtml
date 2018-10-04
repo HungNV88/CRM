@@ -1,0 +1,80 @@
+﻿
+@{
+    ViewBag.Title = "Roles";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try { ace.settings.check('breadcrumbs', 'fixed') } catch (e) { }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+           <a href="#">Trang chủ</a>
+            
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active"><a href="javascript:void(0);">Nhóm người dùng</a></li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>Quản lý nhóm người dùng								
+        </h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+
+            <table id="grid-table"></table>
+
+            <div id="grid-pager"></div>
+
+
+            <!-- PAGE CONTENT ENDS -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+
+<script type="text/javascript">
+    var grid_selector = "#grid-table";
+    var heades = ['', 'Id', 'Tên', 'Mô tả'];
+    var model = [
+            {
+                name: 'act', index: '', width: 80, fixed: true, sortable: false, resize: false,
+                formatter: 'actions',
+                formatoptions: {
+                    keys: true,
+
+                    delOptions: {
+                        recreateForm: true, beforeShowForm: beforeDeleteCallback, delData: {
+                            RoleId: function () {
+                                var sel_id = $(grid_selector).jqGrid('getGridParam', 'selrow');
+                                var value = $(grid_selector).jqGrid('getCell', sel_id, 'RoleID');
+                                return value;
+
+                            }
+                        }
+                    },
+                }
+            },
+			{ name: 'RoleID', index: 'RoleID', width: 60, editable: true, sorttype: 'int', editoptions: { disabled: 'true' } },
+            { name: 'Name', index: 'Name', editable: true, sorttype: 'string' },
+            { name: 'Description', index: 'Description', editable: true, sorttype: 'string' }
+
+    ];
+    $(document).ready(function () {
+        setupGrid("#grid-table", "#grid-pager", "admin/api/role/get", "admin/api/role/edit", "RoleID", "Roles", heades, model);
+    });
+</script>

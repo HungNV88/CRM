@@ -1,0 +1,146 @@
+﻿@using TamoCRM.Domain.UserRole
+
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+@{
+    List<TamoCRM.Domain.UserRole.RoleHomePageConfigInfo> roleConfigs = ViewBag.RoleHomePageConfigs;
+    List<TamoCRM.Domain.UserRole.FunctionInfo> allFunctionInfos = ViewBag.AllFunctions;
+    //List<TamoCRM.Domain.Channels.ChannelInfo> channels = ViewBag.Channels;
+    //List<TamoCRM.Domain.SourceTypes.SourceTypeInfo> sourceTypes = ViewBag.SourceTypes;
+    //List<TamoCRM.Domain.Levels.LevelInfo> levels = ViewBag.Levels;
+    //List<TamoCRM.Domain.Branches.BranchInfo> branches = ViewBag.Branches;
+    //var lst = new SelectList(collectors, "CollectorId", "Name");
+    //var lstChannels = new SelectList(channels, "ChannelId", "Name");
+    //var lstSourceTypes = new SelectList(sourceTypes, "SourceTypeId", "Name");
+    //var lstLevels = new SelectList(levels, "LevelId", "Name");
+    //var lstBranches = new SelectList(branches, "BranchId", "Name");
+    //var lstStatus = new SelectList(status, "StatusId", "Name");
+}
+<style type="text/css">
+    .btn-import{
+        display: inline-block;
+        color: #FFF!important;
+        text-shadow: 0 -1px 0 rgba(0,0,0,0.25)!important;
+        background-image: none!important;
+        border-radius: 0;
+        box-shadow: none!important;
+        -webkit-transition: all ease .15s;
+        transition: all ease .15s;
+        cursor: pointer;
+        vertical-align: middle;
+        margin: 0;
+        position: relative;
+        font-size: 13px;
+        padding: 4px 9px;
+        line-height: 1.39;
+    }
+</style>
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        } catch (e) { }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Quản trị</a>
+        </li>
+        <li class="active"><a href="javascript:void(0);">Thiết lập trang mặc định</a></li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>Thiết lập trang mặc định cho role
+        </h1>
+    </div>
+    <!-- /.page-header -->
+
+
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="col-sm-12">
+                <div id="spiner"></div>
+            </div>
+        </div>
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+
+            @using (Ajax.BeginForm("ConfigRoleHomePage", "RolePermision", new AjaxOptions() { HttpMethod = "POST" }, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "frmConfigRoleHomePage" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    
+                    <div class="col-sm-12">
+                        <table border="1" class="table table-striped table-bordered table-hover" style="margin-bottom: 0px;">
+                            <thead>
+                                <tr>
+                                    <td class="col-sm-1" style="font-weight: bold">STT</td>
+                                    <td class="col-sm-3" style="font-weight: bold">Vai trò</td>
+                                    <td class="col-sm-2" style="font-weight: bold">Trang mặc định</td>                                    
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyChannel">
+                                @for (int i = 0; i < roleConfigs.Count; i++ )
+                                {
+                                    <tr>
+                                        <td>@(i + 1)</td>
+                                        <td>@roleConfigs[i].Name</td>
+                                        <td>
+                                            @Html.DropDownList(@roleConfigs[i].RoleID + "_dropRoleFunction", new SelectList(allFunctionInfos, "FunctionId","Name", @roleConfigs[i].FunctionId.ToString()))
+                                        </td>                                        
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        
+
+                    </div>
+                    
+                    
+                </div>
+                
+                <div class="space-4"></div>
+                <div class="form-group">
+                    <div class="col-sm-5">
+                        <button type="submit" class="btn-import btn-primary" value="Import">Cập nhật</button>
+                    </div>
+                    <div class="col-sm-7">
+                        
+                    </div>
+                </div>
+            }
+            
+            <!-- PAGE CONTENT ENDS -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+<!-- /.page-content -->
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#frmConfigRoleHomePage').ajaxForm({
+            beforeSend: function () {                
+                $("#spiner").removeClass("alert");
+                $("#spiner").removeClass("alert-block");
+                $("#spiner").removeClass("alert-danger");
+                $("#spiner").removeClass("alert-success");
+                $("#spiner").html("<i class='icon-spinner icon-spin orange bigger-125'></i>Đang xử lý...");
+                $("#progressInfo").css("display", "block");
+            },            
+            success: function () {
+                $("#spiner").addClass("alert alert-block alert-success");
+                $("#spiner").html("Cập nhật thành công.");
+            }
+        });
+    });
+</script>

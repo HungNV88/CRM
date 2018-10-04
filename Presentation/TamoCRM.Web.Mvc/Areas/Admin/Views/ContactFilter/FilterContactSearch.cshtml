@@ -1,0 +1,117 @@
+﻿@model TamoCRM.Web.Mvc.Areas.Admin.Models.Contacts.ContactCreateModel
+
+@{
+    ViewBag.Title = "Tìm kiếm tất cả Contact";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        }
+        catch (e) {
+
+        }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Contact</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>Tìm kiếm tất cả Contact</h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            @using (Ajax.BeginForm("FilterContactSearch", "Contact", new AjaxOptions { HttpMethod = "POST" }, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "filter_contact_search_form" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <div class="col-sm-12" id="alert">
+                    </div>
+                </div>
+                <div style="border: 1px solid #c5d0dc; padding: 15px 20px;">
+                     <div class="form-group"  style="margin-left: 100px;margin-bottom: 0px;">
+                        <div class="col-sm-4">
+                            <label style="font-weight: bold;">Điện thoại</label> 
+                            <input id="txtMobile" type="text" style="margin-left: 10px;" />
+                        </div>
+                         <div class="col-sm-4">
+                            <label style="font-weight: bold;">Email</label> 
+                            <input id="txtEmail" type="text" style="margin-left: 10px;" />
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div class="space-6"></div>
+            <button id="btnGoFilter" class="btn-primary" style="float: right; margin-left: 10px;">Tìm kiếm</button>
+            <button id="btnClearFilter" class="btn-primary" style="float: right;">Xóa trang</button>
+            <div class="clearfix"></div>
+
+            <div class="space-6"></div>
+            <table id="grid-table"></table>
+            <div id="grid-pager"></div>
+
+            <!-- PAGE CONTENT ENDS -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+
+<script type="text/javascript">
+    var url = 'admin/api/contact/filtersearch?mobile={0}&email={1}&branchId={2}';
+    var grid_selector = "#grid-table";
+    var heades = ['Id', 'Họ và tên', 'Số điện thoại', 'Email', 'Kênh', 'Level', 'Trạng thái gọi', 'Ngày Import'];
+    var model = [
+        { name: 'Id', index: 'Id', editable: false, sorttype: 'string', editoptions: { disabled: true }, width: '0px' },
+        { name: 'Fullname', index: 'Fullname', editable: false, sorttype: 'string' },
+        { name: 'Mobile', index: 'Mobile', editable: false, sorttype: 'string' },
+        { name: 'Email', index: 'Email', editable: false, sorttype: 'string' },
+        { name: 'ChannelId', index: 'ChannelId', editable: false, formatter: channelFomatter },
+        { name: 'LevelId', index: 'LevelId', editable: false, formatter: levelFomatter },
+        { name: 'StatusMapId', index: 'StatusMapId', editable: false, formatter: statusMapFomatter },
+        { name: 'ImportDate', index: 'ImportDate', editable: false, formatter: 'date', formatoptions: { newformat: 'd/m/Y' } }
+    ];
+    $(document).ready(function () {
+        var branchId = '@ViewBag.BranchId';
+        setupGridWithoutEdit("#grid-table", "#grid-pager", '', '', "Id", "Danh sách Contact", heades, model);
+        $("#btnGoFilter").click(function (e) {
+            e.preventDefault();
+
+            // Param
+            var email = $('#txtEmail').val();
+            var mobile = $('#txtMobile').val();
+            if (email.length == 0 && mobile.length == 0) {
+                $("#alert").addClass("alert alert-block alert-error");
+                $("#alert").html("Nội dung tìm kiếm không phù hợp.");
+            }
+            
+            // Format Url
+            var newUrl = '/' + url.format(mobile, email, branchId);
+            jQuery(grid_selector).jqGrid().setGridParam({ url: newUrl }).trigger("reloadGrid");
+        });
+        $("#btnClearFilter").click(function (e) {
+            e.preventDefault();
+
+            // Param
+            $('#txtEmail').val('');
+            $('#txtMobile').val('');
+        });
+    });
+</script>

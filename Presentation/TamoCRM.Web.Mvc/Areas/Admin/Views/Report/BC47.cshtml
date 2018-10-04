@@ -1,0 +1,255 @@
+﻿@using TamoCRM.Core
+@using TamoCRM.Domain.Groups
+@using TamoCRM.Domain.UserRole
+@using TamoCRM.Web.Framework.Users
+@using TamoCRM.Domain.Catalogs
+@using TamoCRM.Web.Framework
+@using TamoCRM.Web.Framework.Users
+@using TamoCRM.Domain.SourceTypes
+
+@{
+    ViewBag.Title = "Danh sách contact bàn giao thành công";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+
+    var packages = ViewBag.PackagePriceListed;
+    ((List<PackagePriceListed>)packages).Insert(0, new PackagePriceListed { Id = 0, Name = "0", Value = "Tất cả" });
+    var listPackages = new SelectList(packages, "Name", "Value");
+
+    var user = UserContext.GetCurrentUser();
+    var groups = (List<GroupInfo>)ViewBag.Groups;
+    var branchId = UserContext.GetDefaultBranch();
+    const int employeeId = (int)EmployeeType.Consultant;
+    if (user.GroupConsultantType != (int)GroupConsultantType.ManagerConsultant)
+    {
+        groups = groups.Where(c => c.LeaderId == UserContext.GetCurrentUser().UserID || c.GroupId == (int)ViewBag.GroupId).ToList();
+    }
+    ((List<GroupInfo>)groups).RemoveAll(c => c.GroupId == 0);
+    if (groups.Count > 1)
+    {
+        ((List<GroupInfo>)groups).Insert(0, new GroupInfo { GroupId = 0, Name = "Tất cả", BranchId = branchId, EmployeeTypeId = employeeId });
+    }
+
+    var lstGroups = new SelectList(groups.Where(c => c.BranchId == branchId).Where(c => c.EmployeeTypeId == employeeId), "GroupId", "Name");
+    var lstLevels = ViewBag.Levels;
+    var lstUsers = StoreData.SelectedList<UserInfo>();
+
+    List<SourceTypeInfo> sourceTypes = ViewBag.SourceTypes;
+    sourceTypes.Insert(0, new SourceTypeInfo { SourceTypeId = 0, Name = "Tất cả" });
+    var lstSourceTypes = new SelectList(sourceTypes, "SourceTypeId", "Name"); 
+}
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        } catch (e) { }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Danh sách contact bàn giao thành công</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>
+            Danh sách contact bàn giao thành công
+        </h1>
+    </div>
+    <div class="row">
+        <div class="form-group">
+            <div class="col-sm-12" id="alert">
+            </div>
+        </div>
+        <div class="col-xs-12">
+            @using (Ajax.BeginForm("BC47", "Report", new AjaxOptions { HttpMethod = "POST" }, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "uploadexcelform" }))
+            {
+                @Html.AntiForgeryToken()
+               
+                <div style="border: 1px solid #c5d0dc; padding: 15px 20px 0 20px;">
+
+                    <div class="form-group">
+                        <div class="col-sm-2">
+                            Nhóm TVTS
+                        </div>
+                        <div class="col-sm-3">
+                            @Html.DropDownList("GroupId", lstGroups, new { @style = "width: 100%;" })
+                        </div>
+                        <div class="col-sm-2">
+                            <label class="">TVTS</label>
+                        </div>
+                        <div class="col-sm-3">
+                            @Html.DropDownList("UserId", lstUsers, new { @style = "width: 100%;" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-2">
+                            <label class="">Giá niêm yết</label>
+                        </div>
+                        <div class="col-sm-3">
+                            @Html.DropDownList("PackageListed", listPackages, new { @style = "width: 100%;" })
+                        </div>
+
+                        <div class="col-sm-2">
+                            <label class="">Nguồn Contacts</label>
+                        </div>
+                        <div class="col-sm-3">
+                            @Html.DropDownList("SourceType", lstSourceTypes, new { @style = "width: 100%;" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-2">
+                            <label class="">Ngày bàn giao từ </label>
+                        </div>
+                        <div class="col-sm-3">
+                            @Html.TextBox("FHandoverAdvisor", string.Empty, new { @style = "width: 100%;" })
+                        </div>
+                        <div class="col-sm-2">
+                            <label class="">Đến ngày</label>
+                        </div>
+                        <div class="col-sm-3">
+                            @Html.TextBox("THandoverAdvisor", string.Empty, new { @style = "width: 100%;" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-2">
+                            <label class="">Ngày muốn học</label>
+                        </div>
+                        <div class="col-sm-3">
+                            @Html.TextBox("DateWantToLearn", string.Empty, new { @style = "width: 100%;" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-2">
+                            Họ và Tên
+                        </div>
+                        <div class="col-sm-3">
+                            <input id="txtName" type="text" style="width: 90%;" />
+                        </div>
+                        
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-2" style="width: 16.5%;">
+                            Điện thoại
+                        </div>
+                        <div class="col-sm-3" style="width: 24%;">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="icon-phone"></i>
+                                </span>
+                                <input id="txtMobile" type="text" />
+                            </div>
+                        </div>
+                        <div class="col-sm-1">
+                            Email
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="icon-envelope"></i>
+                                </span>
+                                <input id="txtEmail" type="text" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-6"></div>
+                <div class="row">
+                    <div class="col-sm-5">
+                        <button type="button" class="btn-import btn-primary" id="btnReport">Xuất báo cáo</button>
+                        <button type="button" class="btn-import btn-primary" id="btnSave">Tải về</button>
+                    </div>
+                    <div class="col-sm-7">
+                    </div>
+                </div>
+            }
+
+            <div class="space-6"></div>
+            <div id="mydiv">
+                <iframe id="frame" style="width: 100%; height: 400px; border: none;"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    var branchId = '@UserContext.GetDefaultBranch()';
+    var employeeTypeId = '@((int)EmployeeType.Consultant)';
+
+    $(document).ready(function () {
+
+        initPage();
+        bindGlobalProducts();
+
+        $('#UserId').chosen();
+        var groupId = $("#GroupId").val();
+        loadUser(branchId, groupId, employeeTypeId, "UserId");
+
+        $("#btnReport").click(function (e) {
+
+            e.preventDefault();
+           
+            var name = $('#txtName').val();
+            var email = $('#txtEmail').val();
+            var mobile = $('#txtMobile').val();
+            var userIds = $('#UserId').val();
+            if (userIds == 0) userIds = $('#GroupId').val() != 0 ? getIds('UserId') : '';
+            var listedprice = $('#PackageListed').val();
+            var sourcetype = $('#SourceType').val();
+            var datewanttolearn = $('#DateWantToLearn').val().replaceAll('/', '');
+            var handoverfromdateadvisor = $('#FHandoverAdvisor').val().replaceAll('/', '');
+            var handovertodateadvisor = $('#THandoverAdvisor').val().replaceAll('/', '');
+
+            var url = '/admin/report/showbc47?name={0}&phone={1}&email={2}&userIds={3}&listedprice={4}&sourcetype={5}&datewanttolearn={6}&handoverfromdateadvisor={7}&handovertodateadvisor={8}&reportType={9}';
+            var url = url.format(name, mobile, email, userIds, listedprice, sourcetype, datewanttolearn, handoverfromdateadvisor, handovertodateadvisor, '@((int)ReportType.Pdf)');
+            $("#frame").attr("src", url);
+        });
+
+        $("#btnSave").click(function (e) {
+
+            e.preventDefault();
+            
+            var name = $('#txtName').val();
+            var email = $('#txtEmail').val();
+            var mobile = $('#txtMobile').val();
+            var userIds = $('#UserId').val();
+            if (userIds == 0) userIds = $('#GroupId').val() != 0 ? getIds('UserId') : '';
+            var listedprice = $('#PackageListed').val();
+            var sourcetype = $('#SourceType').val();
+            var datewanttolearn = $('#DateWantToLearn').val().replaceAll('/', '');
+            var handoverfromdateadvisor = $('#FHandoverAdvisor').val().replaceAll('/', '');
+            var handovertodateadvisor = $('#THandoverAdvisor').val().replaceAll('/', '');
+
+            var url = '/admin/report/showbc47?name={0}&phone={1}&email={2}&userIds={3}&listedprice={4}&sourcetype={5}&datewanttolearn={6}&handoverfromdateadvisor={7}&handovertodateadvisor={8}&reportType={9}';
+            var url = url.format(name, mobile, email, userIds, listedprice, sourcetype, datewanttolearn, handoverfromdateadvisor, handovertodateadvisor, '@((int)ReportType.Excel)');
+            $("#frame").attr("src", url);
+        });
+    });
+
+    $("#GroupId").change(function () {
+
+        var groupId = $("#GroupId").val();
+        loadUser(branchId, groupId, employeeTypeId, "UserId");
+
+    });
+
+    function initPage() {
+        $("#FromDate").datepicker({ format: 'dd/mm/yyyy', autoclose: true });
+        $("#ToDate").datepicker({ format: 'dd/mm/yyyy', autoclose: true });
+        $('#DateWantToLearn').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly: true });
+        $('#FHandoverAdvisor').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly: true });
+        $('#THandoverAdvisor').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly: true });
+    }
+</script>

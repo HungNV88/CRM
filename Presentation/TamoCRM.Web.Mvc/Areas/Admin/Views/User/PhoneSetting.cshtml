@@ -1,0 +1,135 @@
+﻿@model TamoCRM.Web.Mvc.Areas.Admin.Models.Users.PhoneSettingModel
+
+@{
+    ViewBag.Title = "PhoneSetting";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<script type="text/javascript" src="/Content/themes/ace/assets/ckeditor/ckeditor.js"></script>
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        } catch (e) { }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Email</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>Thay đổi mật khẩu</h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="form-group">
+            <div class="col-sm-12" id="alert">
+            </div>
+        </div>
+        <div class="col-xs-12">
+            <div id="user-profile-1" class="user-profile row">
+                <div class="col-xs-12 col-sm-3 center">
+                    <div>
+                        <span class="profile-picture">
+                            <img id="avatar" class="editable img-responsive editable-click editable-empty" alt="Alex's Avatar" src="/Images/avatars/profile-pic.jpg" />
+                        </span>
+                        <div class="space-4"></div>
+                        <div class="width-80 label label-info label-xlg arrowed-in arrowed-in-right">
+                            <div class="inline position-relative">
+                              
+                                <ul class="align-left dropdown-menu dropdown-caret dropdown-lighter">
+                                    <li class="dropdown-header">Change Status </li>
+
+                                    <li>
+                                        <a href="#">
+                                            <i class="icon-circle green"></i>
+                                            &nbsp;
+                                            <span class="green">Available</span>
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a href="#">
+                                            <i class="icon-circle red"></i>
+                                            &nbsp;
+                                            <span class="red">Busy</span>
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a href="#">
+                                            <i class="icon-circle grey"></i>
+                                            &nbsp;
+                                            <span class="grey">Invisible</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @using (Html.BeginForm("PhoneSetting", "User", FormMethod.Post, new { @id = "form1", @enctype = "multipart/form-data" }))
+                {
+                     @Html.HiddenFor(x => x.UserID)
+                    <div class="col-xs-12 col-sm-9">
+                        <div class="profile-user-info profile-user-info-striped">
+                            <div class="profile-info-row">
+                                <div class="profile-info-name">Điện thoại TVTS</div>
+                                <div class="profile-info-value">
+                                    @Html.TextBoxFor(x => x.Phone, new { @required = "required", error = "Điện thoại không được rỗng" })
+                                    @Html.ValidationMessageFor(x => x.Phone)
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-1"></div>
+                        <div class="profile-user-info profile-user-info-striped">
+                            <div class="profile-info-row">
+                                <div class="profile-info-name">Email TVTS</div>
+                                <div class="profile-info-value">
+                                    @Html.TextBoxFor(x => x.Email, new { @required = "required", error = "Email không được rỗng" })
+                                    @Html.ValidationMessageFor(x => x.Email)
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="center">
+                            <input type="submit" class="btn btn-sm btn-primary" value="Lưu thiết lập" onclick="return submitForm();" />
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function submitForm() {
+        var phone = $('#Phone').val();
+        if (phone == '') {
+            alertError("Bạn phải nhập số điện thoại");
+            return false;
+        }
+        var email = $('#Email').val();
+        if (email == '') {
+            alertError("Bạn phải nhập email");
+            return false;
+        }
+        return true;
+    }
+
+    $(document).ready(function () {
+        customValidate();
+    });
+</script>
+

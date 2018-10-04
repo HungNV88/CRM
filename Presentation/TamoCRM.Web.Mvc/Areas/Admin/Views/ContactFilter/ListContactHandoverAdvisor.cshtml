@@ -1,0 +1,196 @@
+﻿@using TamoCRM.Core;
+
+@{
+    ViewBag.Title = "Danh sách contact chưa bàn giao";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+
+    var lstStatusHandover = Util.SelectedListInclude<StatusHandoverAdvisor>(true, (int)StatusHandoverAdvisor.NotHandover, (int)StatusHandoverAdvisor.Handover, (int)StatusHandoverAdvisor.HandoverFailed);
+}
+
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        }
+        catch (e) {
+
+        }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Contact</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>@ViewBag.Title</h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            @using (Ajax.BeginForm("ListContactHandoverAdvisor", "ContactFilter", new AjaxOptions { HttpMethod = "POST" }, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "filter_contact_handover_advisor" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <div class="col-sm-12" id="alert">
+                    </div>
+                </div>
+                
+                <div style="border: 1px solid #c5d0dc; padding: 15px 20px 0 20px;">
+                    <div class="form-group">
+                        <div class="col-sm-1">
+                            Họ và Tên
+                        </div>
+                        <div class="col-sm-3">
+                            <input id="txtName" type="text" style="width: 90%;" />
+                        </div>
+                        <div class="col-sm-1" style="width: 9%;">
+                            Điện thoại
+                        </div>
+                        <div class="col-sm-3" style="width: 24%;">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="icon-phone"></i>
+                                </span>
+                                <input id="txtMobile" type="text" />
+                            </div>
+                        </div>
+                        <div class="col-sm-1">
+                            Email
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="icon-envelope"></i>
+                                </span>
+                                <input id="txtEmail" type="text" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-1">
+                            Trạng thái bàn giao
+                        </div>
+                        <div class="col-sm-3">
+                            @Html.DropDownList("ddlHandoverAdvisor", lstStatusHandover, new { @style = "width: 100%;" })
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div class="space-6"></div>
+            <button id="btnGoFilter" class="btn-primary" style="float: right; margin-left: 10px;">Tìm kiếm</button>
+            <button id="btnClearFilter" class="btn-primary" style="float: right;">Xóa trang</button>
+            <div class="clearfix"></div>
+
+            <div class="space-6"></div>
+            <table id="grid-table"></table>
+            <div id="grid-pager"></div>
+
+            <!-- PAGE CONTENT ENDS -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+
+<script type="text/javascript">
+    var grid_selector = "#grid-table";
+    
+    var url = 'admin/api/contact/GetAllHandoverContactAdvisor?name={0}&phone={1}&email={2}&statusHandoverId={3}';
+    var heades = ['iHandoverStatus','Id', 'Sản phẩm', 'Họ và tên', 'Điện thoại', 'Email','Số tiền học viên nộp', 'Loại tài khoản','Số tiền niêm yết', 'Tổng số tiền đã nộp','Thời gian học (đơn vị ngày)','Nguồn contact', 'Trạng thái', 'Ghi chú (Advisor)', 'Bàn giao'];
+    var model = [
+        { name: 'iHandoverStatusAdvisor', index: 'iHandoverStatusAdvisor', editable: false, sorttype: 'string', editoptions: { disabled: true }, width: '0px' },
+        { name: 'Id', index: 'Id', editable: false, sorttype: 'string', editoptions: { disabled: true }, width: '0px' },
+        { name: 'ProductSaleId', index: 'ProductSaleId', editable: false, width: '20px', formatter: productFomatter },
+        { name: 'Fullname', index: 'Fullname', editable: false, width: '30px', sorttype: 'string' },
+        { name: 'Mobile1', index: 'Mobile1', editable: false, width: '30px', sorttype: 'string', align: 'center' },
+        { name: 'Email', index: 'Email', editable: false, width: '30px', sorttype: 'string', align: 'center' },
+        { name: 'PackagePriceSale', index: 'PackagePriceSale', editable: false, width: '20px', sorttype: 'string', align: 'center', formatter: moneyFormatter },
+        { name: 'Package', index: 'Package', editable: false, width: '20px', sorttype: 'string', align: 'center' },
+        { name: 'PricePackageListedId', index: 'PricePackageListedId', editable: false, width: '20px', sorttype: 'string', align: 'center', formatter: moneyFormatter },
+        { name: 'FeeEdu', index: 'FeeEdu', editable: false, width: '20px', sorttype: 'string', align: 'center', formatter: moneyFormatter },
+        { name: 'LearnNumberDay', index: 'LearnNumberDay', editable: false, width: '20px', sorttype: 'string', align: 'center' },
+        { name: 'SourceType', index: 'SourceType', editable: false, width: '30px', sorttype: 'string', align: 'center' },
+        { name: 'sHandoverStatusAdvisor', index: 'sHandoverStatusAdvisor', editable: false, width: '30px', sorttype: 'string', align: 'center' },
+        { name: 'NoteAdvisor', index: 'NoteAdvisor', editable: false, width: '40px', sorttype: 'string', align: 'center' },
+        {
+            name: 'Function', index: 'Function', editable: false, width: '20px', align: 'center', formatter: "dynamicLink",
+            formatoptions: {
+                cellValue: function (cellValue, rowId, rowData, options) {
+                    return '<div style="color:#34810c;margin:5px;"><a style="cursor: pointer;" onclick="return openDialogHandoverAdvisor(' + rowData.Id +  ')"><img style="width:16px; height:16px;" src="../../../../Images/forward.png"/></a></div>';
+                }
+            }
+        }
+    ];
+    $(document).ready(function () {
+
+        bindGlobalProducts();
+
+             var newUrl = url.format('', '', '', 0);
+             setupGridWithHeight("#grid-table", "#grid-pager", newUrl, '', "Id", "Danh sách Contact chưa bàn giao", heades, model, 'GET', '100%');
+             $(grid_selector).jqGrid("setGroupHeaders", {
+                 useColSpanStyle: true,
+                 groupHeaders: [
+                     { startColumnName: "Fullname", numberOfColumns: 5, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;height:40px;"><b>Thông tin Contact</b></td></tr></table>' },
+                     { startColumnName: "AppointmentDate", numberOfColumns: 3, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;"><b>Thông tin lịch hẹn gọi lại</b></td></tr></table>' },
+                     { startColumnName: "CallInfo", numberOfColumns: 2, titleText: '<table style="width:100%;border-spacing:0px;"><tr><td style="text-align:center;"><b>Tình trạng chăm sóc</b></td></tr></table>' }
+                 ]
+             });
+             
+             $(window).keydown(function (e) {
+                 if (e.keyCode == 13) {
+                     e.preventDefault();
+                     $("#btnGoFilter").click();
+                 }
+             });
+
+             $("#btnGoFilter").click(function (e) {
+                 e.preventDefault();
+
+                 // Param
+                 var name = $('#txtName').val();
+                 var email = $('#txtEmail').val();
+                 var mobile = $('#txtMobile').val();
+                 var handoveradvisorid = $('#ddlHandoverAdvisor').val();
+                 
+                 // Format Url
+                 alertHide();
+                 var newUrl = '/' + url.format(name, mobile, email, handoveradvisorid);
+                 $.ajax({
+                     type: 'GET',
+                     url: '/admin/api/contact/GetAllHandoverContactAdvisor',
+                     data: {
+                         name: name,
+                         mobile: mobile,
+                         email: email,
+                         statusHandoverId: handoveradvisorid
+                     },
+                     beforeSend: function () {
+                         
+                     },
+                     success: function (response) {
+                         
+                     },
+                     error: function (request, status, ex) {
+
+                     }
+                 });
+                 jQuery(grid_selector).jqGrid().setGridParam({ url: newUrl }).trigger("reloadGrid");
+             });
+         });
+</script>
+
+

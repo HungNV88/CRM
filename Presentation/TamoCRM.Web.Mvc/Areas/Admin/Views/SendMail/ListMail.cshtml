@@ -1,0 +1,56 @@
+﻿@model TamoCRM.Web.Mvc.Areas.Admin.Models.Email.MailModel
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        } catch (e) { }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Email</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>Danh sách Email</h1>
+    </div>
+    <div class="col-xs-12">
+        <table id="grid-table"></table>
+        <div id="grid-pager"></div>
+    </div>
+</div>
+<script type="text/javascript">
+    var url = 'admin/api/email/getall';
+    var grid_selector = "#grid-table";
+    var heades = ['Id', 'Tiêu đề', 'Kiểu Email', 'Nội dung', 'Chức năng'];
+    var model = [
+        { name: 'Id', index: 'Id', editable: false, sorttype: 'string', editoptions: { disabled: true }, width: '0px' },
+        { name: 'Subject', index: 'Subject', editable: false, sorttype: 'string',width:'50px' },
+        { name: 'EmailType', index: 'EmailType', editable: false, sorttype: 'string',width: '50px' },
+        { name: 'Content', index: 'content', editable: false, sorttype: 'string', width: '300px' },
+        {
+            name: 'Function', index: 'Function', editable: false, width: '50px', align: 'center', formatter: "dynamicLink",
+            formatoptions: {
+                cellValue: function (cellValue, rowId, rowData, options) {
+                    return '<div style="color:#34810c;margin:5px;"><a href="/admin/sendmail/edit/' + rowData.Id + '"><img style="width:16px; height:16px;" src="../../../../Images/edit-16.png"/></a></div>';
+                }
+            }
+        }
+        
+    ];
+    $(document).ready(function () {
+        setupGridWithoutEdit("#grid-table", "#grid-pager", url.format(''), "admin/api/email/edit", "Id", "Danh sách email", heades, model);
+    });
+</script>

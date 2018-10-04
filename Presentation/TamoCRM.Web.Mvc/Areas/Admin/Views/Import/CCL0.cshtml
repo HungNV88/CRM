@@ -1,0 +1,172 @@
+﻿@using TamoCRM.Core
+@using TamoCRM.Domain.Channels
+@using TamoCRM.Domain.Collectors
+@using TamoCRM.Domain.ImportExcels
+@using TamoCRM.Domain.Levels
+@model TamoCRM.Web.Mvc.Areas.Admin.Models.Contacts.ContactSearchModel
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+@{
+    var collectors = ViewBag.Collectors;
+    ((List<CollectorInfo>)collectors).RemoveAll(c => c.CollectorId == 0);
+    ((List<CollectorInfo>)collectors).Insert(0, new CollectorInfo { CollectorId = 0, Name = "Tất cả" });
+    var lstCollectors = new SelectList(collectors, "CollectorId", "Name");
+
+    var levels = ViewBag.LevelCCs;
+    ((List<LevelInfo>)levels).RemoveAll(c => c.LevelId == 0);
+    ((List<LevelInfo>)levels).Insert(0, new LevelInfo { LevelId = 0, Name = "Tất cả" });
+    var lstLevels = new SelectList(levels, "LevelId", "Name");
+
+    var channels = ViewBag.channelCCs;
+    ((List<ChannelInfo>)channels).RemoveAll(c => c.ChannelId == 0);
+    ((List<ChannelInfo>)channels).Insert(0, new ChannelInfo { ChannelId = 0, Name = "Tất cả" });
+    var lstChannels = new SelectList(channels, "ChannelId", "Name");
+
+    var importExcels = ViewBag.ImportExcelCCs;
+    ((List<ImportExcelInfo>)importExcels).RemoveAll(c => c.ImportId == 0);
+    ((List<ImportExcelInfo>)importExcels).Insert(0, new ImportExcelInfo { ImportId = 0, FilePath = "Tất cả" });
+    var lstImportExcels = new SelectList(importExcels, "ImportId", "FilePath");
+}
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        } catch (e) { }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active">Contact</li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>Không trùng (CC)
+        </h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            @using (Ajax.BeginForm("CCL0", "Import", new AjaxOptions { HttpMethod = "POST" }, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "uploadexcelform" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <div class="col-sm-1"></div>
+                    <label class="col-sm-1 control-label no-padding-right" for="form-field-1">Người lấy </label>
+                    <div class="col-sm-3">
+                        @Html.DropDownListFor(x => x.CollectorId, lstCollectors, new { @class = "form-control" })
+                    </div>
+                    <label class="col-sm-1 control-label no-padding-right" for="form-field-2">Kênh </label>
+                    <div class="col-sm-5">
+                        @Html.DropDownListFor(x => x.ChannelId, lstChannels, new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-1"></div>
+                    <label class="col-sm-1 control-label no-padding-right" for="form-field-3">Level </label>
+                    <div class="col-sm-3">
+                        @Html.DropDownListFor(x => x.LevelId, lstLevels, new { @class = "form-control" })
+                    </div>
+                    <label class="col-sm-1 control-label no-padding-right" for="form-field-3">File </label>
+                    <div class="col-sm-5">
+                        @Html.DropDownListFor(x => x.ImportId, lstImportExcels, new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="space-4"></div>
+                <div class="form-group">
+                    <div class="col-sm-12">
+                        <button id="btnSearch" type="button" class="btn-import btn-primary" value="Import">Tìm</button>
+                    </div>
+                </div>
+            }
+            <table id="grid-table"></table>
+
+            <div id="grid-pager"></div>
+
+
+            <!-- PAGE CONTENT ENDS -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+<!-- /.page-content -->
+
+<!-- inline scripts related to this page -->
+
+<script type="text/javascript">
+    var grid_selector = "#grid-table";
+    var heades = ['Sửa', 'Id', 'Họ tên', 'Người lấy', 'Kênh'];
+    var model = [
+            {
+                name: 'act', index: '', width: 70, fixed: true, sortable: false, resize: false,
+                formatter: 'actions',
+                formatoptions: {
+                    keys: true,
+                    delbutton: false,
+                    delOptions: {
+                        recreateForm: true, beforeShowForm: beforeDeleteCallback, delData: {
+                            Id: function () {
+                                var sel_id = $(grid_selector).jqGrid('getGridParam', 'selrow');
+                                var value = $(grid_selector).jqGrid('getCell', sel_id, 'Id');
+                                return value;
+
+                            }
+                        }
+                    },
+                }
+            },
+			{ name: 'Id', index: 'Id', width: 60, editable: true, sorttype: 'int', editoptions: { disabled: 'true' } },
+			{ name: 'Fullname', index: 'Fullname', editable: true, sorttype: 'string' },
+            { name: 'CollectorId', index: 'CollectorId', editable: false, sorttype: 'string', formatter: collectorFomatter },
+            { name: 'ChannelName', index: 'ChannelName', editable: false, sorttype: 'string' }
+
+    ];
+    $(document).ready(function () {
+        $('#LevelId').chosen();
+        $('#ImportId').chosen();
+        $('#ChannelId').chosen();
+        $('#CollectorId').chosen();
+        $(".chzn-select-deselect").chosen({ allow_single_deselect: true });
+        
+        $("#ChannelName").change(function (e) {
+            e.preventDefault();
+            $("#btnSearch").attr("disabled", "disabled");
+            if ($("#ChannelName").val().trim() == '') {
+                $("#ChannelId").val('0');
+                return;
+            }
+            $.ajax({
+                type: "POST",
+                url: "/admin/api/channel/getbycode/",
+                data: { code: $("#ChannelName").val() }
+            }).done(function (res) {
+                if (res != null) {
+                    $("#ChannelId").val(res.ChannelId);
+                } else {
+                    $("#ChannelId").val("-1");
+                }
+                $("#btnSearch").removeAttr("disabled");
+            });
+        });
+        //statusid = 2 la do contact dc import tu file excel
+        setupGridWithoutEdit("#grid-table", "#grid-pager", "admin/import/GetForImportTeam?branchId=@TamoCRM.Web.Framework.Users.UserContext.GetDefaultBranch()&collectorId=" + $("#CollectorId").val() + "&channelId=" + $("#ChannelId").val() + "&importId=" + $("#ImportId").val() + "&levelId=" + $("#LevelId").val() + "&sourceTypeId=@TamoCRM.Domain.SourceTypes.SourceTypeIds.CC&schoolId=0&statusId=@((int)StatusType.New)", "admin/api/contact/editfullname", "Id", "Contacts", heades, model);
+        $("#btnSearch").click(function (e) {
+            e.preventDefault();
+            var newUrl = "/admin/import/GetForImportTeam?branchId=@TamoCRM.Web.Framework.Users.UserContext.GetDefaultBranch()&collectorId=" + $("#CollectorId").val() + "&channelId=" + $("#ChannelId").val() + "&importId=" + $("#ImportId").val() + "&levelId=" + $("#LevelId").val() + "&sourceTypeId=@TamoCRM.Domain.SourceTypes.SourceTypeIds.CC&schoolId=0&statusId=@((int)StatusType.New)";
+            jQuery(grid_selector).jqGrid().setGridParam({ url: newUrl }).trigger("reloadGrid");
+        });
+    });
+</script>
+

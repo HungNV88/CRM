@@ -1,0 +1,202 @@
+﻿@using System
+@using System.Data
+@{
+    ViewBag.Title = "TableLog";
+
+    var list_thongkecuocgoi = ViewBag.DashBoard_thongkecuocgoi;
+
+}
+
+<div style="overflow:auto; height:400px; width:auto;">
+    @using (Ajax.BeginForm("TableDashBoardCall", "Report", new AjaxOptions { HttpMethod = "POST" }, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "uploadexcelform" }))
+    {
+
+
+        <table style="width: 100%; border: 2px solid #eee; border-collapse: inherit;" border="1">
+            <tr>
+                <td rowspan="3" colspan="2" style="width:350px">Số TVTS có thực hiện cuộc gọi</td>
+
+                <td rowspan="2" style="width:40px">Cả ngày</td>
+
+                <td colspan="13">Khung giờ</td>
+            </tr>
+            <tr>
+                <td style="width:60px">8h-9h</td>
+                <td style="width:61px">9h-10h</td>
+                <td style="width:61px">10h-11h</td>
+                <td style="width:61px">11h-12h</td>
+                <td style="width:61px">12h-13h</td>
+                <td style="width:61px">13h-14h</td>
+                <td style="width:61px">14h-15h</td>
+                <td style="width:61px">15h-16h</td>
+                <td style="width:61px">16h-17h</td>
+                <td style="width:61px">17h-18h</td>
+                <td style="width:61px">18h-19h</td>
+                <td style="width:61px">19h-20h</td>
+                <td style="width:61px">20h-21h</td>
+            </tr>
+
+            <tr>
+                <td>@list_thongkecuocgoi[0].SumTVTS</td>
+
+                <td>@list_thongkecuocgoi[0].SumTVTS_k8</td>
+                <td>@list_thongkecuocgoi[0].SumTVTS_k9</td>
+                <td>@list_thongkecuocgoi[0].SumTVTS_k10</td>
+                <td>@list_thongkecuocgoi[0].SumTVTS_k11</td>
+                <td>@list_thongkecuocgoi[0].SumTVTS_k12</td>
+                <td>@list_thongkecuocgoi[0].SumTVTS_k13</td>
+                <td>@list_thongkecuocgoi[0].SumTVTS_k14</td>
+                <td>@list_thongkecuocgoi[0].SumTVTS_k15</td>
+                <td>@list_thongkecuocgoi[0].SumTVTS_k16</td>
+                <td>@list_thongkecuocgoi[0].SumTVTS_k17</td>
+                <td>@list_thongkecuocgoi[0].SumTVTS_k18</td>
+                <td>@list_thongkecuocgoi[0].SumTVTS_k19</td>
+                <td>@list_thongkecuocgoi[0].SumTVTS_k20</td>
+
+            </tr>
+
+            <tr><td colspan="16"></td></tr>
+
+            @foreach (var j in list_thongkecuocgoi)
+            {
+
+                <tr>
+
+                    <td style="width:100px">@j.UserName</td>
+
+                    <td colspan="15">
+                        <table style="width: 100%" border="1">
+                            <tr>
+                                <td rowspan="2">Nội dung</td>
+
+                                <td rowspan="2">Cả ngày</td>
+
+                                <td colspan="13">Khung giờ</td>
+                            </tr>
+                            <tr>
+                                <td style="width:62px">8h-9h</td>
+                                <td style="width:62px">9h-10h</td>
+                                <td style="width:62px">10h-11h</td>
+                                <td style="width:62px">11h-12h</td>
+                                <td style="width:62px">12h-13h</td>
+                                <td style="width:62px">13h-14h</td>
+                                <td style="width:62px">14h-15h</td>
+                                <td style="width:62px">15h-16h</td>
+                                <td style="width:62px">16h-17h</td>
+                                <td style="width:62px">17h-18h</td>
+                                <td style="width:62px">18h-19h</td>
+                                <td style="width:62px">19h-20h</td>
+                                <td style="width:62px">20h-21h</td>
+                            </tr>
+                            <tr>
+                                <td style="width:199px">Tổng số cuộc gọi đã thực hiện (cuộc)</td>
+                                <td style="width:40px">@j.Sum_tyle1</td>
+                                <td style="width:62px">@j._khung8_tyle1</td>
+                                <td style="width:62px">@j._khung9_tyle1</td>
+                                <td style="width:62px">@j._khung10_tyle1</td>
+                                <td style="width:62px">@j._khung11_tyle1</td>
+                                <td style="width:62px">@j._khung12_tyle1</td>
+                                <td style="width:62px">@j._khung13_tyle1</td>
+                                <td style="width:62px">@j._khung14_tyle1</td>
+                                <td style="width:62px">@j._khung15_tyle1</td>
+                                <td style="width:62px">@j._khung16_tyle1</td>
+                                <td style="width:62px">@j._khung17_tyle1</td>
+                                <td style="width:62px">@j._khung18_tyle1</td>
+                                <td style="width:62px">@j._khung19_tyle1</td>
+                                <td style="width:62px">@j._khung20_tyle1</td>
+
+                            </tr>
+                            <tr>
+                                <td style="width:199px">Thời lượng cuộc gọi có tương tác (duration>0) (s)</td>
+                                <td style="width:40px">@j.Sum_tyle2</td>
+                                <td style="width:62px">@j._khung8_tyle2</td>
+                                <td style="width:62px">@j._khung9_tyle2</td>
+                                <td style="width:62px">@j._khung10_tyle2</td>
+                                <td style="width:62px">@j._khung11_tyle2</td>
+                                <td style="width:62px">@j._khung12_tyle2</td>
+                                <td style="width:62px">@j._khung13_tyle2</td>
+                                <td style="width:62px">@j._khung14_tyle2</td>
+                                <td style="width:62px">@j._khung15_tyle2</td>
+                                <td style="width:62px">@j._khung16_tyle2</td>
+                                <td style="width:62px">@j._khung17_tyle2</td>
+                                <td style="width:62px">@j._khung18_tyle2</td>
+                                <td style="width:62px">@j._khung19_tyle2</td>
+                                <td style="width:62px">@j._khung20_tyle2</td>
+                            </tr>
+                            <tr>
+                                <td style="width:199px">Số cuộc gọi tương tác (cuộc)</td>
+                                <td style="width:40px">@j.Sum_tyle3</td>
+                                <td style="width:62px">@j._khung8_tyle3</td>
+                                <td style="width:62px">@j._khung9_tyle3</td>
+                                <td style="width:62px">@j._khung10_tyle3</td>
+                                <td style="width:62px">@j._khung11_tyle3</td>
+                                <td style="width:62px">@j._khung12_tyle3</td>
+                                <td style="width:62px">@j._khung13_tyle3</td>
+                                <td style="width:62px">@j._khung14_tyle3</td>
+                                <td style="width:62px">@j._khung15_tyle3</td>
+                                <td style="width:62px">@j._khung16_tyle3</td>
+                                <td style="width:62px">@j._khung17_tyle3</td>
+                                <td style="width:62px">@j._khung18_tyle3</td>
+                                <td style="width:62px">@j._khung19_tyle3</td>
+                                <td style="width:62px">@j._khung20_tyle3</td>
+                            </tr>
+                            <tr>
+                                <td style="width:199px">Thời gian trung bình/cuộc gọi tương tác (s)</td>
+                                <td style="width:40px">@j.Sum_tyle4</td>
+                                <td style="width:62px">@j._khung8_tyle4</td>
+                                <td style="width:62px">@j._khung9_tyle4</td>
+                                <td style="width:62px">@j._khung10_tyle4</td>
+                                <td style="width:62px">@j._khung11_tyle4</td>
+                                <td style="width:62px">@j._khung12_tyle4</td>
+                                <td style="width:62px">@j._khung13_tyle4</td>
+                                <td style="width:62px">@j._khung14_tyle4</td>
+                                <td style="width:62px">@j._khung15_tyle4</td>
+                                <td style="width:62px">@j._khung16_tyle4</td>
+                                <td style="width:62px">@j._khung17_tyle4</td>
+                                <td style="width:62px">@j._khung18_tyle4</td>
+                                <td style="width:62px">@j._khung19_tyle4</td>
+                                <td style="width:62px">@j._khung20_tyle4</td>
+                            </tr>
+                            <tr>
+                                <td style="width:199px">Cuộc gọi đầu tiên (lúc)</td>
+                                <td style="width:40px"></td>
+                                <td style="width:62px">@j._khung8_tyle5</td>
+                                <td style="width:62px">@j._khung9_tyle5</td>
+                                <td style="width:62px">@j._khung10_tyle5</td>
+                                <td style="width:62px">@j._khung11_tyle5</td>
+                                <td style="width:62px">@j._khung12_tyle5</td>
+                                <td style="width:62px">@j._khung13_tyle5</td>
+                                <td style="width:62px">@j._khung14_tyle5</td>
+                                <td style="width:62px">@j._khung15_tyle5</td>
+                                <td style="width:62px">@j._khung16_tyle5</td>
+                                <td style="width:62px">@j._khung17_tyle5</td>
+                                <td style="width:62px">@j._khung18_tyle5</td>
+                                <td style="width:62px">@j._khung19_tyle5</td>
+                                <td style="width:62px">@j._khung20_tyle5</td>
+                            </tr>
+                            <tr>
+                                <td style="width:199px">Cuộc gọi cuối cùng (lúc)</td>
+                                <td style="width:40px"></td>
+                                <td style="width:62px">@j._khung8_tyle6</td>
+                                <td style="width:62px">@j._khung9_tyle6</td>
+                                <td style="width:62px">@j._khung10_tyle6</td>
+                                <td style="width:62px">@j._khung11_tyle6</td>
+                                <td style="width:62px">@j._khung12_tyle6</td>
+                                <td style="width:62px">@j._khung13_tyle6</td>
+                                <td style="width:62px">@j._khung14_tyle6</td>
+                                <td style="width:62px">@j._khung15_tyle6</td>
+                                <td style="width:62px">@j._khung16_tyle6</td>
+                                <td style="width:62px">@j._khung17_tyle6</td>
+                                <td style="width:62px">@j._khung18_tyle6</td>
+                                <td style="width:62px">@j._khung19_tyle6</td>
+                                <td style="width:62px">@j._khung20_tyle6</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            }
+
+        </table>
+    }
+
+</div>
