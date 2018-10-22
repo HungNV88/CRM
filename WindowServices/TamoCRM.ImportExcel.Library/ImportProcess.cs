@@ -176,6 +176,7 @@ namespace TamoCRM.ImportExcel.Library
                                             {
                                                 contactTmpStatus = (int)ContactError.InternalDuplicate;
                                                 ImportInfo.InternalDuplicateCount++;
+                                                Console.WriteLine("Duplicated in Internal file with Mobile:" + mobile + ";Email:" + email + ";ImportId: " + ImportInfo.ImportId + ";ImportDate:" + ImportInfo.ImportedDate + ";UserImportId:" + ImportInfo.UserId);
                                             }
                                             else
                                             {
@@ -200,6 +201,7 @@ namespace TamoCRM.ImportExcel.Library
                                                 {
                                                     ImportInfo.DuplicateCount++;
                                                     contactTmpStatus = (int)ContactError.Duplicate;
+                                                    Console.WriteLine("Duplicated in Redis:" + mobile + ";Email:" + email + ";ImportId: " + ImportInfo.ImportId + ";ImportDate:" + ImportInfo.ImportedDate + ";UserImportId:" + ImportInfo.UserId);
                                                 }
                                             }
 

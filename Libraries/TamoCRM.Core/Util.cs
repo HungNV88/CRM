@@ -32,13 +32,24 @@ namespace TamoCRM.Core
         }
         public static string CleanAlphabetAndFirstZero(string input)
         {
-            if (string.IsNullOrEmpty(input)) return string.Empty;
+            if (string.IsNullOrEmpty(input))
+            {
+                return string.Empty;
+            }
             input = input.Replace("O", "0");
             input = input.Replace("o", "0");
             var arr = input.Where(char.IsNumber).ToArray();
             var retVal = new string(arr);
-            if (retVal.StartsWith("0")) retVal = retVal.Substring(1);
-            if (retVal.StartsWith("84")) retVal = retVal.Substring(2);
+            // Nếu số điện thoại bắt đầu bằng 84, remove 84 khỏi số điện thoại để check duplicate
+            if (retVal.StartsWith("84"))
+            {
+                retVal = retVal.Substring(2);
+            }
+            // Nếu số điện thoại bắt đầu bằng 0, remove 0 khỏi số điện thoại để check duplicate
+            if (retVal.StartsWith("0"))
+            {
+                retVal = retVal.Substring(1);
+            }
             return retVal;
         }
         public static bool ValidateFormat(string input, string format)
