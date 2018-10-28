@@ -50,6 +50,78 @@ namespace TamoCRM.Core
             {
                 retVal = retVal.Substring(1);
             }
+            var prefix = retVal.Substring(0, 3);
+            switch (prefix)
+            {
+                // Check đầu số cũ mạng Viettel, sẽ chuyển đổi sang đầu số mới
+                case Constant.VIETTEL_162:
+                    retVal = String.Concat(Constant.VIETTEL_32, retVal.Substring(3));
+                    break;
+                case Constant.VIETTEL_163:
+                    retVal = String.Concat(Constant.VIETTEL_33, retVal.Substring(3));
+                    break;
+                case Constant.VIETTEL_164:
+                    retVal = String.Concat(Constant.VIETTEL_34, retVal.Substring(3));
+                    break;
+                case Constant.VIETTEL_165:
+                    retVal = String.Concat(Constant.VIETTEL_35, retVal.Substring(3));
+                    break;
+                case Constant.VIETTEL_166:
+                    retVal = String.Concat(Constant.VIETTEL_36, retVal.Substring(3));
+                    break;
+                case Constant.VIETTEL_167:
+                    retVal = String.Concat(Constant.VIETTEL_37, retVal.Substring(3));
+                    break;
+                case Constant.VIETTEL_168:
+                    retVal = String.Concat(Constant.VIETTEL_38, retVal.Substring(3));
+                    break;
+                case Constant.VIETTEL_169:
+                    retVal = String.Concat(Constant.VIETTEL_39, retVal.Substring(3));
+                    break;
+                // Check đầu số cũ mạng Mobile, sẽ chuyển đổi sang đầu số mới
+                case Constant.MOBILE_120:
+                    retVal = String.Concat(Constant.MOBILE_70, retVal.Substring(3));
+                    break;
+                case Constant.MOBILE_121:
+                    retVal = String.Concat(Constant.MOBILE_79, retVal.Substring(3));
+                    break;
+                case Constant.MOBILE_122:
+                    retVal = String.Concat(Constant.MOBILE_77, retVal.Substring(3));
+                    break;
+                case Constant.MOBILE_126:
+                    retVal = String.Concat(Constant.MOBILE_76, retVal.Substring(3));
+                    break;
+                case Constant.MOBILE_128:
+                    retVal = String.Concat(Constant.MOBILE_78, retVal.Substring(3));
+                    break;
+                // Check đầu số cũ mạng Vina, sẽ chuyển đổi sang đầu số mới
+                case Constant.VINA_123:
+                    retVal = String.Concat(Constant.VINA_83, retVal.Substring(3));
+                    break;
+                case Constant.VINA_124:
+                    retVal = String.Concat(Constant.VINA_84, retVal.Substring(3));
+                    break;
+                case Constant.VINA_125:
+                    retVal = String.Concat(Constant.VINA_85, retVal.Substring(3));
+                    break;
+                case Constant.VINA_127:
+                    retVal = String.Concat(Constant.VINA_81, retVal.Substring(3));
+                    break;
+                case Constant.VINA_129:
+                    retVal = String.Concat(Constant.VINA_82, retVal.Substring(3));
+                    break;
+                // Check đầu số cũ mạng Vietnammobile, sẽ chuyển đổi sang đầu số mới
+                case Constant.VIETNAM_186:
+                    retVal = String.Concat(Constant.VIETNAM_56, retVal.Substring(3));
+                    break;
+                case Constant.VIETNAM_188:
+                    retVal = String.Concat(Constant.VIETNAM_58, retVal.Substring(3));
+                    break;
+                // Check đầu số cũ mạng GTel, sẽ chuyển đổi sang đầu số mới
+                case Constant.GTEL_199:
+                    retVal = String.Concat(Constant.GTEL_59, retVal.Substring(3));
+                    break;
+            }
             return retVal;
         }
         public static bool ValidateFormat(string input, string format)
