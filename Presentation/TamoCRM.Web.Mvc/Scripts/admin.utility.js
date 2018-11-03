@@ -1268,10 +1268,50 @@ function validateEmail(value) {
     return value.match(regex);
 }
 
-function  validateMobile(value) {
+function validateMobile(value) {
+    var PREFIX_PHONE = [
+        "86",
+        "96",
+        "97",
+        "98",
+        "32",
+        "33",
+        "34",
+        "35",
+        "36",
+        "37",
+        "38",
+        "39",
+        "90",
+        "93",
+        "70",
+        "79",
+        "77",
+        "76",
+        "78",
+        "91",
+        "83",
+        "84",
+        "85",
+        "81",
+        "82",
+        "92",
+        "56",
+        "58",
+        "99",
+        "59",
+    ]
     if (value == null || value.length == 0) return true;
-    var regex = /^(?!0)((\d{3}-\d{3}-\d{4,5})|\d{9,10})$/;
-    return value.match(regex);
+    // Check đầu số các thuê bao di động trong nước
+    var prefix = value.substr(0, 2);
+    if (PREFIX_PHONE.indexOf(prefix) > -1) {
+        var regex = /^(?!0)((\d{3}-\d{3}-\d{4})|\d{9})$/;
+        return value.match(regex);
+    } else {
+        // Không phải thuê bao di động trong nước
+        var regex = /^\d+$/;
+        return value.match(regex);
+    }
 }
 
 // dd/MM/yyyy HH:mm:ss

@@ -24,9 +24,23 @@ namespace TamoCRM.Core
         }
         public static bool ValidateMobile(string mobile)
         {
-            if (mobile.Length > 8 && mobile.Length < 11)
+            // Check đầu số di động mạng trong nước
+            var prefix = mobile.Substring(0,2);
+            var index = Array.IndexOf(Constant.PREFIX_PHONE, prefix);
+            if(index > -1)
             {
-                if (IsDigitsOnly(mobile)) return true;
+                if (mobile.Length == 9 && IsDigitsOnly(mobile))
+                {
+                    return true;
+                }
+            }
+            // Không phải đầu số di động mạng trong nước, có thể là thuê bao nước ngoài, cần check thêm.....
+            else
+            {
+                if (IsDigitsOnly(mobile))
+                {
+                    return true;
+                }
             }
             return false;
         }
@@ -40,8 +54,13 @@ namespace TamoCRM.Core
             input = input.Replace("o", "0");
             var arr = input.Where(char.IsNumber).ToArray();
             var retVal = new string(arr);
+            // Nếu số điện thoại bắt đầu bằng 0, remove 0 khỏi số điện thoại để check duplicate
+            if (retVal.StartsWith("0"))
+            {
+                retVal = retVal.Substring(1);
+            }
             // Nếu số điện thoại bắt đầu bằng 84, remove 84 khỏi số điện thoại để check duplicate
-            if (retVal.StartsWith("84"))
+            if (retVal.StartsWith("84") && retVal.Length > 9)
             {
                 retVal = retVal.Substring(2);
             }
@@ -50,6 +69,7 @@ namespace TamoCRM.Core
             {
                 retVal = retVal.Substring(1);
             }
+            // Lấy đầu số để check số cũ và convert sang đầu số mới trong trường hợp nhập phone với đầu số cũ của các nhà mạng
             var prefix = retVal.Substring(0, 3);
             switch (prefix)
             {

@@ -58,12 +58,14 @@ namespace TamoCRM.ImportExcel.Library
         {
             var watch = new Stopwatch();
             watch.Start();
-            Console.WriteLine("==============Begin Import=================");
+            Console.WriteLine("==============Begin Import Contacts=================");
             Console.WriteLine("Processing file: " + ImportInfo.FilePath);
+            Console.WriteLine("");
             DoImport(ImportInfo.FilePath);
             watch.Stop();
             Console.WriteLine("Processed file: " + ImportInfo.FilePath + " in: " + watch.ElapsedMilliseconds);
-            Console.WriteLine("==============End Import===================");
+            Console.WriteLine("==============End Import Contacts===================");
+            Console.WriteLine("");
         }
 
         private void DoImport(string file)
@@ -176,7 +178,7 @@ namespace TamoCRM.ImportExcel.Library
                                             {
                                                 contactTmpStatus = (int)ContactError.InternalDuplicate;
                                                 ImportInfo.InternalDuplicateCount++;
-                                                Console.WriteLine("Duplicated in Internal file with Mobile:" + mobile + ";Email:" + email + ";ImportId: " + ImportInfo.ImportId + ";ImportDate:" + ImportInfo.ImportedDate + ";UserImportId:" + ImportInfo.UserId);
+                                                Console.WriteLine("Duplicated in INTERNAL FILE with Mobile: " + mobile + "; \tEmail: " + email + "; \t\t\t\tImportId: " + ImportInfo.ImportId + "; \tImportDate:" + ImportInfo.ImportedDate + "; \tUserImportId:" + ImportInfo.UserId);
                                             }
                                             else
                                             {
@@ -201,7 +203,7 @@ namespace TamoCRM.ImportExcel.Library
                                                 {
                                                     ImportInfo.DuplicateCount++;
                                                     contactTmpStatus = (int)ContactError.Duplicate;
-                                                    Console.WriteLine("Duplicated in Redis:" + mobile + ";Email:" + email + ";ImportId: " + ImportInfo.ImportId + ";ImportDate:" + ImportInfo.ImportedDate + ";UserImportId:" + ImportInfo.UserId);
+                                                    Console.WriteLine("Duplicated in REDIS CACHE with Mobile: " + mobile + "; \tEmail: " + email + "; \t\t\t\tImportId: " + ImportInfo.ImportId + "; \tImportDate:" + ImportInfo.ImportedDate + "; \tUserImportId:" + ImportInfo.UserId);
                                                 }
                                             }
 
@@ -444,6 +446,7 @@ namespace TamoCRM.ImportExcel.Library
                         }
 
                         watch.Stop();
+                        Console.WriteLine("");
                         Console.WriteLine("Thoi gian read file: " + watch.ElapsedMilliseconds);
                         watch.Reset();
                         watch.Restart();
@@ -802,11 +805,13 @@ namespace TamoCRM.ImportExcel.Library
         {
             if (string.IsNullOrEmpty(mobile1) || !Util.ValidateMobile(mobile1))
             {
+                Console.WriteLine("Số điện thoại 1 không đúng : " + mobile1);
                 return ContactError.MobilePhoneFormat;
             }
 
             if (!string.IsNullOrEmpty(mobile2) && !Util.ValidateMobile(mobile2))
             {
+                Console.WriteLine("Số điện thoại 2 không đúng : " + mobile2);
                 return ContactError.MobilePhoneFormat;
             }
             if (!string.IsNullOrEmpty(tel) && !Util.ValidateMobile(tel))
@@ -815,6 +820,7 @@ namespace TamoCRM.ImportExcel.Library
             }
             if (!string.IsNullOrEmpty(email) && !Util.ValidateFormat(email, ImportConfig.EmailFormat))
             {
+                Console.WriteLine("Email không đúng định dạng :" + email);
                 return ContactError.EmailFormat;
             }
             return ContactError.None;
