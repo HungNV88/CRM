@@ -19,8 +19,9 @@
     {
         ((List<GroupInfo>)groups).Insert(0, new GroupInfo { GroupId = 0, Name = "Tất cả", BranchId = branchId, EmployeeTypeId = (int)EmployeeType.Consultant });
     }
-    var lstGroups = new SelectList(((List<GroupInfo>)groups).Where(c => c.BranchId == branchId).Where(c => c.EmployeeTypeId == (int)EmployeeType.Consultant), "GroupId", "Name");
-    
+    //var lstGroups = new SelectList(((List<GroupInfo>)groups).Where(c => c.BranchId == branchId).Where(c => c.EmployeeTypeId == (int)EmployeeType.Consultant), "GroupId", "Name");
+    var lstGroups = new SelectList(groups.Where(c => c.EmployeeTypeId == (int)EmployeeType.Consultant), "GroupId", "Name");
+
 
     // User
     var users = ViewBag.Users;

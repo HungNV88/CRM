@@ -19,11 +19,12 @@
     ((List<UserInfo>)Users).RemoveAll(c => c.UserID == 0);
     ((List<UserInfo>)Users).Insert(0, new UserInfo { UserID = 0, FullName = "Tất Cả" });
     var lstUsers = new SelectList(Users, "UserID", "FullName");
-    
+
     var user = UserContext.GetCurrentUser();
     // Group
     var groups = (List<GroupInfo>)ViewBag.Groups;
     var branchId = UserContext.GetDefaultBranch();
+    var employeeId = (int)EmployeeType.Consultant;
     if (user.GroupConsultantType != (int)GroupConsultantType.ManagerConsultant)
     {
         groups = groups.Where(c => c.LeaderId == UserContext.GetCurrentUser().UserID || c.GroupId == (int)ViewBag.GroupId).ToList();
@@ -31,11 +32,12 @@
     ((List<GroupInfo>)groups).RemoveAll(c => c.GroupId == 0);
     if (groups.Count > 1)
     {
-       ((List<GroupInfo>)groups).Insert(0, new GroupInfo { GroupId = 0, Name = "Tất cả", BranchId = branchId, EmployeeTypeId = (int)EmployeeType.Consultant });
+        ((List<GroupInfo>)groups).Insert(0, new GroupInfo { GroupId = 0, Name = "Tất cả", BranchId = branchId, EmployeeTypeId = (int)EmployeeType.Consultant });
     }
-    var lstGroups = new SelectList(((List<GroupInfo>)groups).Where(c => c.BranchId == branchId).Where(c => c.EmployeeTypeId == (int)EmployeeType.Consultant), "GroupId", "Name");
+    //var lstGroups = new SelectList(((List<GroupInfo>)groups).Where(c => c.BranchId == branchId).Where(c => c.EmployeeTypeId == (int)EmployeeType.Consultant), "GroupId", "Name");
+    var lstGroups = new SelectList(groups.Where(c => c.EmployeeTypeId == employeeId), "GroupId", "Name");
 
-    
+
 }
 
 <div class="breadcrumbs" id="breadcrumbs">

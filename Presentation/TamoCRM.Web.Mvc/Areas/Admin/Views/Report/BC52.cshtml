@@ -26,7 +26,8 @@
         ((List<GroupInfo>)groups).Insert(0, new GroupInfo { GroupId = 0, Name = "Tất cả", BranchId = branchId, EmployeeTypeId = employeeId });
     }
 
-    var lstGroups = new SelectList(groups.Where(c => c.BranchId == branchId).Where(c => c.EmployeeTypeId == employeeId), "GroupId", "Name");
+    //var lstGroups = new SelectList(groups.Where(c => c.BranchId == branchId).Where(c => c.EmployeeTypeId == employeeId), "GroupId", "Name");
+    var lstGroups = new SelectList(groups.Where(c => c.EmployeeTypeId == (int)EmployeeType.Consultant), "GroupId", "Name");
     var lstLevels = ViewBag.Levels;
     var lstUsers = StoreData.SelectedList<UserInfo>();
 
