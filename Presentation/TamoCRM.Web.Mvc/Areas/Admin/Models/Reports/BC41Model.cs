@@ -10,7 +10,7 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.Models.Reports
         public DateTime? CallConsultantDate { get; set; }
         public string Consultant { get; set; }
         public string SourceType { get; set; }
-
+        public string Campaign { get; set; }
         public string Code { get; set; }
     }
 }

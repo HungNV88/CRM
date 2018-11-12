@@ -2131,6 +2131,7 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.Controllers
                     CallConsultantDate = info.CallConsultantDate,
                     Consultant = info.UserName,
                     SourceType = info.Name,
+                    Campaign = info.CampaindTpe,
                     Code = info.Code
                 };
                 lstData.Add(objModel);
