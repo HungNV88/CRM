@@ -2128,10 +2128,11 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.Controllers
                     Mobile = info.PhoneNumber,
                     Email = info.Email,
                     Level = info.LevelId,
-                    CallConsultantDate = info.CallConsultantDate,
+                    CallConsultantDate = info.CallConsultantDate == null ? string.Empty : info.CallConsultantDate.Value.ToString("dd/MM/yyyy"),
                     Consultant = info.UserName,
                     SourceType = info.Name,
-                    Campaign = info.CampaindTpe,
+                    CampainTpe = info.CampaindTpe,
+                    CampainTpeId = info.CampaindTpeId,
                     Code = info.Code
                 };
                 lstData.Add(objModel);
@@ -2247,7 +2248,7 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.Controllers
                     Mobile = info.Mobile1,
                     Email = info.Email,
                     Address = info.Address,
-                    RegisteredDate = info.RegisteredDate,
+                    RegisteredDate = info.RegisteredDate == null ? string.Empty : info.RegisteredDate.Value.ToString("dd/MM/yyyy"),
                     Campaind = info.CampaindTpe,
                     LandingPage = info.LandingPage,
                     Channel = info.Channel,
@@ -2255,7 +2256,7 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.Controllers
                     SearchKeyword = info.SearchKeyword,
                     PackageName = info.Package,
                     ContactId = info.Code,
-                    HandoverConsultantDate = info.HandoverConsultantDate,
+                    HandoverConsultantDate = info.HandoverConsultantDate == null ? string.Empty : info.HandoverConsultantDate.Value.ToString("dd/MM/yyyy"),
                     Consultant = info.UserName,
                     SourceType = info.SourceType
                 };

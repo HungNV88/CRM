@@ -6,31 +6,34 @@
         <TablixBody>
           <TablixColumns>
             <TablixColumn>
-              <Width>0.83093in</Width>
+              <Width>0.51655in</Width>
             </TablixColumn>
             <TablixColumn>
-              <Width>1in</Width>
+              <Width>1.30019in</Width>
             </TablixColumn>
             <TablixColumn>
-              <Width>1.84136in</Width>
+              <Width>1.84989in</Width>
             </TablixColumn>
             <TablixColumn>
-              <Width>1.20593in</Width>
+              <Width>0.9957in</Width>
             </TablixColumn>
             <TablixColumn>
-              <Width>0.9976in</Width>
+              <Width>2.29967in</Width>
             </TablixColumn>
             <TablixColumn>
-              <Width>0.84135in</Width>
+              <Width>0.51654in</Width>
             </TablixColumn>
             <TablixColumn>
-              <Width>1.28926in</Width>
+              <Width>0.90195in</Width>
             </TablixColumn>
             <TablixColumn>
-              <Width>1.33093in</Width>
+              <Width>0.78737in</Width>
             </TablixColumn>
             <TablixColumn>
-              <Width>1.33334in</Width>
+              <Width>2.77557in</Width>
+            </TablixColumn>
+            <TablixColumn>
+              <Width>1.30019in</Width>
             </TablixColumn>
           </TablixColumns>
           <TablixRows>
@@ -335,6 +338,43 @@
                 </TablixCell>
                 <TablixCell>
                   <CellContents>
+                    <Textbox Name="Textbox8">
+                      <CanGrow>true</CanGrow>
+                      <KeepTogether>true</KeepTogether>
+                      <Paragraphs>
+                        <Paragraph>
+                          <TextRuns>
+                            <TextRun>
+                              <Value>Chiến dịch</Value>
+                              <Style>
+                                <FontWeight>Bold</FontWeight>
+                                <Color>White</Color>
+                              </Style>
+                            </TextRun>
+                          </TextRuns>
+                          <Style>
+                            <TextAlign>Center</TextAlign>
+                          </Style>
+                        </Paragraph>
+                      </Paragraphs>
+                      <rd:DefaultName>Textbox8</rd:DefaultName>
+                      <Style>
+                        <Border>
+                          <Color>LightGrey</Color>
+                          <Style>Solid</Style>
+                        </Border>
+                        <BackgroundColor>#34810c</BackgroundColor>
+                        <VerticalAlign>Middle</VerticalAlign>
+                        <PaddingLeft>2pt</PaddingLeft>
+                        <PaddingRight>2pt</PaddingRight>
+                        <PaddingTop>2pt</PaddingTop>
+                        <PaddingBottom>2pt</PaddingBottom>
+                      </Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+                <TablixCell>
+                  <CellContents>
                     <Textbox Name="Textbox2">
                       <CanGrow>true</CanGrow>
                       <KeepTogether>true</KeepTogether>
@@ -421,7 +461,7 @@
                             </TextRun>
                           </TextRuns>
                           <Style>
-                            <TextAlign>Center</TextAlign>
+                            <TextAlign>Left</TextAlign>
                           </Style>
                         </Paragraph>
                       </Paragraphs>
@@ -437,7 +477,6 @@
                         <PaddingBottom>2pt</PaddingBottom>
                       </Style>
                     </Textbox>
-                    <rd:Selected>true</rd:Selected>
                   </CellContents>
                 </TablixCell>
                 <TablixCell>
@@ -454,7 +493,7 @@
                             </TextRun>
                           </TextRuns>
                           <Style>
-                            <TextAlign>Center</TextAlign>
+                            <TextAlign>Left</TextAlign>
                           </Style>
                         </Paragraph>
                       </Paragraphs>
@@ -518,7 +557,7 @@
                             </TextRun>
                           </TextRuns>
                           <Style>
-                            <TextAlign>Center</TextAlign>
+                            <TextAlign>Left</TextAlign>
                           </Style>
                         </Paragraph>
                       </Paragraphs>
@@ -614,11 +653,43 @@
                             </TextRun>
                           </TextRuns>
                           <Style>
-                            <TextAlign>Center</TextAlign>
+                            <TextAlign>Left</TextAlign>
                           </Style>
                         </Paragraph>
                       </Paragraphs>
                       <rd:DefaultName>Consultant1</rd:DefaultName>
+                      <Style>
+                        <Border>
+                          <Color>LightGrey</Color>
+                          <Style>Solid</Style>
+                        </Border>
+                        <PaddingLeft>2pt</PaddingLeft>
+                        <PaddingRight>2pt</PaddingRight>
+                        <PaddingTop>2pt</PaddingTop>
+                        <PaddingBottom>2pt</PaddingBottom>
+                      </Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="CampainTpe">
+                      <CanGrow>true</CanGrow>
+                      <KeepTogether>true</KeepTogether>
+                      <Paragraphs>
+                        <Paragraph>
+                          <TextRuns>
+                            <TextRun>
+                              <Value>=Fields!CampainTpe.Value</Value>
+                              <Style />
+                            </TextRun>
+                          </TextRuns>
+                          <Style>
+                            <TextAlign>Left</TextAlign>
+                          </Style>
+                        </Paragraph>
+                      </Paragraphs>
+                      <rd:DefaultName>CampainTpe</rd:DefaultName>
                       <Style>
                         <Border>
                           <Color>LightGrey</Color>
@@ -646,7 +717,7 @@
                             </TextRun>
                           </TextRuns>
                           <Style>
-                            <TextAlign>Center</TextAlign>
+                            <TextAlign>Left</TextAlign>
                           </Style>
                         </Paragraph>
                       </Paragraphs>
@@ -679,6 +750,7 @@
             <TablixMember />
             <TablixMember />
             <TablixMember />
+            <TablixMember />
           </TablixMembers>
         </TablixColumnHierarchy>
         <TablixRowHierarchy>
@@ -692,10 +764,10 @@
           </TablixMembers>
         </TablixRowHierarchy>
         <DataSetName>BC41</DataSetName>
-        <Top>0.625in</Top>
-        <Left>1.04167in</Left>
+        <Top>0.59722in</Top>
+        <Left>0.19792in</Left>
         <Height>0.91667in</Height>
-        <Width>10.6707in</Width>
+        <Width>13.24361in</Width>
         <Style>
           <Border>
             <Style>None</Style>
@@ -709,6 +781,10 @@
           <Paragraph>
             <TextRuns>
               <TextRun>
+                <Value xml:space="preserve">    </Value>
+                <Style />
+              </TextRun>
+              <TextRun>
                 <Value>=Parameters!Infomation.Value</Value>
                 <Style />
               </TextRun>
@@ -719,8 +795,8 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox46</rd:DefaultName>
-        <Top>0.34722in</Top>
-        <Left>1.04167in</Left>
+        <Top>0.27778in</Top>
+        <Left>1.52084in</Left>
         <Height>0.25in</Height>
         <Width>9.6707in</Width>
         <ZIndex>1</ZIndex>
@@ -768,7 +844,7 @@
           </Paragraph>
         </Paragraphs>
         <rd:DefaultName>Textbox4</rd:DefaultName>
-        <Left>0.89584in</Left>
+        <Left>1.52084in</Left>
         <Height>0.30556in</Height>
         <Width>9.81653in</Width>
         <ZIndex>2</ZIndex>
@@ -783,10 +859,10 @@
         </Style>
       </Textbox>
     </ReportItems>
-    <Height>1.54167in</Height>
+    <Height>1.64584in</Height>
     <Style />
   </Body>
-  <Width>11.71237in</Width>
+  <Width>13.44153in</Width>
   <Page>
     <PageHeight>8.5in</PageHeight>
     <PageWidth>14.05in</PageWidth>
@@ -845,10 +921,18 @@
           <DataField>Code</DataField>
           <rd:TypeName>System.String</rd:TypeName>
         </Field>
+        <Field Name="CampainTpe">
+          <DataField>CampainTpe</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="CampainTpeId">
+          <DataField>CampainTpeId</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
       </Fields>
       <rd:DataSetInfo>
         <rd:DataSetName>TmpJobReport</rd:DataSetName>
-        <rd:SchemaPath>E:\SVN_CRM\02.Source\Presentation\TamoCRM.Web.Mvc\Areas\Admin\DataSet\TmpJobReport.xsd</rd:SchemaPath>
+        <rd:SchemaPath>E:\Project\CRM\CRM Native\Presentation\TamoCRM.Web.Mvc\Areas\Admin\DataSet\TmpJobReport.xsd</rd:SchemaPath>
         <rd:TableName>BC41</rd:TableName>
         <rd:TableAdapterFillMethod />
         <rd:TableAdapterGetDataMethod />

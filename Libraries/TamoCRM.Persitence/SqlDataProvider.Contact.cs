@@ -736,12 +736,12 @@ namespace TamoCRM.Persitence
         }
 
         // Create
-        public override int Contacts_Insert_Tvts(string email, string email2, int levelId, DateTime? birth, int typeId, int gender, string fullname, string address, string notes, int branchId, int productSellId, int statusId, int userId, int statusMapId, int statusCareId, DateTime? registeredDate, DateTime? createdDate, DateTime? handoverDate, DateTime? appointmentDate, string mobile1, string mobile2, int createdBy)
+        public override int Contacts_Insert_Tvts(string email, string email2, int levelId, DateTime? birth, int typeId, int gender, string fullname, string address, string notes, int branchId, int productSellId, int statusId, int userId, int statusMapId, int statusCareId, DateTime? registeredDate, DateTime? createdDate, DateTime? handoverDate, DateTime? appointmentDate, string mobile1, string mobile2, int createdBy, int campaindTpe)
         {
             return (int)SqlHelper.ExecuteScalar(ConnectionString, GetFullyQualifiedName("Contacts_Insert_Tvts"),
                 email, email2, levelId, birth, typeId, gender, fullname, address, notes, branchId, productSellId, statusId,
                 userId, statusMapId, statusCareId, registeredDate, createdDate, handoverDate, appointmentDate,
-                mobile1, mobile2, createdBy);
+                mobile1, mobile2, createdBy, campaindTpe);
         }
         public override int Contacts_Insert_Hotline(int channelId, string email, string email2, int levelId, DateTime? birth, int typeId, int gender, string fullname, string address, string notes, int branchId, int productSellId, int statusId, int userId, int statusMapId, int statusCareId, DateTime? registeredDate, DateTime? createdDate, DateTime? handoverDate, DateTime? appointmentDate, string mobile1, string mobile2, int createdBy)
         {

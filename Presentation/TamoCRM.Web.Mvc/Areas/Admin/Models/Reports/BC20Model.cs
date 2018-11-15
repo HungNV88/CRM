@@ -11,7 +11,7 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.Models.Reports
         public string Mobile { get; set; }
         public string Email { get; set; }
         public string Address { get; set; }
-        public DateTime? RegisteredDate { get; set; }
+        public string RegisteredDate { get; set; }
         public string Campaind { get; set; }
         public string LandingPage { get; set; }
         public string Channel { get; set; }
@@ -19,7 +19,7 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.Models.Reports
         public string SearchKeyword { get; set; }
         public string PackageName { get; set; }
         public string ContactId { get; set; }
-        public DateTime? HandoverConsultantDate { get; set; }
+        public string HandoverConsultantDate { get; set; }
         public string Consultant { get; set; }
         public string SourceType { get; set; }
     }

@@ -61,117 +61,117 @@
                 </div>
                 <div style="border: 1px solid #c5d0dc; padding: 50px;">
                     <div class="row">
-                        <div class="col-xs-1">
+                        <div class="col-md-2" style="left:4%;">
                             Họ và tên *
                         </div>
-                        <div class="col-xs-4">
+                        <div class="col-md-4">
                             <div class="clearfix">
                                 @Html.TextBoxFor(x => x.ContactInfo.Fullname, new { @style = "width: 60%", @required = "required", error = "Họ và tên rỗng" })
                             </div>
                         </div>
-                        <div class="col-xs-1">
+                        <div class="col-md-2" style="left:4%;">
                             Chiến dịch
                         </div>
-                        <div class="col-xs-4">
+                        <div class="col-md-4">
                             <div class="clearfix">
-                                @Html.TextBoxFor(x => x.ContactInfo.CampaindTpe, new { @style = "width: 60%"})
+                                @Html.TextBoxFor(x => x.ContactInfo.CampaindTpe, new { @style = "width: 60%" })
                             </div>
                         </div>
                     </div>
                     <div class="space-4"></div>
                     <div class="row">
-                        <div class="col-xs-1">
+                        <div class="col-md-2" style="left:4%;">
                             Số điện thoại 1*
                         </div>
-                        <div class="col-xs-4">
+                        <div class="col-md-4">
                             <div class="input-group">
                                 <span class="input-group-addon">
                                     <i class="icon-phone"></i>
-                                </span>@Html.TextBoxFor(x => x.ContactInfo.Mobile1, new { @style = "width: 57%", @required = "", error = "Số điện thoại rỗng hoặc không đúng định dạng" })
+                                </span>@Html.TextBoxFor(x => x.ContactInfo.Mobile1, new { @style = "width: 55%", @required = "", error = "Số điện thoại rỗng hoặc không đúng định dạng" })
                             </div>
                         </div>
-                        <div class="col-xs-1">
+                        <div class="col-md-2" style="left:4%;">
                             Nguồn
                         </div>
-                        <div class="col-xs-4">
+                        <div class="col-md-4">
                             @Html.DropDownListFor(x => x.ContactInfo.TypeId, lstSourceTypes, new { style = "width: 60%" })
                         </div>
                     </div>
                     <div class="space-4"></div>
                     <div class="row">
-                        <div class="col-xs-1">
+                        <div class="col-md-2" style="left:4%;">
                             Số điện thoại 2
                         </div>
-                        <div class="col-xs-4">
+                        <div class="col-md-4">
                             <div class="input-group">
                                 <span class="input-group-addon">
                                     <i class="icon-phone"></i>
-                                </span>@Html.TextBoxFor(x => x.ContactInfo.Mobile2, new { @style = "width: 57%" })
+                                </span>@Html.TextBoxFor(x => x.ContactInfo.Mobile2, new { @style = "width: 55%" })
                             </div>
                         </div>
-                        <div class="col-xs-1">
+                        <div class="col-md-2" style="left:4%;">
                             Định bán
                         </div>
-                        <div class="col-xs-4">
+                        <div class="col-md-4">
                             @Html.DropDownListFor(x => x.ContactInfo.ProductSellId, lstProducts, new { style = "width: 60%" })
                         </div>
                     </div>
                     <div class="space-4"></div>
                     <div class="row">
-                        <div class="col-xs-1">
+                        <div class="col-md-2" style="left:4%;">
                             Email 1
                         </div>
-                        <div class="col-xs-4">
+                        <div class="col-md-4">
                             <div class="input-group">
                                 <span class="input-group-addon">
                                     <i class="icon-envelope" style="width: 11px;"></i>
                                 </span>
-                                @Html.TextBoxFor(x => x.ContactInfo.Email, new { style = "width: 57%" })
+                                @Html.TextBoxFor(x => x.ContactInfo.Email, new { style = "width: 55%" })
                             </div>
                         </div>
-                        <div class="col-xs-1">
+                        <div class="col-md-2" style="left:4%;">
                             Email 2
                         </div>
-                        <div class="col-xs-4">
+                        <div class="col-md-4">
                             <div class="input-group">
                                 <span class="input-group-addon">
                                     <i class="icon-envelope" style="width: 11px;"></i>
                                 </span>
-                                @Html.TextBoxFor(x => x.ContactInfo.Email2, new { @style = "width: 57%" })
+                                @Html.TextBoxFor(x => x.ContactInfo.Email2, new { @style = "width: 55%" })
                             </div>
                         </div>
                     </div>
                     <div class="space-4"></div>
                     <div class="row">
-                        <div class="col-xs-1">
-                            Giới tính  
+                        <div class="col-md-2" style="left:4%;">
+                            Giới tính
                         </div>
-                        <div class="col-xs-4">
+                        <div class="col-md-4">
                             @Html.DropDownListFor(x => x.ContactInfo.Gender, lstGenders, new { style = "width: 60%" })
                         </div>
-                        <div class="col-xs-1">
+                        <div class="col-md-2" style="left:4%;">
                             Ngày sinh
                         </div>
-                        <div class="col-xs-4">
+                        <div class="col-md-4">
                             @Html.TextBoxFor(x => x.Birthday, new { @style = "width: 60%", @pattern = "\\d{2}/\\d{2}/\\d{4})", error = "Ngày sinh không đúng định dạng" })
                         </div>
                     </div>
                     <div class="space-4"></div>
                     <div class="row">
-                        <div class="col-xs-1">
+                        <div class="col-md-2" style="left:4%;">
                             <label>Địa chỉ liên hệ</label>
                         </div>
-                        <div class="col-xs-10">
-                            @Html.TextBoxFor(x => x.ContactInfo.Address, new { @style = "width: 51%" })
+                        <div class="col-md-10">
+                            @Html.TextBoxFor(x => x.ContactInfo.Address, new { @style = "width: 60%" })
                         </div>
                     </div>
                     <div class="space-4"></div>
                     <div class="row">
-                        <div class="col-xs-1">
+                        <div class="col-md-2" style="left:4%;">
                             Ghi chú
                         </div>
-                        <div class="col-xs-10">
-                            @Html.TextAreaFor(x => x.ContactInfo.Notes, new { @style = "width: 51%" })
+                        <div class="col-md-10">
+                            @Html.TextAreaFor(x => x.ContactInfo.Notes, new { @style = "width: 60%" })
                         </div>
                     </div>
                     <div class="space-4"></div>

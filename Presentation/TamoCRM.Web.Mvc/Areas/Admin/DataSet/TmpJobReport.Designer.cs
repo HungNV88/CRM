@@ -7393,6 +7393,10 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.DataSet {
             
             private global::System.Data.DataColumn columnCode;
             
+            private global::System.Data.DataColumn columnCampainTpe;
+            
+            private global::System.Data.DataColumn columnCampainTpeId;
+            
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public BC41DataTable() {
@@ -7492,6 +7496,22 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.DataSet {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn CampainTpeColumn {
+                get {
+                    return this.columnCampainTpe;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn CampainTpeIdColumn {
+                get {
+                    return this.columnCampainTpeId;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             [global::System.ComponentModel.Browsable(false)]
             public int Count {
                 get {
@@ -7527,7 +7547,7 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.DataSet {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public BC41Row AddBC41Row(string Fullname, string Mobile, string Email, string Level, string CallConsultantDate, string Consultant, string SourceType, string Code) {
+            public BC41Row AddBC41Row(string Fullname, string Mobile, string Email, string Level, string CallConsultantDate, string Consultant, string SourceType, string Code, string CampainTpe, string CampainTpeId) {
                 BC41Row rowBC41Row = ((BC41Row)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         Fullname,
@@ -7537,7 +7557,9 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.DataSet {
                         CallConsultantDate,
                         Consultant,
                         SourceType,
-                        Code};
+                        Code,
+                        CampainTpe,
+                        CampainTpeId};
                 rowBC41Row.ItemArray = columnValuesArray;
                 this.Rows.Add(rowBC41Row);
                 return rowBC41Row;
@@ -7568,6 +7590,8 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.DataSet {
                 this.columnConsultant = base.Columns["Consultant"];
                 this.columnSourceType = base.Columns["SourceType"];
                 this.columnCode = base.Columns["Code"];
+                this.columnCampainTpe = base.Columns["CampainTpe"];
+                this.columnCampainTpeId = base.Columns["CampainTpeId"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -7589,6 +7613,10 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.DataSet {
                 base.Columns.Add(this.columnSourceType);
                 this.columnCode = new global::System.Data.DataColumn("Code", typeof(string), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnCode);
+                this.columnCampainTpe = new global::System.Data.DataColumn("CampainTpe", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnCampainTpe);
+                this.columnCampainTpeId = new global::System.Data.DataColumn("CampainTpeId", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnCampainTpeId);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -19448,6 +19476,38 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.DataSet {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public string CampainTpe {
+                get {
+                    try {
+                        return ((string)(this[this.tableBC41.CampainTpeColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'CampainTpe\' in table \'BC41\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableBC41.CampainTpeColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public string CampainTpeId {
+                get {
+                    try {
+                        return ((string)(this[this.tableBC41.CampainTpeIdColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'CampainTpeId\' in table \'BC41\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableBC41.CampainTpeIdColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public bool IsFullnameNull() {
                 return this.IsNull(this.tableBC41.FullnameColumn);
             }
@@ -19540,6 +19600,30 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.DataSet {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public void SetCodeNull() {
                 this[this.tableBC41.CodeColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsCampainTpeNull() {
+                return this.IsNull(this.tableBC41.CampainTpeColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetCampainTpeNull() {
+                this[this.tableBC41.CampainTpeColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool IsCampainTpeIdNull() {
+                return this.IsNull(this.tableBC41.CampainTpeIdColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public void SetCampainTpeIdNull() {
+                this[this.tableBC41.CampainTpeIdColumn] = global::System.Convert.DBNull;
             }
         }
         

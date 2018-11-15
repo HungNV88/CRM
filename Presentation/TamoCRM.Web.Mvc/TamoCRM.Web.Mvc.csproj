@@ -1271,6 +1271,10 @@
       <Project>{f0e035ae-2c17-4eb1-af1d-a29ab10036c6}</Project>
       <Name>TamoCRM.Call</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\WindowServices\TamoCRM.ImportExcel.Library\TamoCRM.ImportExcel.Library.csproj">
+      <Project>{FAEC043F-B291-47E0-8253-BA38C01342D4}</Project>
+      <Name>TamoCRM.ImportExcel.Library</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TamoCRM.Web.Framework\TamoCRM.Web.Framework.csproj">
       <Project>{ac605704-9c3f-4b32-a596-95d7649b8f0d}</Project>
       <Name>TamoCRM.Web.Framework</Name>
