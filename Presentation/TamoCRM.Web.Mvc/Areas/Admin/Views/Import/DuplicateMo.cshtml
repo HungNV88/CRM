@@ -121,13 +121,13 @@
 <script type="text/javascript">
     var grid_selector = "#grid-table";
     var employeeTypeId = '@((int)EmployeeType.Consultant)';
-    //var heades = ['Id', 'Họ tên', 'Email', 'Điện thoại', 'Thông tin bị trùng', 'Địa chỉ', 'Ngày đăng ký', 'Ngày gọi gần nhất', 'Landing Page', 'TVTS'];
-    var heades = ['Id', 'Họ tên', 'Email', 'Điện thoại', 'Thông tin bị trùng', 'Địa chỉ', 'Ngày đăng ký', 'Ngày gọi gần nhất', 'Landing Page', 'TVTS', '<input type="checkbox" id="chkSelectAll" onclick="fixCheckBoxGrid(event)" />'];
+    var heades = ['Id', 'Họ tên', 'Email', 'Điện thoại', 'Level', 'Thông tin bị trùng', 'Địa chỉ', 'Ngày đăng ký', 'Ngày gọi gần nhất', 'Landing Page', 'TVTS', '<input type="checkbox" id="chkSelectAll" onclick="fixCheckBoxGrid(event)" />'];
     var model = [
             { name: 'Id', index: 'Id', width: 40, editable: true, sorttype: 'string' },
 			{ name: 'Fullname', index: 'Fullname', width: 60, editable: true, sorttype: 'string' },
             { name: 'Email', index: 'Email', width: 80, editable: true, sorttype: 'string' },
             { name: 'Mobile', index: 'Mobile', width: 60, editable: true, sorttype: 'string' },
+            { name: 'LevelId', index: 'LevelId', width: 60, editable: true, sorttype: 'string', align: 'center', formatter: levelFomatter },
             { name: 'DuplicateInfo', index: 'DuplicateInfo', width: 80, editable: true, sorttype: 'string' },
             { name: 'Address', index: 'Address', width: 40, editable: true, sorttype: 'string' },
             { name: 'RegisteredDate', index: 'RegisteredDate', width: 60, editable: true, sorttype: 'int', editoptions: { disabled: 'true' } },

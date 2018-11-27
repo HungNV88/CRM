@@ -1066,8 +1066,12 @@ namespace TamoCRM.Web.Framework
             if (type == typeof(SourceTypeInfo))
             {
                 ListSourceType.RemoveAll(c => c.SourceTypeId == 0);
-                if (existAll) ListSourceType.Insert(0, new SourceTypeInfo { SourceTypeId = 0, Name = "Tất cả" });
-                return new SelectList(ListSourceType, "SourceTypeId", "Name");
+                List<SourceTypeInfo> listSourceType = new List<SourceTypeInfo>(ListSourceType);
+                if (existAll)
+                {
+                    listSourceType.Insert(0, new SourceTypeInfo() { SourceTypeId = 0, Name = "Tất cả" });
+                }
+                return new SelectList(listSourceType, "SourceTypeId", "Name");
             }
             if (type == typeof(ContainerInfo))
             {
