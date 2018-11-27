@@ -2,6 +2,8 @@
 @using TamoCRM.Domain.Collectors
 @using TamoCRM.Domain.ImportExcels
 @using TamoCRM.Core
+@using TamoCRM.Domain.UserRole
+@using TamoCRM.Web.Framework
 @model TamoCRM.Web.Mvc.Areas.Admin.Models.Contacts.ContactSearchModel
 @{
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
@@ -21,6 +23,7 @@
     ((List<ImportExcelInfo>)importExcels).RemoveAll(c => c.ImportId == 0);
     ((List<ImportExcelInfo>)importExcels).Insert(0, new ImportExcelInfo { ImportId = 0, FilePath = "Tất cả" });
     var lstImportExcels = new SelectList(importExcels, "ImportId", "FilePath");
+    var lstUsers = StoreData.SelectedList<UserInfo>();
 }
 <div class="breadcrumbs" id="breadcrumbs">
     <script type="text/javascript">
@@ -44,12 +47,17 @@
 
 <div class="page-content">
     <div class="page-header">
-        <h1>Danh sách contact bị trùng khi import					
+        <h1>
+            Danh sách contact bị trùng khi import
         </h1>
     </div>
     <!-- /.page-header -->
 
     <div class="row">
+        <div class="form-group">
+            <div class="col-sm-12" id="alert">
+            </div>
+        </div>
         <div class="col-xs-12">
             <!-- PAGE CONTENT BEGINS -->
             @using (Ajax.BeginForm("DuplicateMo", "Import", new AjaxOptions { HttpMethod = "POST" }, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "frmDuplicateMo" }))
@@ -70,8 +78,28 @@
                     </div>
                     <div class="col-sm-8">
                         <button id="btnSearch" type="button" class="btn-import btn-primary" value="Import" style="float: right; width: 80px;">Tìm</button>
-                        <button id="btnGetExcel" type="button" class="btn-import btn-primary" value="Excel" style="float: right; width: 80px;">Xuất excel</button>
+                        <button id="btnGetExcel" type="button" class="btn-import btn-primary" value="Excel" style="float: right; width: 100px;">Xuất excel</button>
                     </div>
+                </div>
+
+                <div class="space-6"></div>
+                <div id="divForwardDuplicate" style="border: 1px solid #c5d0dc; padding: 15px">
+                    <div class="form-group">
+                        <div class="col-sm-4"></div>
+                        <div class="col-sm-1">
+                            TVTS
+                        </div>
+                        <div class="col-sm-3">
+                            @Html.DropDownList("UserId", lstUsers, new { @style = "width: 100%;" })
+                        </div>
+                    </div>
+                    <div class="row" style="float: right">
+
+                        <button id="btnForwardDuplicate" class="btn-primary" style="float:right; margin-right: 15px;">Phân cho TVTS</button>
+                        @Html.TextBox("HandoverDate", DateTime.Now.ToString("dd/MM/yyyy"), new { @style = "float: right; height: 25px; margin-right: 10px; width: 100px; " })
+                        <label style="float: right; margin-right: 10px; margin-top: 2px;">Bàn giao cho ngày</label>
+                    </div>
+                    <div class="clearfix"></div>
                 </div>
             }
             <table id="grid-table"></table>
@@ -88,12 +116,13 @@
     <!-- /.row -->
 </div>
 <!-- /.page-content -->
-
 <!-- inline scripts related to this page -->
 
 <script type="text/javascript">
     var grid_selector = "#grid-table";
-    var heades = ['Id','Họ tên', 'Email','Điện thoại', 'Thông tin bị trùng', 'Địa chỉ', 'Ngày đăng ký','Ngày gọi gần nhất','Landing Page','TVTS'];
+    var employeeTypeId = '@((int)EmployeeType.Consultant)';
+    //var heades = ['Id', 'Họ tên', 'Email', 'Điện thoại', 'Thông tin bị trùng', 'Địa chỉ', 'Ngày đăng ký', 'Ngày gọi gần nhất', 'Landing Page', 'TVTS'];
+    var heades = ['Id', 'Họ tên', 'Email', 'Điện thoại', 'Thông tin bị trùng', 'Địa chỉ', 'Ngày đăng ký', 'Ngày gọi gần nhất', 'Landing Page', 'TVTS', '<input type="checkbox" id="chkSelectAll" onclick="fixCheckBoxGrid(event)" />'];
     var model = [
             { name: 'Id', index: 'Id', width: 40, editable: true, sorttype: 'string' },
 			{ name: 'Fullname', index: 'Fullname', width: 60, editable: true, sorttype: 'string' },
@@ -104,11 +133,12 @@
             { name: 'RegisteredDate', index: 'RegisteredDate', width: 60, editable: true, sorttype: 'int', editoptions: { disabled: 'true' } },
             { name: 'CallConsultantDate', index: 'CallConsultantDate', width: 60, editable: true, sorttype: 'int', editoptions: { disabled: 'true' } },
             { name: 'Landingpage', index: 'Landingpage', width: 30, editable: true, sorttype: 'string' },
-            { name: 'UserName', index: 'UserName', width: 40, editable: true, sorttype: 'string' }
+            { name: 'UserName', index: 'UserName', width: 40, editable: true, sorttype: 'string' },
+            { name: 'chkSelect', index: 'chkSelect', editable: false, edittype: 'checkbox', align: 'center', width: '40px', editoptions: { value: "True:False" }, formatter: checkboxFomatter, formatoptions: { disabled: false } }
     ];
     $(document).ready(function () {
         $('#ImportId').chosen();
-    
+
         $(".chzn-select-deselect").chosen({ allow_single_deselect: true });
 
         $('#ImportDate').datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly: true, endDate: "+0d" });
@@ -119,24 +149,76 @@
 
         $("#btnSearch").click(function (e) {
             e.preventDefault();
-            
+
             var importDate = $("#ImportDate").val().replaceAll('/', '');
             var importId = $('#ImportId').chosen().val();
-          
+
             var newUrl = "/admin/api/contact/get?action=duplicatemo&branchId=@TamoCRM.Web.Framework.Users.UserContext.GetDefaultBranch()" + "&importDate=" + importDate + "&importId=" + importId;
             jQuery(grid_selector).jqGrid().setGridParam({ url: newUrl }).trigger("reloadGrid");
         });
-      
+
         $("#btnGetExcel").click(function (e) {
             e.preventDefault();
 
             var importDate = $("#ImportDate").val().replaceAll('/', '');
             var importId = $('#ImportId').chosen().val();
-            
+
             var newUrl = "/admin/report/showbc55?branchId=@TamoCRM.Web.Framework.Users.UserContext.GetDefaultBranch()" + "&importDate=" + importDate + "&importId=" + importId;
             $("#frame").attr("src", newUrl);
         });
     });
 
+    $("#chkSelectAll").click(function () {
+        checkAll('chkSelectAll', 'checkbox');
+    });
+
+    $("#btnForwardDuplicate").click(function (e) {
+        e.preventDefault();
+        // Param
+        var ids = '';
+        var items = $("#grid-table td input");
+        for (var i = 0; i < items.length; i++) {
+            if ($(items[i]).is(':checked')) {
+                ids += ids.length == 0
+                    ? $('#grid-table').jqGrid('getCell', i + 1, 'Id')
+                    : ',' + $('#grid-table').jqGrid('getCell', i + 1, 'Id');
+            }
+        }
+        if (ids.length == 0) {
+            alertError('Bạn chưa chọn contact để Chuyển giao, vui lòng chọn!');
+            return;
+        }
+
+        var targetUserId = $('#UserId').val();
+        if (targetUserId == 0) {
+            alertError('Bạn chưa chọn TVTS cần chuyền giao, vui lòng chọn!');
+            return;
+        }
+        var handoverDate = $('#HandoverDate').val().replaceAll('/', '');
+        var r = confirm("Có phải bạn muốn chuyển contact đã chọn sang cho TVTS khác?");
+        if (r == true) {
+            $.ajax({
+                type: 'POST',
+                url: '/admin/api/contact/HandoverContactFast',
+                data: {
+                    ids: ids,
+                    handoverDate: handoverDate,
+                    targetUserId: targetUserId,
+                    targetBranchId: 4,
+                    employeeTypeId: employeeTypeId,
+                },
+                beforeSend: function () {
+                    alertProcess();
+                },
+                success: function (response) {
+                    alertSuccess("Chuyển thành công " + response + " contacts cho TVTS");
+                    $("#btnSearch").click();
+                },
+                error: function (request, status, ex) {
+                    alertError("Hệ thống bị lỗi, Bàn giao không thành công.");
+                }
+            });
+        }
+    });   
 </script>
 
