@@ -489,6 +489,17 @@ namespace TamoCRM.Persitence
             }
         }
 
+        // Khi import contact bi duplicate, se chon cac contact duplicate va chuyen ve kho MOL
+        public override void Contacts_Update_RecoveryContainer_Duplicate(string ids, int userId, DateTime recoveryDate, EmployeeType employeeType, int createdBy)
+        {
+            switch (employeeType)
+            {
+                case EmployeeType.Consultant:
+                    SqlHelper.ExecuteNonQuery(ConnectionString, GetFullyQualifiedName("Contacts_Update_RecoveryContainer_Duplicate_Consultant"), (int)StatusType.ContainerMOL, ids, userId, recoveryDate, createdBy);
+                    break;
+            }
+        }
+
         // Change
         public override int Contacts_Update_Change_Container(int branchId, string typeIds, string levelIds, string importIds, string statusIds, string containerIds, string channelIds, string channelAmounts, int containerId, int productSellId, int createdBy)
         {

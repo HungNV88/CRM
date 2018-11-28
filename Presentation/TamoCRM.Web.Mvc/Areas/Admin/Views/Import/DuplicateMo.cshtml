@@ -83,21 +83,9 @@
                 </div>
 
                 <div class="space-6"></div>
-                <div id="divForwardDuplicate" style="border: 1px solid #c5d0dc; padding: 15px">
-                    <div class="form-group">
-                        <div class="col-sm-4"></div>
-                        <div class="col-sm-1">
-                            TVTS
-                        </div>
-                        <div class="col-sm-3">
-                            @Html.DropDownList("UserId", lstUsers, new { @style = "width: 100%;" })
-                        </div>
-                    </div>
+                <div id="divRecoveryDuplicate" style="border: 1px solid #c5d0dc; padding: 15px">
                     <div class="row" style="float: right">
-
-                        <button id="btnForwardDuplicate" class="btn-primary" style="float:right; margin-right: 15px;">Phân cho TVTS</button>
-                        @Html.TextBox("HandoverDate", DateTime.Now.ToString("dd/MM/yyyy"), new { @style = "float: right; height: 25px; margin-right: 10px; width: 100px; " })
-                        <label style="float: right; margin-right: 10px; margin-top: 2px;">Bàn giao cho ngày</label>
+                        <button id="btnRecoveryDuplicate" class="btn-primary" style="float:right; margin-right: 15px;">Chuyển contact sang MOL</button>
                     </div>
                     <div class="clearfix"></div>
                 </div>
@@ -172,7 +160,7 @@
         checkAll('chkSelectAll', 'checkbox');
     });
 
-    $("#btnForwardDuplicate").click(function (e) {
+    $("#btnRecoveryDuplicate").click(function (e) {
         e.preventDefault();
         // Param
         var ids = '';
@@ -185,37 +173,34 @@
             }
         }
         if (ids.length == 0) {
-            alertError('Bạn chưa chọn contact để Chuyển giao, vui lòng chọn!');
+            alertError('Bạn chưa chọn contact để chuyển, vui lòng chọn!');
             return;
         }
 
         var targetUserId = $('#UserId').val();
         if (targetUserId == 0) {
-            alertError('Bạn chưa chọn TVTS cần chuyền giao, vui lòng chọn!');
+            alertError('Bạn chưa chọn TVTS cần chuyền, vui lòng chọn!');
             return;
         }
-        var handoverDate = $('#HandoverDate').val().replaceAll('/', '');
-        var r = confirm("Có phải bạn muốn chuyển contact đã chọn sang cho TVTS khác?");
+        //var handoverDate = $('#HandoverDate').val().replaceAll('/', '');
+        var r = confirm("Có phải bạn muốn chuyển các contact đã chọn sang kho MOL?");
         if (r == true) {
             $.ajax({
                 type: 'POST',
-                url: '/admin/api/contact/HandoverContactFast',
+                url: '/admin/api/contact/recoverycontainerduplicate',
                 data: {
                     ids: ids,
-                    handoverDate: handoverDate,
-                    targetUserId: targetUserId,
-                    targetBranchId: 4,
                     employeeTypeId: employeeTypeId,
                 },
                 beforeSend: function () {
                     alertProcess();
                 },
                 success: function (response) {
-                    alertSuccess("Chuyển thành công " + response + " contacts cho TVTS");
+                    alertSuccess("Chuyển thành công " + response + " contacts sang kho MOL");
                     $("#btnSearch").click();
                 },
                 error: function (request, status, ex) {
-                    alertError("Hệ thống bị lỗi, Bàn giao không thành công.");
+                    alertError("Hệ thống bị lỗi, chuyển contact không thành công.");
                 }
             });
         }
