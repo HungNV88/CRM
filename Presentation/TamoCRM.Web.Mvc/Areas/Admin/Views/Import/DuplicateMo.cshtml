@@ -154,10 +154,10 @@
             var newUrl = "/admin/report/showbc55?branchId=@TamoCRM.Web.Framework.Users.UserContext.GetDefaultBranch()" + "&importDate=" + importDate + "&importId=" + importId;
             $("#frame").attr("src", newUrl);
         });
-    });
 
-    $("#chkSelectAll").click(function () {
-        checkAll('chkSelectAll', 'checkbox');
+        $("#chkSelectAll").click(function () {
+            checkAll('chkSelectAll', 'checkbox');
+        });
     });
 
     $("#btnRecoveryDuplicate").click(function (e) {
@@ -197,6 +197,7 @@
                 },
                 success: function (response) {
                     alertSuccess("Chuyển thành công " + response + " contacts sang kho MOL");
+                    $('#chkSelectAll').prop('checked', false); 
                     $("#btnSearch").click();
                 },
                 error: function (request, status, ex) {
