@@ -63,7 +63,7 @@
     ((List<ProductInfo>)product).Insert(0, new ProductInfo { Id = 0, Name = "Tất cả" });
     var lstProducts = new SelectList(product, "Id", "Name");
 
-    var lstStatus = Util.SelectedListInclude<StatusType>(true, (int)StatusType.New, (int)StatusType.AcceptCollaborator, (int)StatusType.RecoveryConsultant, (int)StatusType.DuplicateContact);
+    var lstStatus = Util.SelectedListInclude<StatusType>(true, (int)StatusType.New, (int)StatusType.AcceptCollaborator, (int)StatusType.RecoveryConsultant, (int)StatusType.DuplicateContact, (int)StatusType.ContainerMOL);
 }
 
 <style>
@@ -145,7 +145,7 @@
                                     </div>
                                     <div class="row"></div>
                                     <div class="col-sm-4">
-                                        <label class="bolder">Trạng Thái</label>
+                                        <label class="bolder">Kho contact</label>
                                     </div>
                                     <div class="col-sm-5">
                                         @Html.DropDownListFor(x => x.StatusId, lstStatus, new { @class = "form-control", @style = "width: 180px;" })
