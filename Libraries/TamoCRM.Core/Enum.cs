@@ -34,7 +34,18 @@ namespace TamoCRM.Core
 
         //Thêm 1 kho contact L8 để chứa các contact L8 đã được thu hồi lại, tách riêng với các kho khác
         [Description("Kho Contact L8")]
-        L8Container = 10     
+        L8Container = 10,
+        // Thêm mới 5 kho
+        [Description("Kho MOL 1.1")]
+        ContainerMOL1_1 = 11,
+        [Description("Kho MOL 1.6")]
+        ContainerMOL1_6 = 16,
+        [Description("Kho MOL Kid")]
+        ContainerMOL_KID = 17,
+        [Description("Kho CC")]
+        Container_CC = 18,
+        [Description("Kho dự phòng")]
+        Container_DuPhong = 19,
     }
 
     public enum TodayType
