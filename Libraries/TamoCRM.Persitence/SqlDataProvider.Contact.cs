@@ -470,9 +470,9 @@ namespace TamoCRM.Persitence
             switch (employeeType)
             {
                 case EmployeeType.Collaborator:
-                    return SqlHelper.ExecuteReader(ConnectionString, GetFullyQualifiedName("Contacts_Filter_Recovery_Collaborator"), (int)StatusType.RecoveryCollaborator, userIds, levelIds, statusMapId, statusCareId, branchId, (int)todayType, handoverFromDate, handoverToDate, callFromDate, callToDate, sourceType, pageIndex, pageSize);
+                    return SqlHelper.ExecuteReader(ConnectionString, GetFullyQualifiedName("Contacts_Filter_Recovery_Collaborator"), (int)StatusType.HandoverCollaborator, userIds, levelIds, statusMapId, statusCareId, branchId, (int)todayType, handoverFromDate, handoverToDate, callFromDate, callToDate, sourceType, pageIndex, pageSize);
                 case EmployeeType.Consultant:
-                    return SqlHelper.ExecuteReader(ConnectionString, GetFullyQualifiedName("Contacts_Filter_Recovery_Consultant"), (int)StatusType.RecoveryConsultant, userIds, levelIds, statusMapId, statusCareId, branchId, (int)todayType, handoverFromDate, handoverToDate, callFromDate, callToDate, sourceType, pageIndex, pageSize);
+                    return SqlHelper.ExecuteReader(ConnectionString, GetFullyQualifiedName("Contacts_Filter_Recovery_Consultant"), (int)StatusType.HandoverConsultant, userIds, levelIds, statusMapId, statusCareId, branchId, (int)todayType, handoverFromDate, handoverToDate, callFromDate, callToDate, sourceType, pageIndex, pageSize);
             }
             return null;
         }
