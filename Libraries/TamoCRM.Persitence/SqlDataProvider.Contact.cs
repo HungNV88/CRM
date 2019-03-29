@@ -446,7 +446,7 @@ namespace TamoCRM.Persitence
         }
 
         // Recovery
-        public override int Contacts_Recovery_All(string userIds, string levelIds, int statusMapId, int statusCareId, int day, int branchId, TodayType todayType, EmployeeType employeeType, int userId, DateTime recoveryDate, int createdBy,DateTime? callToDate,DateTime? callFromDate,DateTime? handoverToDate,DateTime? handoverFromDate)
+        public override int Contacts_Recovery_All(string userIds, string levelIds, int statusMapId, int statusCareId, int day, int branchId, int sourceType, TodayType todayType, EmployeeType employeeType, int userId, DateTime recoveryDate, int createdBy,DateTime? callToDate,DateTime? callFromDate,DateTime? handoverToDate,DateTime? handoverFromDate)
         {
             switch (employeeType)
             {
@@ -454,13 +454,13 @@ namespace TamoCRM.Persitence
                     return (int)SqlHelper.ExecuteScalar(ConnectionString,
                                 GetFullyQualifiedName("Contacts_Update_Recovery_All_Collaborator"),
                                 (int) StatusType.HandoverCollaborator, userIds, levelIds, statusMapId, statusCareId, day,
-                                branchId, (int) todayType, userId, (int) StatusType.RecoveryCollaborator, recoveryDate,
+                                branchId, sourceType, (int) todayType, userId, (int) StatusType.RecoveryCollaborator, recoveryDate,
                                 createdBy, callToDate, callFromDate, handoverToDate, handoverFromDate);
                 case EmployeeType.Consultant:
                     return (int)SqlHelper.ExecuteScalar(ConnectionString,
                                 GetFullyQualifiedName("Contacts_Update_Recovery_All_Consultant"),
                                 (int) StatusType.HandoverConsultant, userIds, levelIds, statusMapId, statusCareId, day,
-                                branchId, (int) todayType, userId, (int) StatusType.RecoveryConsultant, recoveryDate,
+                                branchId, sourceType, (int) todayType, userId, (int) StatusType.RecoveryConsultant, recoveryDate,
                                 createdBy, callToDate, callFromDate, handoverToDate, handoverFromDate);
             }
             return 0;

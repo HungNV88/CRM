@@ -1268,7 +1268,7 @@ function validateEmail(value) {
     return value.match(regex);
 }
 
-function validateMobile(value) {
+function validateMobile(value, isValid) {
     var PREFIX_PHONE = [
         "86",
         "96",
@@ -1304,7 +1304,7 @@ function validateMobile(value) {
     if (value == null || value.length == 0) return true;
     // Check đầu số các thuê bao di động trong nước
     var prefix = value.substr(0, 2);
-    if (PREFIX_PHONE.indexOf(prefix) > -1) {
+    if (PREFIX_PHONE.indexOf(prefix) > -1 && isValid) {
         var regex = /^(?!0)((\d{3}-\d{3}-\d{4})|\d{9})$/;
         return value.match(regex);
     } else {
@@ -1567,7 +1567,7 @@ function checkDuplicate() {
             mobile1 = mobile1.substr(1);
             $('#ContactInfo_Mobile1').val(mobile1);
         }
-        if (!validateMobile(mobile1)) {
+        if (!validateMobile(mobile1, true)) {
             alertError('Số điện thoại 1 không hợp lệ, vui lòng thử lại');
             return false;
         }
@@ -1579,7 +1579,7 @@ function checkDuplicate() {
             mobile2 = mobile2.substr(1);
             $('#ContactInfo_Mobile2').val(mobile2);
         }
-        if (!validateMobile(mobile2)) {
+        if (!validateMobile(mobile2, false)) {
             alertError('Số điện thoại 2 không hợp lệ, vui lòng thử lại');
             return false;
         }
@@ -1591,7 +1591,7 @@ function checkDuplicate() {
             mobile3 = mobile3.substr(1);
             $('#ContactInfo_Mobile3').val(mobile3);
         }
-        if (!validateMobile(mobile3)) {
+        if (!validateMobile(mobile3, true)) {
             alertError('Số điện thoại 3 không hợp lệ, vui lòng thử lại');
             return false;
         }
@@ -1616,6 +1616,11 @@ function checkDuplicate() {
             alertError('Số điện thoại 2 và 3 đang bị trùng nhau, vui lòng thử lại');
             return false;
         }
+    }
+
+    if (mobile1 === '' && mobile2 === '') {
+        alertError('Số điện thoại 1 hoặc 2 không được trống, vui lòng thử lại');
+        return false;
     }
 
     // Check email

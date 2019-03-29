@@ -315,6 +315,7 @@
             var callFromDate = $('#CallFromDate').val().replaceAll('/', '');
             var handoverToDate = $('#HandoverToDate').val().replaceAll('/', '');
             var handoverFromDate = $('#HandoverFromDate').val().replaceAll('/', '');
+            var sourceType = $("#TypeId").val();
 
             var items = $("#grid-table td input");
             if (items.length == 0) {
@@ -349,7 +350,8 @@
                         callToDate: callToDate,
                         callFromDate: callFromDate,
                         handoverToDate: handoverToDate,
-                        handoverFromDate: handoverFromDate
+                        handoverFromDate: handoverFromDate,
+                        sourceType: sourceType
                     },
                     beforeSend: function () {
                         alertProcess();
