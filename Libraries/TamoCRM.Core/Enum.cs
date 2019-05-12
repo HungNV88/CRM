@@ -46,6 +46,8 @@ namespace TamoCRM.Core
         Container_CC = 18,
         [Description("Kho dự phòng")]
         Container_DuPhong = 19,
+        [Description("Kho MOL KVKL")]
+        Container_MOL_KVKL = 20,
     }
 
     public enum TodayType
