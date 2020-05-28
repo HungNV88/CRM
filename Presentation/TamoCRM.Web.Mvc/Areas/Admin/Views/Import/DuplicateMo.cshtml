@@ -85,7 +85,8 @@
                 <div class="space-6"></div>
                 <div id="divRecoveryDuplicate" style="border: 1px solid #c5d0dc; padding: 15px">
                     <div class="row" style="float: right">
-                        <button id="btnRecoveryDuplicate" class="btn-primary" style="float:right; margin-right: 15px;">Chuyển contact sang MOL</button>
+                        <button id="btnRecoveryDuplicate" class="btn-primary" style="float:left; margin-right: 15px;">Chuyển contact sang MOL</button>
+                        <button id="btnRecoveryDuplicate1_6" class="btn-primary" style="float:right; margin-right: 15px;">Chuyển contact sang thu hồi lớp 1-6</button>
                     </div>
                     <div class="clearfix"></div>
                 </div>
@@ -159,7 +160,7 @@
             checkAll('chkSelectAll', 'checkbox');
         });
     });
-
+    // Thu hoi contact mo hinh 1-1
     $("#btnRecoveryDuplicate").click(function (e) {
         e.preventDefault();
         // Param
@@ -198,6 +199,102 @@
                 success: function (response) {
                     alertSuccess("Chuyển thành công " + response + " contacts sang kho MOL");
                     $('#chkSelectAll').prop('checked', false); 
+                    $("#btnSearch").click();
+                },
+                error: function (request, status, ex) {
+                    alertError("Hệ thống bị lỗi, chuyển contact không thành công.");
+                }
+            });
+        }
+    });   
+
+    // Thu hoi contact mo hinh 1-1
+    $("#btnRecoveryDuplicate").click(function (e) {
+        e.preventDefault();
+        // Param
+        var ids = '';
+        var items = $("#grid-table td input");
+        for (var i = 0; i < items.length; i++) {
+            if ($(items[i]).is(':checked')) {
+                ids += ids.length == 0
+                    ? $('#grid-table').jqGrid('getCell', i + 1, 'Id')
+                    : ',' + $('#grid-table').jqGrid('getCell', i + 1, 'Id');
+            }
+        }
+        if (ids.length == 0) {
+            alertError('Bạn chưa chọn contact để chuyển, vui lòng chọn!');
+            return;
+        }
+
+        var targetUserId = $('#UserId').val();
+        if (targetUserId == 0) {
+            alertError('Bạn chưa chọn TVTS cần chuyền, vui lòng chọn!');
+            return;
+        }
+        //var handoverDate = $('#HandoverDate').val().replaceAll('/', '');
+        var r = confirm("Có phải bạn muốn chuyển các contact đã chọn sang kho MOL?");
+        if (r == true) {
+            $.ajax({
+                type: 'POST',
+                url: '/admin/api/contact/recoverycontainerduplicate',
+                data: {
+                    ids: ids,
+                    employeeTypeId: employeeTypeId,
+                },
+                beforeSend: function () {
+                    alertProcess();
+                },
+                success: function (response) {
+                    alertSuccess("Chuyển thành công " + response + " contacts sang kho MOL");
+                    $('#chkSelectAll').prop('checked', false); 
+                    $("#btnSearch").click();
+                },
+                error: function (request, status, ex) {
+                    alertError("Hệ thống bị lỗi, chuyển contact không thành công.");
+                }
+            });
+        }
+    });
+
+    // Thu hoi contact mo hinh 1-6
+    $("#btnRecoveryDuplicate1_6").click(function (e) {
+        e.preventDefault();
+        // Param
+        var ids = '';
+        var items = $("#grid-table td input");
+        for (var i = 0; i < items.length; i++) {
+            if ($(items[i]).is(':checked')) {
+                ids += ids.length == 0
+                    ? $('#grid-table').jqGrid('getCell', i + 1, 'Id')
+                    : ',' + $('#grid-table').jqGrid('getCell', i + 1, 'Id');
+            }
+        }
+        if (ids.length == 0) {
+            alertError('Bạn chưa chọn contact để chuyển, vui lòng chọn!');
+            return;
+        }
+
+        var targetUserId = $('#UserId').val();
+        if (targetUserId == 0) {
+            alertError('Bạn chưa chọn TVTS cần chuyền, vui lòng chọn!');
+            return;
+        }
+        //var handoverDate = $('#HandoverDate').val().replaceAll('/', '');
+        var r = confirm("Có phải bạn muốn chuyển các contact đã chọn sang Kho thu hồi lớp 1-6?");
+        if (r == true) {
+            $.ajax({
+                type: 'POST',
+                url: '/admin/api/contact/recoverycontainerduplicate1_6',
+                data: {
+                    ids: ids,
+                    employeeTypeId: employeeTypeId,
+                },
+                beforeSend: function () {
+                    alertProcess();
+                },
+                success: function (response) {
+                    alertSuccess("Chuyển thành công " + response + " contacts sang Kho thu hồi lớp 1-6");
+                    $('#chkSelectAll').prop('checked', false);
                     $("#btnSearch").click();
                 },
                 error: function (request, status, ex) {

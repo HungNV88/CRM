@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Data;
 using Microsoft.ApplicationBlocks.Data;
 using TamoCRM.Core;
@@ -392,7 +392,7 @@ namespace TamoCRM.Persitence
         }
 
         // Handover
-        public override IDataReader Contacts_Filter_Handover(int branchId, string typeIds, string levelIds, string importIds, string statusIds, string containerIds, string channelIds, string channelAmounts, EmployeeType employeeType, int statusCareId, int statusMapId)
+        public override IDataReader Contacts_Filter_Handover(int amountContacts, int branchId, string typeIds, string levelIds, string importIds, string statusIds, string containerIds, string channelIds, string channelAmounts, EmployeeType employeeType, int statusCareId, int statusMapId)
         {
             switch (employeeType)
             {
@@ -402,7 +402,7 @@ namespace TamoCRM.Persitence
                     }
                 case EmployeeType.Consultant:
                     {
-                        return SqlHelper.ExecuteReader(ConnectionString, GetFullyQualifiedName("Contacts_Filter_Handover_Consultant"), branchId, typeIds, levelIds, importIds, statusIds, containerIds, channelIds, channelAmounts, statusCareId, statusMapId);
+                        return SqlHelper.ExecuteReader(ConnectionString, GetFullyQualifiedName("Contacts_Filter_Handover_Consultant"), amountContacts, branchId, typeIds, levelIds, importIds, statusIds, containerIds, channelIds, channelAmounts, statusCareId, statusMapId);
                     }
                 case EmployeeType.All:
                     {
@@ -489,13 +489,13 @@ namespace TamoCRM.Persitence
             }
         }
 
-        // Khi import contact bi duplicate, se chon cac contact duplicate va chuyen ve kho MOL
-        public override void Contacts_Update_RecoveryContainer_Duplicate(string ids, int userId, DateTime recoveryDate, EmployeeType employeeType, int createdBy)
+        // Khi import contact bi duplicate, se chon cac contact duplicate va chuyen ve kho MOL hoáº·c kho thu hoi 1-6
+        public override void Contacts_Update_RecoveryContainer_Duplicate(string ids, int userId, int statusId, DateTime recoveryDate, EmployeeType employeeType, int createdBy)
         {
             switch (employeeType)
             {
                 case EmployeeType.Consultant:
-                    SqlHelper.ExecuteNonQuery(ConnectionString, GetFullyQualifiedName("Contacts_Update_RecoveryContainer_Duplicate_Consultant"), (int)StatusType.ContainerMOL, ids, userId, recoveryDate, createdBy);
+                    SqlHelper.ExecuteNonQuery(ConnectionString, GetFullyQualifiedName("Contacts_Update_RecoveryContainer_Duplicate_Consultant"), statusId, ids, userId, recoveryDate, createdBy);
                     break;
             }
         }
@@ -630,7 +630,7 @@ namespace TamoCRM.Persitence
                     userIds = string.Empty;
                     var statusIds = string.Empty;
                     //var statusIds = (int)StatusType.New;
-                    branchId = 0; //thêm vào do yêu c?u qu?n lý contact du?c tìm ki?m trên toàn h? th?ng
+                    branchId = 0; //thÃªm vÃ o do yÃªu c?u qu?n lÃ½ contact du?c tÃ¬m ki?m trÃªn toÃ n h? th?ng
                     return SqlHelper.ExecuteReader(ConnectionString, GetFullyQualifiedName("Contacts_Filter_Search_Fast_Consultant"), branchId, userIds, statusIds, name, mobile, email, pageIndex, pageSize);
                 }
             }

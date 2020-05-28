@@ -48,6 +48,11 @@ namespace TamoCRM.Core
         Container_DuPhong = 19,
         [Description("Kho MOL KVKL")]
         Container_MOL_KVKL = 20,
+        // HungNV: 16/05/2020- Thêm kho cho mô hình lớp 1-6
+        [Description("Kho Lớp 1_6")]
+        Container_1_6 = 21,
+        [Description("Kho Thu hồi Lớp 1_6")]
+        Container_Recovery_1_6 = 22,
     }
 
     public enum TodayType

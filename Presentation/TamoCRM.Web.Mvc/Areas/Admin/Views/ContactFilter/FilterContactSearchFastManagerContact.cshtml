@@ -7,7 +7,7 @@
 @{
     ViewBag.Title = "Tìm kiếm Contact cho Quản lý";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
-    var lstStatus = Util.SelectedListExclude<StatusType>(false, (int)StatusType.HandoverCollaborator, (int)StatusType.HandoverConsultant, (int)StatusType.AcceptCollaborator, (int)StatusType.NewCollaborator, (int)StatusType.RecoveryCollaborator, (int)StatusType.RecoveryConsultant, (int)StatusType.DuplicateContact, (int)StatusType.ContainerMOL);
+    var lstStatus = Util.SelectedListExclude<StatusType>(false, (int)StatusType.HandoverCollaborator, (int)StatusType.HandoverConsultant, (int)StatusType.AcceptCollaborator, (int)StatusType.NewCollaborator, (int)StatusType.RecoveryCollaborator, (int)StatusType.RecoveryConsultant, (int)StatusType.DuplicateContact);
     var lstUsers = StoreData.SelectedList<UserInfo>();
     var lstBranches = StoreData.SelectedList<BranchInfo>();
 }

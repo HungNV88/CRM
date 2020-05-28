@@ -63,8 +63,9 @@
     ((List<ProductInfo>)product).Insert(0, new ProductInfo { Id = 0, Name = "Tất cả" });
     var lstProducts = new SelectList(product, "Id", "Name");
 
-    var lstStatus = Util.SelectedListInclude<StatusType>(true, (int)StatusType.New, (int)StatusType.AcceptCollaborator, (int)StatusType.RecoveryConsultant, 
-        (int)StatusType.DuplicateContact, (int)StatusType.ContainerMOL, (int)StatusType.ContainerMOL1_1, (int)StatusType.ContainerMOL1_6, (int)StatusType.ContainerMOL_KID, (int)StatusType.Container_CC, (int)StatusType.Container_DuPhong, (int)StatusType.Container_MOL_KVKL);
+    var lstStatus = Util.SelectedListInclude<StatusType>(true, (int)StatusType.New, (int)StatusType.AcceptCollaborator, (int)StatusType.RecoveryConsultant,
+        (int)StatusType.DuplicateContact, (int)StatusType.ContainerMOL, (int)StatusType.ContainerMOL1_1, (int)StatusType.ContainerMOL1_6, (int)StatusType.ContainerMOL_KID,
+        (int)StatusType.Container_CC, (int)StatusType.Container_DuPhong, (int)StatusType.Container_MOL_KVKL, (int)StatusType.Container_1_6, (int)StatusType.Container_Recovery_1_6);
 }
 
 <style>
@@ -319,7 +320,7 @@
             // Param
             var typeIds = $('#TypeId').val();
             var levelIds = $('#LevelId').val();
-            var statusIds = getIds('StatusId');
+            var statusIds = $('#StatusId').val();
             var importIds = $('#ImportId').val();
             var channelIds = buildParamChannel(lstChannels);
             var containerIds = $('#ContainerId').val();
@@ -331,12 +332,20 @@
             var users = '';
             var amounts = '';
             var rows = $("#grid-table").getDataIDs();
+            var index = 0;
             for (i = 1; i < rows.length + 1; i++) {
-                users += i == 1 ? $('#grid-table').jqGrid('getCell', i, 'Id') : ',' + $('#grid-table').jqGrid('getCell', i, 'Id');
+                
                 var numId = $($('#grid-table').jqGrid('getCell', i, 'DraftNew')).attr('id');
-                amounts += i == 1
+                var amount = $('#' + numId).val();
+                if (amount <= 0) {
+                    continue;
+                }
+                index += 1;
+                amounts += index == 1
                     ? $('#' + numId).val()
                     : ',' + $('#' + numId).val();
+
+                users += index == 1 ? $('#grid-table').jqGrid('getCell', i, 'Id') : ',' + $('#grid-table').jqGrid('getCell', i, 'Id');
             }
 
             $.post("/admin/api/contact/SaveDraft", {

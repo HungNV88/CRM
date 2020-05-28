@@ -278,6 +278,8 @@ namespace TamoCRM.ImportExcel.Library
                                                     contactRow["BranchId"] = ImportInfo.BranchId;
                                                     contactRow["ImportId"] = ImportInfo.ImportId;
                                                     contactRow["StatusId"] = ImportInfo.Status; //(int)StatusType.New;
+                                                    // HungNV: 18/05/2020 Trường hợp kho 1-6 cần điều kiện container để phân biệt lúc thu hồi
+                                                    contactRow["ContainerId"] = ImportInfo.Status;
                                                     contactRow["RegisteredDate"] = registeredDate;
                                                     contactRow["UserImportId"] = ImportInfo.UserId;
                                                     contactRow["SearchKeywordId"] = searchKeywordId;
@@ -429,6 +431,8 @@ namespace TamoCRM.ImportExcel.Library
                                                     contactRow["BranchId"] = ImportInfo.BranchId;
                                                     contactRow["ImportId"] = ImportInfo.ImportId;
                                                     contactRow["StatusId"] = (int)StatusType.New;
+                                                    // HungNV: 18/05/2020 Trường hợp kho 1-6 cần điều kiện container để phân biệt lúc thu hồi
+                                                    contactRow["ContainerId"] = ImportInfo.Status;
                                                     contactRow["RegisteredDate"] = registeredDate;
                                                     contactRow["UserImportId"] = ImportInfo.UserId;
                                                     contactRow["SearchKeywordId"] = searchKeywordId;

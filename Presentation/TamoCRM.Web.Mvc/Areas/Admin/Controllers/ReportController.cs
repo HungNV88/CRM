@@ -3639,7 +3639,7 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.Controllers
             var branchId = UserContext.GetDefaultBranch();
             var userImportId = UserContext.GetCurrentUser().UserID;
             var employeeType = (EmployeeType)employeeTypeId;
-            var listContacts = ContactRepository.FilterHandover(branchId, typeIds, levelIds, importIds, statusIds, containerIds, channelIds, channelAmounts, employeeType, statusCareId, statusMapId) ?? new List<ContactInfo>();
+            var listContacts = ContactRepository.FilterHandover(9999999, branchId, typeIds, levelIds, importIds, statusIds, containerIds, channelIds, channelAmounts, employeeType, statusCareId, statusMapId) ?? new List<ContactInfo>();
 
             var localReport = new LocalReport { ReportPath = Server.MapPath("~/Areas/Admin/Reports/rptBC44.rdlc") };
             localReport.SetParameters(new ReportParameter("Infomation", "Chuc nang in danh sach nhu crm cu"));
