@@ -212,6 +212,7 @@
     <Compile Include="ApplicationViewPage.cs" />
     <Compile Include="App_Start\MySuperPackage.cs" />
     <Compile Include="Areas\Admin\Controllers\AccessDeniedController.cs" />
+    <Compile Include="Areas\Admin\Controllers\CallCenterController.cs" />
     <Compile Include="Areas\Admin\Controllers\CallHistoryController.cs" />
     <Compile Include="Areas\Admin\Controllers\CatalogController.cs" />
     <Compile Include="Areas\Admin\Controllers\ChannelController.cs" />
@@ -1096,6 +1097,7 @@
     <Content Include="Areas\Admin\Views\Report\TableDashBoard.cshtml" />
     <Content Include="Areas\Admin\Views\Report\TableDashBoardCall.cshtml" />
     <Content Include="Areas\Admin\Views\ContactFilter\FilterContactSearchFowardManager.cshtml" />
+    <Content Include="Areas\Admin\Views\CallCenter\Index.cshtml" />
     <None Include="Properties\PublishProfiles\CRM3.pubxml" />
     <None Include="Properties\PublishProfiles\CRMTPE3.pubxml" />
     <None Include="Properties\PublishProfiles\CRM_NATIVE.pubxml" />
