@@ -75,6 +75,7 @@
     <Compile Include="SqlDataProvider.TimeSlots.cs" />
     <Compile Include="SqlDataProvider.TopicaAccount.cs" />
     <Compile Include="SqlDataProvider.UserDraft.cs" />
+    <Compile Include="SqlDataProvider.CallCenter.cs" />
     <Compile Include="SqlDataProvider.WebServiceConfig.cs" />
     <Compile Include="SqlDataProvider.Table.cs" />
     <Compile Include="SqlDataProvider.ContactDuplicate.cs" />
