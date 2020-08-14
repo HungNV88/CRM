@@ -120,6 +120,7 @@
     <Compile Include="Data\DataProvider.TimeSlots.cs" />
     <Compile Include="Data\DataProvider.TopicaAccount.cs" />
     <Compile Include="Data\DataProvider.UserDraft.cs" />
+    <Compile Include="Data\DataProvider.CallCenter.cs" />
     <Compile Include="Data\DataProvider.WebServiceConfig.cs" />
     <Compile Include="Data\DataProvider.Table.cs" />
     <Compile Include="Data\DataProvider.ContactDuplicate.cs" />

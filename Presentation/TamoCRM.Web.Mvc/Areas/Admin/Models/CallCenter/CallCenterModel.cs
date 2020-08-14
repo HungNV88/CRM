@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Web;
+using TamoCRM.Domain.CallCenter;
 
-namespace TamoCRM.Domain.CallCenter
+namespace TamoCRM.Web.Mvc.Areas.Admin.Models.CallCenter
 {
-    public class CallCenterInfo: BaseClassInfo
+    public class CallCenterModel
     {
-        public int Id { get; set; }
         public string Name { get; set; }
         public string PhoneNumber { get; set; }
         public string UserFor { get; set; }
