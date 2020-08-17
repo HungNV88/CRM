@@ -20,7 +20,7 @@ namespace TamoCRM.Services.CallCenter
 
         public static List<CallCenterInfo> Search(string keyword, int pageIndex, int pageSize, out int totalRecord)
         {
-            return FillCallCenterCollection(DataProvider.Instance().SourceTypes_Search(keyword, pageIndex, pageSize), out totalRecord);
+            return FillCallCenterCollection(DataProvider.Instance().CallCenter_Search(keyword, pageIndex, pageSize), out totalRecord);
         }
 
 
@@ -40,6 +40,12 @@ namespace TamoCRM.Services.CallCenter
                 ObjectHelper.CloseDataReader(reader, true);
             }
             return retVal;
+        }
+
+
+        public static void Insert(CallCenterInfo info)
+        {
+            info.Id = DataProvider.Instance().CallCenter_Insert(info.Name, info.PhoneNumber, info.UseFor, info.EndPoint, info.Token, info.Port, info.CreatedBy);
         }
     }
 }

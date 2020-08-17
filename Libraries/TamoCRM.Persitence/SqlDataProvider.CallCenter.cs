@@ -18,5 +18,10 @@ namespace TamoCRM.Persitence
             return SqlHelper.ExecuteReader(ConnectionString, GetFullyQualifiedName("CallCenter_Search"), keyword, pageIndex, pageSize);
         }
 
+        public override int CallCenter_Insert(string name, string phoneNumber, string useFor, string endPoint, string token, int port, int createBy)
+        {
+            return (int)SqlHelper.ExecuteScalar(ConnectionString, GetFullyQualifiedName("CallCenter_Insert"), name, phoneNumber, useFor, endPoint, token, port, createBy);
+        }
+
     }
 }

@@ -35,7 +35,7 @@
 
     <div class="row">
         <div class="col-xs-12">
-            @using (Html.BeginForm("CreateHotline", "Contact", FormMethod.Post, new { @id = "CreateContact" }))
+            @using (Html.BeginForm("Create", "CallCenter", FormMethod.Post, new { @id = "Create" }))
             {
                 @Html.AntiForgeryToken()
                 <div class="form-group">
@@ -47,7 +47,7 @@
                         <div class="col-xs-2">
                             Tên đầu số*
                         </div>
-                        <div class="col-xs-4">
+                        <div class="col-xs-6">
                             <div class="clearfix">
                                 @Html.TextBoxFor(x => x.Name, new { @style = "width: 90%", @required = "required", error = "Tên đầu rố rỗng" })
                             </div>
@@ -55,7 +55,7 @@
                         <div class="col-xs-2">
                             Số điện thoại*
                         </div>
-                        <div class="col-xs-4">
+                        <div class="col-xs-2">
                             <div class="clearfix">
                                 @Html.TextBoxFor(x => x.PhoneNumber, new { @style = "width: 90%", @required = "required", error = "Số điện thoại rỗng" })
                             </div>
@@ -67,12 +67,12 @@
                         <div class="col-xs-2">
                             Dành cho
                         </div>
-                        <div class="col-xs-4">
+                        <div class="col-xs-6">
                             <div class="clearfix">
-                                @Html.TextBoxFor(x => x.PhoneNumber, new { @style = "width: 90%"})
+                                @Html.TextBoxFor(x => x.UseFor, new { @style = "width: 90%"})
                             </div>
                         </div>
-                        <div class="col-xs-4">
+                        <div class="col-xs-2">
 
                         </div>
                     </div>
@@ -83,18 +83,16 @@
                             End point*
                         </div>
                         <div class="col-xs-6">
-                            <div class="input-group">
-                                <span class="input-group-addon">
-                                </span>@Html.TextBoxFor(x => x.EndPoint, new { @style = "width: 88.5%" })
+                            <div class="clearfix">
+                                @Html.TextBoxFor(x => x.EndPoint, new { @style = "width: 90%" })
                             </div>
                         </div>
                         <div class="col-xs-2">
                             Port
                         </div>
                         <div class="col-xs-2">
-                            <div class="input-group">
-                                <span class="input-group-addon">
-                                </span>@Html.TextBoxFor(x => x.Port, new { @style = "width: 100%" })
+                            <div class="clearfix">
+                                @Html.TextBoxFor(x => x.Port, new { @style = "width: 90%" })
                             </div>
                         </div>
                     </div>
@@ -105,9 +103,8 @@
                             Token*
                         </div>
                         <div class="col-xs-6">
-                            <div class="input-group">
-                                <span class="input-group-addon">
-                                </span>@Html.TextBoxFor(x => x.Token, new { @style = "width: 88.5%" })
+                            <div class="clearfix">
+                                @Html.TextBoxFor(x => x.Token, new { @style = "width: 90%" })
                             </div>
                         </div>
 
