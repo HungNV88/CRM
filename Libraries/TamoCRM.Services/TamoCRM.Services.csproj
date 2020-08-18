@@ -57,6 +57,7 @@
     <Compile Include="Banks\BankRepository.cs" />
     <Compile Include="Branches\BranchRepository.cs" />
     <Compile Include="Caching\RedisCachingProvider.cs" />
+    <Compile Include="CallCenter\CallCenterExtensionRepository.cs" />
     <Compile Include="CallCenter\CallCenterRepository.cs" />
     <Compile Include="CallHistories\CallHistoryRepository.cs" />
     <Compile Include="CC3ContactReport\CC3ContactReportRepository.cs" />

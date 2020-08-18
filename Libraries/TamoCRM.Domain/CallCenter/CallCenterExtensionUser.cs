@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TamoCRM.Domain.CallCenter
 {
-    class CallCenterExtensionUser
+    public class CallCenterExtensionUser
     {
         public int Id { get; set; }
         public int UserId { get; set; }

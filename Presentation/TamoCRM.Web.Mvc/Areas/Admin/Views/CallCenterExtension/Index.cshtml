@@ -1,0 +1,108 @@
+﻿@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        } catch (e) { }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active"> <a href="javascript:void(0);">Call center extension</a></li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>Danh sách call center extension</h1>
+    </div>
+    @*<div class="row">
+            <div class="col-xs-12">
+                 /.page-header
+                @using (Ajax.BeginForm("ListPaging", "User", new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "divlistuser" }, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "createcontact" }))
+                {
+                    <div class="form-group">
+                        <div class="col-sm-6">@Html.ActionLink("Tạo mới", "create")</div>
+                        <div class="col-sm-6 dataTables_filter">
+                            <label>
+                                Tìm kiếm:
+                        <input type="text" id="searchKey" name="searchKey" aria-controls="sample-table-2"></label>
+
+                            <button class="btn-primary" type="button" id="btnGoFilter">
+                                <i class="icon-search"></i>&nbsp;Tìm kiếm</button>
+                        </div>
+                    </div>
+                }
+
+                <table id="grid-table"></table>
+                <div id="grid-pager"></div>
+            </div>
+        </div>*@
+
+    <div class="col-sm-6">@Html.ActionLink("Thêm mới", "create")</div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <table id="grid-table"></table>
+            <div id="grid-pager"></div>
+        </div>
+    </div>
+
+</div>
+
+<script type="text/javascript">
+    //var url = 'admin/api/user/find?user={0}';
+    var grid_selector = "#grid-table";
+    var heades = ['Id', 'Tên đầu số', 'Số máy', 'Extension', 'Người sử dụng', 'Chức năng'];
+    var model = [
+        { name: 'Id', index: 'Id', editable: false, sorttype: 'string', editoptions: { disabled: true }, width: '0px' },
+        { name: 'CallCenterName', index: 'CallCenterName', editable: false, sorttype: 'string' },
+        { name: 'PhoneNumber', index: 'PhoneNumber', editable: false, sorttype: 'string' },
+        { name: 'Extension', index: 'Extension', editable: false, sorttype: 'string' },
+        { name: 'UserName', index: 'UserName', editable: false, sorttype: 'string' },
+        {
+            name: 'Function', index: 'Function', editable: false, width: '50px', align: 'center', formatter: "dynamicLink",
+            formatoptions: {
+                cellValue: function (cellValue, rowId, rowData, options) {
+                    return '<div style="color:#34810c;margin:5px;"><a href="/admin/callcenterextension/edit/' + rowData.Id + '"><img style="width:16px; height:16px;" src="../../../../Images/edit-16.png"/></a></div>';
+                }
+            }
+        }
+    ];
+
+    $(document).ready(function () {
+        setupGrid("#grid-table", "#grid-pager", "admin/api/callcenterextension/get", "admin/api/callcenterextension/edit", "Id", "Danh sách extension", heades, model);
+    });
+
+    //$(document).ready(function () {
+    //    setupGridWithoutEdit("#grid-table", "#grid-pager", url.format(''), "admin/api/callcenter/edit", "UserID", "Danh sách call center", heades, model);
+    //    $(window).keydown(function (e) {
+    //        if (e.keyCode == 13) {
+    //            e.preventDefault();
+    //            $("#btnGoFilter").click();
+    //        }
+    //    });
+    //    $("#btnGoFilter").click(function (e) {
+    //        e.preventDefault();
+
+    //        // Param
+    //        var search = $('#searchKey').val();
+
+    //        // Format Url
+    //        var newUrl = '/' + url.format(search);
+    //        jQuery(grid_selector).jqGrid().setGridParam({ url: newUrl }).trigger("reloadGrid");
+
+    //        return false;
+    //    });
+</script>
+

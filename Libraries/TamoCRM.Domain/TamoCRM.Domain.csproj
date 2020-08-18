@@ -58,7 +58,7 @@
     <Compile Include="Activity\ActivityObjectChangeInfo.cs" />
     <Compile Include="BaseClassInfo.cs" />
     <Compile Include="Branches\BranchInfo.cs" />
-    <Compile Include="CallCenter\CallCenterExtension.cs" />
+    <Compile Include="CallCenter\CallCenterExtensionInfo.cs" />
     <Compile Include="CallCenter\CallCenterExtensionUser.cs" />
     <Compile Include="CallCenter\CallCenterInfo.cs" />
     <Compile Include="CallHistories\CallHistoryInfo.cs" />

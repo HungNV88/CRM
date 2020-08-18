@@ -212,6 +212,7 @@
     <Compile Include="ApplicationViewPage.cs" />
     <Compile Include="App_Start\MySuperPackage.cs" />
     <Compile Include="Areas\Admin\Controllers\AccessDeniedController.cs" />
+    <Compile Include="Areas\Admin\Controllers\CallCenterExtensionController.cs" />
     <Compile Include="Areas\Admin\Controllers\CallCenterController.cs" />
     <Compile Include="Areas\Admin\Controllers\CallHistoryController.cs" />
     <Compile Include="Areas\Admin\Controllers\CatalogController.cs" />
@@ -258,7 +259,10 @@
     </Compile>
     <Compile Include="Areas\Admin\Models\Branches\BranchListModel.cs" />
     <Compile Include="Areas\Admin\Models\Branches\BranchModel.cs" />
+    <Compile Include="Areas\Admin\Models\CallCenter\CallCenterExtensionUserModel.cs" />
+    <Compile Include="Areas\Admin\Models\CallCenter\CallCenterExtensionListModel.cs" />
     <Compile Include="Areas\Admin\Models\CallCenter\CallCenterListModel.cs" />
+    <Compile Include="Areas\Admin\Models\CallCenter\CallCenterExtensionModel.cs" />
     <Compile Include="Areas\Admin\Models\CallCenter\CallCenterModel.cs" />
     <Compile Include="Areas\Admin\Models\CallHistories\CallHistoryListModel.cs" />
     <Compile Include="Areas\Admin\Models\Casec\CasecListModel.cs" />
@@ -354,6 +358,7 @@
     <Compile Include="Areas\Admin\WebApi\AdvisorCreate\AdvisorsCreateController.cs" />
     <Compile Include="Areas\Admin\WebApi\AppointmentInterview\AppointmentInterviewController.cs" />
     <Compile Include="Areas\Admin\WebApi\Branches\BranchController.cs" />
+    <Compile Include="Areas\Admin\WebApi\CallCenter\CallCenterExtensionController.cs" />
     <Compile Include="Areas\Admin\WebApi\CallCenter\CallCenterController.cs" />
     <Compile Include="Areas\Admin\WebApi\CallHistories\CallHistoryController.cs" />
     <Compile Include="Areas\Admin\WebApi\Casec\CasecAccountController.cs" />
@@ -1102,6 +1107,7 @@
     <Content Include="Areas\Admin\Views\ContactFilter\FilterContactSearchFowardManager.cshtml" />
     <Content Include="Areas\Admin\Views\CallCenter\Index.cshtml" />
     <Content Include="Areas\Admin\Views\CallCenter\Create.cshtml" />
+    <Content Include="Areas\Admin\Views\CallCenterExtension\Index.cshtml" />
     <None Include="Properties\PublishProfiles\CRM3.pubxml" />
     <None Include="Properties\PublishProfiles\CRMTPE3.pubxml" />
     <None Include="Properties\PublishProfiles\CRM_NATIVE.pubxml" />
