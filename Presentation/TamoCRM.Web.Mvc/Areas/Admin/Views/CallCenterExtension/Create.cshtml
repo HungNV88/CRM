@@ -1,0 +1,155 @@
+﻿
+@model TamoCRM.Web.Mvc.Areas.Admin.Models.CallCenter.CallCenterModel
+@{
+    ViewBag.Title = "Thêm mới extesion";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="breadcrumbs" id="breadcrumbs">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('breadcrumbs', 'fixed');
+        } catch (e) { }
+    </script>
+
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="#">Trang chủ</a>
+        </li>
+
+        <li>
+            <a href="javascript:void(0);">Danh mục</a>
+        </li>
+        <li class="active"> <a href="javascript:void(0);">Call center</a></li>
+    </ul>
+</div>
+
+<div class="page-content">
+    <div class="page-header">
+        <h1>
+            Thêm mới extension
+        </h1>
+    </div>
+    <!-- /.page-header -->
+
+    <div class="row">
+        <div class="col-xs-12">
+            @using (Html.BeginForm("Create", "CallCenterExtension", FormMethod.Post, new { @id = "Create" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <div class="col-sm-12" id="alert">
+                    </div>
+                </div>
+                <div style="border: 1px solid #c5d0dc; padding: 25px;">
+                    <div class="row">
+                        <div class="col-xs-2">
+                            Tên đầu số*
+                        </div>
+                        <div class="col-xs-6">
+                            <div class="clearfix">
+                                @Html.TextBoxFor(x => x.Name, new { @style = "width: 90%", @required = "required", error = "Tên đầu rố rỗng" })
+                            </div>
+                        </div>
+                        <div class="col-xs-2">
+                            Số điện thoại*
+                        </div>
+                        <div class="col-xs-2">
+                            <div class="clearfix">
+                                @Html.TextBoxFor(x => x.PhoneNumber, new { @style = "width: 90%", @required = "required", error = "Số điện thoại rỗng" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-4"></div>
+
+                    <div class="row">
+                        <div class="col-xs-2">
+                            Dành cho
+                        </div>
+                        <div class="col-xs-6">
+                            <div class="clearfix">
+                                @Html.TextBoxFor(x => x.UseFor, new { @style = "width: 90%"})
+                            </div>
+                        </div>
+                        <div class="col-xs-2">
+
+                        </div>
+                    </div>
+
+                    <div class="space-4"></div>
+                    <div class="row">
+                        <div class="col-xs-2">
+                            End point*
+                        </div>
+                        <div class="col-xs-6">
+                            <div class="clearfix">
+                                @Html.TextBoxFor(x => x.EndPoint, new { @style = "width: 90%" })
+                            </div>
+                        </div>
+                        <div class="col-xs-2">
+                            Port
+                        </div>
+                        <div class="col-xs-2">
+                            <div class="clearfix">
+                                @Html.TextBoxFor(x => x.Port, new { @style = "width: 90%" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-4"></div>
+
+                    <div class="row">
+                        <div class="col-xs-2">
+                            Token*
+                        </div>
+                        <div class="col-xs-6">
+                            <div class="clearfix">
+                                @Html.TextBoxFor(x => x.Token, new { @style = "width: 90%" })
+                            </div>
+                        </div>
+
+                    </div>
+            </div>
+            <div class="space-6"></div>
+            <button id="btnSubmit" class="btn-primary" style="float: right; width: 150px;" type="submit" onclick="return saveCallCenter();">Thêm mới call center</button>
+            <div class="clearfix"></div>
+        }
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    function saveCallCenter() {
+        return true;
+    }
+
+    $("#GroupId").change(function () {
+        var groupId = $("#GroupId").val();
+        loadUser(branchId, groupId, employeeTypeId, "ContactInfo_UserConsultantId");
+    });
+
+    var message = '@ViewBag.Message';
+    if (message == null || message == '') {
+        $('#btnSubmit').removeAttr('disabled');
+        alertHide();
+    }
+    else {
+        $("#alert").addClass("alert alert-block alert-success");
+        $("#alert").html($("#alert").html(message).text());
+        $('#btnSubmit').removeAttr('disabled');
+        if (message.indexOf('vui lòng thử lại') < 0) resetForm();
+    }
+
+    function resetForm() {
+        $('#ContactInfo_ProductSellId').val(0);
+        $('#ContactInfo_Fullname').val('');
+        $('#ContactInfo_Birthday').val('');
+        $('#ContactInfo_Address').val('');
+        $('#ContactInfo_Mobile1').val('');
+        $('#ContactInfo_Mobile2').val('');
+        $('#ContactInfo_Email2').val('');
+        $('#ContactInfo_Email').val('');
+        $('#ContactInfo_Notes').val('');
+    }
+</script>

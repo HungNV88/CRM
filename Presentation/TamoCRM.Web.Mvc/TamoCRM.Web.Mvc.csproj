@@ -1108,6 +1108,7 @@
     <Content Include="Areas\Admin\Views\CallCenter\Index.cshtml" />
     <Content Include="Areas\Admin\Views\CallCenter\Create.cshtml" />
     <Content Include="Areas\Admin\Views\CallCenterExtension\Index.cshtml" />
+    <Content Include="Areas\Admin\Views\CallCenterExtension\Create.cshtml" />
     <None Include="Properties\PublishProfiles\CRM3.pubxml" />
     <None Include="Properties\PublishProfiles\CRMTPE3.pubxml" />
     <None Include="Properties\PublishProfiles\CRM_NATIVE.pubxml" />

@@ -22,6 +22,7 @@ using TamoCRM.Domain.StatusMap;
 using TamoCRM.Domain.UserDraft;
 using TamoCRM.Domain.UserRole;
 using TamoCRM.Domain.WebServiceConfig;
+using TamoCRM.Domain.CallCenter;
 using TamoCRM.Services.Branches;
 using TamoCRM.Services.CallHistories;
 using TamoCRM.Services.Catalogs;
@@ -54,7 +55,7 @@ using TamoCRM.Services.StatusCare;
 using TamoCRM.Services.TeacherType;
 using TamoCRM.Services.FeeMoneyType;
 using TamoCRM.Services.PackageFeeEdu;
-
+using TamoCRM.Services.CallCenter;
 
 namespace TamoCRM.Web.Framework
 {
@@ -114,6 +115,34 @@ namespace TamoCRM.Web.Framework
                 return listGroup;
             }
         }
+
+        //Call center
+        public static List<CallCenterInfo> _listCallCenter = new List<CallCenterInfo>();
+        public static object _lockListCallCenter = new object();
+        public static List<CallCenterInfo> ListCallCenter
+        {
+            get
+            {
+                List<CallCenterInfo> listCallCenter;
+                if (_listCallCenter.IsNullOrEmpty())
+                {
+                    lock (_lockListCallCenter)
+                    {
+                        if (_listCallCenter.IsNullOrEmpty())
+                        {
+                            //_listCallCenter = CallCenterRepository.GetAll<CallCenterInfo>() ?? new List<CallCenterInfo>();
+                        }
+                    }
+                    listCallCenter = new List<CallCenterInfo>(_listCallCenter);
+                }
+                else
+                {
+                    listCallCenter = new List<CallCenterInfo>(_listCallCenter);
+                }
+                return listCallCenter;
+            }
+        }
+
 
         //Level
         public static List<LevelInfo> _listLevel = new List<LevelInfo>();
