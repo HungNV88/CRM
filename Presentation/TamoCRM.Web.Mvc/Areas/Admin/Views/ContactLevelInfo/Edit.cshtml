@@ -245,7 +245,7 @@
                                     <label>Chiến dịch</label>
                                 </div>
                                 <div class="col-xs-3" style="width: 24%;">
-                                    @Html.TextBoxFor(x => x.ContactInfo.CampaindTpe, new { @style = "width: 100%", @readonly = "readonly" })
+                                    @Html.TextBoxFor(x => x.ContactInfo.CampaindTpe, new { @style = "width: 100%" })
                                 </div>
                             </div>
                             <div class="space-4"></div>
@@ -2564,6 +2564,7 @@
                 mobile3: $('#ContactInfo_Mobile3').val(),
                 address: $('#ContactInfo_Address').val(),
                 productSellId: $('#ContactInfo_ProductSellId').val(),
+                CampaindTpe: $('#ContactInfo_CampaindTpe').val(),
             },
             beforeSend: function () {
                 alertProcess();

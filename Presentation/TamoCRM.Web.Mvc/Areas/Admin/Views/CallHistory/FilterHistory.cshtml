@@ -165,7 +165,7 @@
     var employeeTypeId = '@((int)EmployeeType.Consultant)';
     
     var url = 'admin/api/callhistory/FilterHistory?groupId={0}&userId={1}&handoverDate={2}&callDate={3}&statusMapId={4}&statusCareId={5}&levelIds={6}&mobilePhone={7}&employeeTypeId=' + employeeTypeId;
-    var heades = ['Id', 'Họ và tên', 'Level', 'Ngày', 'Sáng/Chiều', 'Giờ', 'Nội dung gọi gần nhất', 'Thời gian gọi', 'Trạng thái chăm sóc','ID TVTS', 'Nghe', 'Tải'];
+    var heades = ['Id', 'Họ và tên', 'Điện thoại', 'Level', 'Ngày gọi lại', 'Sáng/Chiều', 'Giờ', 'Nội dung gọi gần nhất', 'Thời gian gọi', 'Trạng thái chăm sóc','ID TVTS', 'Nghe', 'Tải'];
     var model = [
         { name: 'CallHistoryId', index: 'CallHistoryId', editable: false, sorttype: 'string', editoptions: { disabled: true }, width: '0px' },
         {
@@ -176,9 +176,10 @@
                 }
             }
         },
-        { name: 'LevelId', index: 'LevelId', editable: false, width: '30px', sorttype: 'string', align: 'center', formatter: levelFomatter },
+        { name: 'MobilePhone', index: 'MobilePhone', editable: false, width: '80px', sorttype: 'string', align: 'center', formatter: levelFomatter },
+        { name: 'LevelId', index: 'LevelId', editable: false, width: '35px', sorttype: 'string', align: 'center', formatter: levelFomatter },
         { name: 'RecallTime', index: 'RecallTime', editable: false, width: '60px', align: 'center', formatter: 'date', formatoptions: { srcformat: 'Y-m-dTH:i:s', newformat: 'd/m/Y' } },
-        { name: 'RecallTimeAmPm', index: 'RecallTime', editable: false, width: '50px', align: 'center', formatter: stringFormatter },
+        { name: 'RecallTimeAmPm', index: 'RecallTime', editable: false, width: '70px', align: 'center', formatter: stringFormatter },
         { name: 'RecallTimeTime', index: 'RecallTime', editable: false, width: '40px', align: 'center', formatter: 'date', formatoptions: { srcformat: 'Y-m-dTH:i:s', newformat: 'H:i' } },
         { name: 'CallCenterInfo', index: 'CallCenterInfo', editable: false, width: '150px', sorttype: 'string', align: 'left' },
         { name: 'CallTime', index: 'CallTime', editable: false, sorttype: 'string', width: '80px', formatter: 'date', formatoptions: { srcformat: 'Y-m-dTH:i:s', newformat: 'd/m/Y H:i' } },

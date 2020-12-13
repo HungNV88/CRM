@@ -838,9 +838,9 @@ namespace TamoCRM.Persitence
         }
 
         // Update
-        public override void Contacts_Update_L1(int id, string fullname, DateTime? birthday, string email, string email2, string address, int gender, int productSellId, string notes, string mobile1, string mobile2, string mobile3)
+        public override void Contacts_Update_L1(int id, string fullname, DateTime? birthday, string email, string email2, string address, int gender, int productSellId, string notes, string mobile1, string mobile2, string mobile3, int CampaindTpeId)
         {
-            SqlHelper.ExecuteNonQuery(ConnectionString, GetFullyQualifiedName("Contacts_Update_L1"), id, fullname, birthday, email, email2, address, gender, productSellId, notes, mobile1, mobile2, mobile3);
+            SqlHelper.ExecuteNonQuery(ConnectionString, GetFullyQualifiedName("Contacts_Update_L1"), id, fullname, birthday, email, email2, address, gender, productSellId, notes, mobile1, mobile2, mobile3, CampaindTpeId);
         }
 
         // Duplicate
