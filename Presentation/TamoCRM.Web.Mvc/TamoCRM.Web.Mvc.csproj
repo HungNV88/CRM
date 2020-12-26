@@ -294,6 +294,7 @@
     <Compile Include="Areas\Admin\Models\InterviewSchedule\InterviewListModel.cs" />
     <Compile Include="Areas\Admin\Models\Reports\BC12Model.cs" />
     <Compile Include="Areas\Admin\Models\Reports\BC20Model.cs" />
+    <Compile Include="Areas\Admin\Models\Reports\BC301Model.cs" />
     <Compile Include="Areas\Admin\Models\Reports\BC47Model.cs" />
     <Compile Include="Areas\Admin\Models\Reports\BC46Model.cs" />
     <Compile Include="Areas\Admin\Models\Reports\BC45Model.cs" />
@@ -1096,6 +1097,7 @@
     <Content Include="Areas\Admin\Views\Report\TableDashBoard.cshtml" />
     <Content Include="Areas\Admin\Views\Report\TableDashBoardCall.cshtml" />
     <Content Include="Areas\Admin\Views\ContactFilter\FilterContactSearchFowardManager.cshtml" />
+    <Content Include="Areas\Admin\Views\Report\BC301.cshtml" />
     <None Include="Properties\PublishProfiles\CRM3.pubxml" />
     <None Include="Properties\PublishProfiles\CRMTPE3.pubxml" />
     <None Include="Properties\PublishProfiles\CRM_NATIVE.pubxml" />
@@ -1146,6 +1148,18 @@
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
     <Content Include="SqlServerTypes\readme.htm" />
+    <Content Include="SqlServerTypes\x64\msvcr120.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlServerTypes\x64\SqlServerSpatial140.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlServerTypes\x86\msvcr120.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlServerTypes\x86\SqlServerSpatial140.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -1286,6 +1300,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Areas\Admin\Reports\rptBC301.rdlc" />
     <EmbeddedResource Include="Areas\Admin\Reports\rptBCReportImportExport.rdlc">
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -1322,12 +1337,16 @@
     <EmbeddedResource Include="Areas\Admin\Reports\rptBC08.rdlc" />
     <EmbeddedResource Include="Areas\Admin\Reports\rptBC07.rdlc" />
     <EmbeddedResource Include="Areas\Admin\Reports\rptBC03.rdlc" />
-    <EmbeddedResource Include="Areas\Admin\Reports\rptBC06.rdlc" />
+    <EmbeddedResource Include="Areas\Admin\Reports\rptBC06.rdlc">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Areas\Admin\Reports\rptBC04.rdlc">
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Areas\Admin\Reports\rptBC01.rdlc" />
-    <EmbeddedResource Include="Areas\Admin\Reports\rptBC300.rdlc" />
+    <EmbeddedResource Include="Areas\Admin\Reports\rptBC300.rdlc">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Areas\Admin\Reports\rptBC02.rdlc" />
     <EmbeddedResource Include="Areas\Admin\Reports\rptBC05.rdlc">
       <SubType>Designer</SubType>

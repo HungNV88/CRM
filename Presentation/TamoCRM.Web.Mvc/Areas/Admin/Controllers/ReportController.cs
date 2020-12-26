@@ -1192,6 +1192,138 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.Controllers
             ViewBag.Status = new SelectList(StatusTypes, "Key", "Value");
             return View();
         }
+        // Begin: 12/12/2020: Báo cáo tỉ lệ các level theo chiến dịch
+        public ActionResult BC301()
+        {
+            var dayReportTypes = new Dictionary<int, string>();
+            foreach (var item in Enum.GetValues(typeof(DayReportType)))
+                dayReportTypes.Add((int)item, ObjectExtensions.GetEnumDescription((DayReportType)item));
+            ViewBag.DayReportTypes = new SelectList(dayReportTypes, "Key", "Value");
+
+            var StatusTypes = new Dictionary<int, string>();
+            foreach (var item in Enum.GetValues(typeof(StatusContact)))
+                StatusTypes.Add((int)item, ObjectExtensions.GetEnumDescription((StatusContact)item));
+            ViewBag.Status = new SelectList(StatusTypes, "Key", "Value");
+            return View();
+        }
+        public ActionResult ShowBC301(int userId, string hFromDate, string hToDate, int reportType)
+        {
+            // Param datetime
+            var dtTo = hToDate.ToDateTime() ?? DateTime.Now;
+            var dtFrom = hFromDate.ToDateTime() ?? DateTime.Now;
+
+            List<UserInfo> listUser = new List<UserInfo>();
+
+            var infomation = "Ngày bàn giao từ ngày: {0} - đến ngày: {1}";
+            if (dtTo == DateTime.MinValue || dtTo > DateTime.Now.Date) dtTo = DateTime.Now.Date;
+            if (dtFrom == DateTime.MinValue || dtFrom > DateTime.Now.Date) dtFrom = DateTime.Now.Date;
+            var handoverToDate = dtTo;
+            var handoverFromDate = dtFrom;
+            handoverToDate = handoverToDate.AddDays(1).AddSeconds(-1);
+
+            // Load & filter data
+            var lstData = TmpJobReportRepository.GetAllBC301(handoverFromDate, handoverToDate, userId) ?? new List<TmpJobReportBC301Info>();
+
+            #region tính cho từng TVTS
+            var listDataSource = new List<BC301Model>();
+            var campaindTypeId = 0;
+            foreach (var data in lstData)
+            {
+                if(campaindTypeId == data.CampaindTypeId)
+                {
+                    continue;
+                }
+                campaindTypeId = data.CampaindTypeId;
+                var campaindName = data.CampaindName;
+                var listTemp = lstData;
+                var level1 = listTemp.Where(c => c.LevelId == (int)LevelType.L1 && c.CampaindTypeId == campaindTypeId && c.LevelId < (int)LevelType.L3M).Sum(c => c.Count);
+                var level2 = listTemp.Where(c => c.LevelId == (int)LevelType.L2 && c.CampaindTypeId == campaindTypeId && c.LevelId < (int)LevelType.L3M).Sum(c => c.Count);
+                var level3 = listTemp.Where(c => c.LevelId == (int)LevelType.L3 && c.CampaindTypeId == campaindTypeId && c.LevelId < (int)LevelType.L3M).Sum(c => c.Count);
+                var level4 = listTemp.Where(c => c.LevelId == (int)LevelType.L4 && c.CampaindTypeId == campaindTypeId && c.LevelId < (int)LevelType.L3M).Sum(c => c.Count);
+                var level5 = listTemp.Where(c => c.LevelId == (int)LevelType.L5 && c.CampaindTypeId == campaindTypeId && c.LevelId < (int)LevelType.L3M).Sum(c => c.Count);
+                var level6 = listTemp.Where(c => c.LevelId == (int)LevelType.L6 && c.CampaindTypeId == campaindTypeId && c.LevelId < (int)LevelType.L3M).Sum(c => c.Count);
+                var level7 = listTemp.Where(c => c.LevelId == (int)LevelType.L7 && c.CampaindTypeId == campaindTypeId && c.LevelId < (int)LevelType.L3M).Sum(c => c.Count);
+                var level8 = listTemp.Where(c => c.LevelId == (int)LevelType.L8 && c.CampaindTypeId == campaindTypeId && c.LevelId < (int)LevelType.L3M).Sum(c => c.Count);
+
+                var totalcountLevel = listTemp.Where(c => c.LevelId >= (int)LevelType.L1 && c.CampaindTypeId == campaindTypeId && c.LevelId < (int)LevelType.L3M).Sum(c => c.Count);
+
+
+                var entity = new BC301Model
+                {
+                    CampaindName = campaindName,
+                    SumCampaindLevel = totalcountLevel.ToString(),
+                    Level0 = "0",
+                    Level1 = level1.ToString(),
+                    Level2 = level2.ToString(),
+                    Level3 = level3.ToString(),
+                    Level4 = level4.ToString(),
+                    Level5 = level5.ToString(),
+                    Level6 = level6.ToString(),
+                    Level7 = level7.ToString(),
+                    Level8 = level8.ToString(),
+                    Level0Percent = "0%",
+                    Level1Percent = (level1 > 0 ? Math.Round((double)(level1) / totalcountLevel * 100, 1) : 0).ToString("0") + "%",
+                    Level2Percent = (level2 > 0 ? Math.Round((double)(level2) / totalcountLevel * 100, 1) : 0).ToString("0") + "%",
+                    Level3Percent = (level3 > 0 ? Math.Round((double)(level3) / totalcountLevel * 100, 1) : 0).ToString("0") + "%",
+                    Level4Percent = (level4 > 0 ? Math.Round((double)(level4) / totalcountLevel * 100, 1) : 0).ToString("0") + "%",
+                    Level5Percent = (level5 > 0 ? Math.Round((double)(level5) / totalcountLevel * 100, 1) : 0).ToString("0") + "%",
+                    Level6Percent = (level6 > 0 ? Math.Round((double)(level6) / totalcountLevel * 100, 1) : 0).ToString("0") + "%",
+                    Level7Percent = (level7 > 0 ? Math.Round((double)(level7) / totalcountLevel * 100, 1) : 0).ToString("0") + "%",
+                    Level8Percent = (level8 > 0 ? Math.Round((double)(level8) / totalcountLevel * 100, 1) : 0).ToString("0") + "%",
+      
+                };
+                listDataSource.Add(entity);
+            }
+
+            #endregion
+            var reportDataSource = new ReportDataSource("BC301", listDataSource);
+            var localReport = new LocalReport { ReportPath = Server.MapPath("~/Areas/Admin/Reports/rptBC301.rdlc") };
+            //localReport.SetParameters(new ReportParameter("Infomation", infomation));
+            localReport.DataSources.Add(reportDataSource);
+            string mimeType;
+            string encoding;
+            string fileNameExtension;
+            //const string reportType = "pdf";
+            const string deviceInfo = "<DeviceInfo>" +
+                                       "  <OutputFormat>PDF</OutputFormat>" +
+                                       "  <PageWidth>11in</PageWidth>" +
+                                       "  <PageHeight>8.5in</PageHeight>" +
+                                       "  <MarginTop>0.5in</MarginTop>" +
+                                       "  <MarginLeft>0.2in</MarginLeft>" +
+                                       "  <MarginRight>0.2in</MarginRight>" +
+                                       "  <MarginBottom>1in</MarginBottom>" +
+                                       "</DeviceInfo>";
+            string[] streams;
+            Warning[] warnings;
+            string type_bc = "pdf";
+            switch (reportType)
+            {
+                case (int)ReportType.Pdf:
+                    type_bc = "pdf";
+                    break;
+                case (int)ReportType.Excel:
+                    type_bc = "excel";
+                    break;
+            }
+            var renderedBytes = localReport.Render(
+                type_bc,
+                deviceInfo,
+                out mimeType,
+                out encoding,
+                out fileNameExtension,
+                out streams,
+                out warnings);
+            switch (reportType)
+            {
+                case (int)ReportType.Pdf:
+                    return File(renderedBytes, mimeType);
+                case (int)ReportType.Excel:
+                    return File(renderedBytes, mimeType, "BC301_" + DateTime.Now.ToString("ddMMyyyyHHmm") + ".xls");
+            }
+            return File(renderedBytes, mimeType);
+        }
+
+        // End: 12/12/2020: Báo cáo tỉ lệ các level theo chiến dịch
         public ActionResult ShowBC300(int dayReportType, string groupId, int userId, int branchId, int statusType, string date, string hFromDate, string hToDate, int reportType)
         {
             // Param datetime

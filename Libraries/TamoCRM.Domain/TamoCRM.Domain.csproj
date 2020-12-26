@@ -90,6 +90,7 @@
     <Compile Include="Reports\ReportBC46Info.cs" />
     <Compile Include="Reports\ReportLogDashBoardInfo.cs" />
     <Compile Include="Reports\ReportModel.cs" />
+    <Compile Include="Reports\TmpJobReportBC301Info.cs" />
     <Compile Include="Reports\TmpJobReportBC53.cs" />
     <Compile Include="Reports\TmpJobReportContactAriseBC300Info.cs" />
     <Compile Include="Reports\TmpJobReportImportExportInfo.cs" />
