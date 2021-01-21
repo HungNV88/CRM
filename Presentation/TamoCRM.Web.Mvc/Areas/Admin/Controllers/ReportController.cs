@@ -1206,26 +1206,133 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.Controllers
             ViewBag.Status = new SelectList(StatusTypes, "Key", "Value");
             return View();
         }
-        public ActionResult ShowBC301(int userId, string hFromDate, string hToDate, int reportType)
+        public ActionResult ShowBC301(int groupId, int userId, string hFromDate, string hToDate, string callFromDate, string callToDate, int reportType)
         {
             // Param datetime
-            var dtTo = hToDate.ToDateTime() ?? DateTime.Now;
-            var dtFrom = hFromDate.ToDateTime() ?? DateTime.Now;
+            var handOrverToDate = hToDate.Replace("/", "").ToDateTime("ddMMyyyy");
+            var handOrverFromDate = hFromDate.Replace("/", "").ToDateTime("ddMMyyyy");
+            var callFrom = callFromDate.Replace("/", "").ToDateTime("ddMMyyyy");
+            var callTo = callToDate.Replace("/", "").ToDateTime("ddMMyyyy");
+            if (!handOrverToDate.HasValue) handOrverToDate = handOrverFromDate;
+            if (handOrverToDate.HasValue) handOrverToDate = handOrverToDate.Value.AddDays(1).AddSeconds(-1);
+            if (!callTo.HasValue) callTo = callFrom;
+            if (callTo.HasValue) callTo = callTo.Value.AddDays(1).AddSeconds(-1);
 
-            List<UserInfo> listUser = new List<UserInfo>();
+            //List<UserInfo> listUser = new List<UserInfo>();
 
-            var infomation = "Ngày bàn giao từ ngày: {0} - đến ngày: {1}";
-            if (dtTo == DateTime.MinValue || dtTo > DateTime.Now.Date) dtTo = DateTime.Now.Date;
-            if (dtFrom == DateTime.MinValue || dtFrom > DateTime.Now.Date) dtFrom = DateTime.Now.Date;
-            var handoverToDate = dtTo;
-            var handoverFromDate = dtFrom;
-            handoverToDate = handoverToDate.AddDays(1).AddSeconds(-1);
+            //var listUser = StoreData.ListUser.AsReadOnly();
+            //if (groupId > 0)
+            //{
+            //    listUser = listUser.Where(c => c.GroupId == groupId).ToList().AsReadOnly();
+            //}
+
+            string users;
+            string groupName;
+            string userName;
+            if (userId == 0)
+            {
+                if (groupId == 0)
+                {
+                    users = string.Empty;
+                    groupName = "Tất cả";
+                }
+                else
+                {
+                    users = StoreData.ListUser
+                        .Where(c => c.GroupId == groupId)
+                        .Select(c => c.UserID.ToString())
+                        .Distinct().Aggregate((total, curent) => total + "," + curent);
+                    groupName = StoreData.ListGroup.Where(c => c.GroupId == groupId).Select(c => c.Name).First();
+                }
+                userName = "Tất cả";
+            }
+            else
+            {
+                groupName = StoreData.ListGroup.Where(c => c.GroupId == groupId).Select(c => c.Name).First();
+                users = userId.ToString();
+                userName = StoreData.ListUser.Where(c => c.UserID == userId).Select(c => c.UserName).First();
+            }
+
+            //string[] groupIds = Regex.Split(groupId, @",");
+
+            //foreach (string value in groupIds)
+            //{
+            //    if (!string.IsNullOrEmpty(value))
+            //    {
+            //        int i = int.Parse(value);
+            //        var listUserFake = StoreData.ListUser.AsReadOnly();
+            //        if (i > 0)
+            //        {
+            //            listUserFake = listUserFake.Where(c => c.GroupId == i).ToList().AsReadOnly();
+            //        }
+            //        listUser.AddRange(listUserFake);
+            //    }
+            //}
+
+
+            var information = " ";
+            var date = new DateTime();
+            var information2 = " ";
+            if (handOrverFromDate != null && handOrverToDate != null)
+            {
+                information = string.Format("Ngày bàn giao từ ngày: {0} - đến ngày: {1}", hFromDate, hToDate);
+            }
+            if (callFrom != null && callTo != null)
+            {
+                information2 = string.Format("Ngày gọi từ ngày: {0} - đến ngày: {1}", callFromDate, callToDate);
+            }
+
+            //if (dtTo == DateTime.MinValue || dtTo > DateTime.Now.Date) dtTo = DateTime.Now.Date;
+            //if (dtFrom == DateTime.MinValue || dtFrom > DateTime.Now.Date) dtFrom = DateTime.Now.Date;
+            //var handoverToDate = dtTo;
+            //var handoverFromDate = dtFrom;
+            //handoverToDate = handoverToDate.AddDays(1).AddSeconds(-1);
 
             // Load & filter data
-            var lstData = TmpJobReportRepository.GetAllBC301(handoverFromDate, handoverToDate, userId) ?? new List<TmpJobReportBC301Info>();
+            var lstData = TmpJobReportRepository.GetAllBC301(handOrverFromDate, handOrverToDate, callFrom, callTo, users) ?? new List<TmpJobReportBC301Info>();
+            var listDataSource = new List<BC301Model>();
+            #region tính tổng tỷ lệ cho toàn bảng
+            {
+                var listTemp = lstData;
+                var level1 = listTemp.Where(c => c.LevelId == (int)LevelType.L1 && c.LevelId < (int)LevelType.L3M).Sum(c => c.Count);
+                var level2 = listTemp.Where(c => c.LevelId == (int)LevelType.L2 && c.LevelId < (int)LevelType.L3M).Sum(c => c.Count);
+                var level3 = listTemp.Where(c => c.LevelId == (int)LevelType.L3 && c.LevelId < (int)LevelType.L3M).Sum(c => c.Count);
+                var level4 = listTemp.Where(c => c.LevelId == (int)LevelType.L4 && c.LevelId < (int)LevelType.L3M).Sum(c => c.Count);
+                var level5 = listTemp.Where(c => c.LevelId == (int)LevelType.L5 && c.LevelId < (int)LevelType.L3M).Sum(c => c.Count);
+                var level6 = listTemp.Where(c => c.LevelId == (int)LevelType.L6 && c.LevelId < (int)LevelType.L3M).Sum(c => c.Count);
+                var level7 = listTemp.Where(c => c.LevelId == (int)LevelType.L7 && c.LevelId < (int)LevelType.L3M).Sum(c => c.Count);
+                var level8 = listTemp.Where(c => c.LevelId == (int)LevelType.L8 && c.LevelId < (int)LevelType.L3M).Sum(c => c.Count);
+
+                var totalcountLevel = listTemp.Where(c => c.LevelId >= (int)LevelType.L1 && c.LevelId < (int)LevelType.L3M).Sum(c => c.Count);
+
+                var entity = new BC301Model
+                {
+                    CampaindName = "Tổng",
+                    SumCampaindLevel = totalcountLevel.ToString(),
+                    Level0 = "0",
+                    Level1 = level1.ToString(),
+                    Level2 = level2.ToString(),
+                    Level3 = level3.ToString(),
+                    Level4 = level4.ToString(),
+                    Level5 = level5.ToString(),
+                    Level6 = level6.ToString(),
+                    Level7 = level7.ToString(),
+                    Level8 = level8.ToString(),
+                    L0Percent = "0%",
+                    L1Percent = (totalcountLevel > 0 ? Math.Round((double)(level1) / totalcountLevel * 100, 1) : 0).ToString("0") + "%",
+                    L2Percent = (totalcountLevel > 0 ? Math.Round((double)(level2) / totalcountLevel * 100, 1) : 0).ToString("0") + "%",
+                    L3Percent = (totalcountLevel > 0 ? Math.Round((double)(level3) / totalcountLevel * 100, 1) : 0).ToString("0") + "%",
+                    L6Percent = (totalcountLevel > 0 ? Math.Round((double)(level6) / totalcountLevel * 100, 1) : 0).ToString("0") + "%",
+                    L8L6Percent = (level6 > 0 ? Math.Round((double)(level8) / level6 * 100, 1) : 0).ToString("0") + "%",
+                    L8Percent = (totalcountLevel > 0 ? Math.Round((double)(level8) / totalcountLevel * 100, 1) : 0).ToString("0") + "%",
+
+                };
+                listDataSource.Add(entity);
+            }
+
+            #endregion
 
             #region tính cho từng TVTS
-            var listDataSource = new List<BC301Model>();
             var campaindTypeId = 0;
             foreach (var data in lstData)
             {
@@ -1261,16 +1368,14 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.Controllers
                     Level6 = level6.ToString(),
                     Level7 = level7.ToString(),
                     Level8 = level8.ToString(),
-                    Level0Percent = "0%",
-                    Level1Percent = (level1 > 0 ? Math.Round((double)(level1) / totalcountLevel * 100, 1) : 0).ToString("0") + "%",
-                    Level2Percent = (level2 > 0 ? Math.Round((double)(level2) / totalcountLevel * 100, 1) : 0).ToString("0") + "%",
-                    Level3Percent = (level3 > 0 ? Math.Round((double)(level3) / totalcountLevel * 100, 1) : 0).ToString("0") + "%",
-                    Level4Percent = (level4 > 0 ? Math.Round((double)(level4) / totalcountLevel * 100, 1) : 0).ToString("0") + "%",
-                    Level5Percent = (level5 > 0 ? Math.Round((double)(level5) / totalcountLevel * 100, 1) : 0).ToString("0") + "%",
-                    Level6Percent = (level6 > 0 ? Math.Round((double)(level6) / totalcountLevel * 100, 1) : 0).ToString("0") + "%",
-                    Level7Percent = (level7 > 0 ? Math.Round((double)(level7) / totalcountLevel * 100, 1) : 0).ToString("0") + "%",
-                    Level8Percent = (level8 > 0 ? Math.Round((double)(level8) / totalcountLevel * 100, 1) : 0).ToString("0") + "%",
-      
+                    L0Percent = "0%",
+                    L1Percent = (totalcountLevel > 0 ? Math.Round((double)(level1) / totalcountLevel * 100, 1) : 0).ToString("0") + "%",
+                    L2Percent = (totalcountLevel > 0 ? Math.Round((double)(level2) / totalcountLevel * 100, 1) : 0).ToString("0") + "%",
+                    L3Percent = (totalcountLevel > 0 ? Math.Round((double)(level3) / totalcountLevel * 100, 1) : 0).ToString("0") + "%",
+                    L6Percent = (totalcountLevel > 0 ? Math.Round((double)(level6) / totalcountLevel * 100, 1) : 0).ToString("0") + "%",
+                    L8L6Percent = (level6 > 0 ? Math.Round((double)(level8) / level6 * 100, 1) : 0).ToString("0") + "%",
+                    L8Percent = (totalcountLevel > 0 ? Math.Round((double)(level8) / totalcountLevel * 100, 1) : 0).ToString("0") + "%",
+
                 };
                 listDataSource.Add(entity);
             }
@@ -1278,7 +1383,10 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.Controllers
             #endregion
             var reportDataSource = new ReportDataSource("BC301", listDataSource);
             var localReport = new LocalReport { ReportPath = Server.MapPath("~/Areas/Admin/Reports/rptBC301.rdlc") };
-            //localReport.SetParameters(new ReportParameter("Infomation", infomation));
+            localReport.SetParameters(new ReportParameter("Information", information));
+            localReport.SetParameters(new ReportParameter("Information2", information2));
+            localReport.SetParameters(new ReportParameter("Group", groupName));
+            localReport.SetParameters(new ReportParameter("TVTS", userName));
             localReport.DataSources.Add(reportDataSource);
             string mimeType;
             string encoding;

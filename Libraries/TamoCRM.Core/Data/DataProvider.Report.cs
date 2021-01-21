@@ -29,7 +29,7 @@ namespace TamoCRM.Core.Data
         public abstract IDataReader TmpJobReportBC08_GetAll(DateTime dateTime);
         public abstract IDataReader TmpJobReportBC300_GetAll(DateTime dateTime);
         public abstract IDataReader TmpJobReportBC300_GetAll(DateTime dateTime, int statusType);
-        public abstract IDataReader TmpJobReportBC301_GetAll(DateTime handOrverFromDate , DateTime handOrverToDate, int userConsultantId);
+        public abstract IDataReader TmpJobReportBC301_GetAll(DateTime? handOrverFromDate, DateTime? handOrverToDate, DateTime? callFromDate, DateTime? callToDate, string userConsultantIds);
         public abstract IDataReader TmpJobReportBC54_GetAll(DateTime dateTime, int statusType);
         public abstract IDataReader TmpJobReportBC09_GetAll(int branchId, int sourceTypeId, int userId, DateTime? startDate, DateTime? endDate);
         public abstract IDataReader TmpJobReportBC10_GetAll(int branchId, int sourceTypeId, int userId, int collaboratorId, DateTime? consultantStartDate, DateTime? consultantEndDate, DateTime? collaboratorStartDate, DateTime? collaboratorEndDate);

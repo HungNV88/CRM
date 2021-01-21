@@ -13890,39 +13890,41 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.DataSet {
             
             private global::System.Data.DataColumn columnLevel0;
             
-            private global::System.Data.DataColumn columnLevel0Percent;
+            private global::System.Data.DataColumn columnL0Percent;
             
             private global::System.Data.DataColumn columnLevel1;
             
-            private global::System.Data.DataColumn columnLevel1Percent;
+            private global::System.Data.DataColumn columnL1Percent;
             
             private global::System.Data.DataColumn columnLevel2;
             
-            private global::System.Data.DataColumn columnLevel2Percent;
+            private global::System.Data.DataColumn columnL2Percent;
             
             private global::System.Data.DataColumn columnLevel3;
             
-            private global::System.Data.DataColumn columnLevel3Percent;
+            private global::System.Data.DataColumn columnL3Percent;
             
             private global::System.Data.DataColumn columnLevel4;
             
-            private global::System.Data.DataColumn columnLevel4Percent;
+            private global::System.Data.DataColumn columnL4Percent;
             
             private global::System.Data.DataColumn columnLevel5;
             
-            private global::System.Data.DataColumn columnLevel5Percent;
+            private global::System.Data.DataColumn columnL5Percent;
             
             private global::System.Data.DataColumn columnLevel6;
             
-            private global::System.Data.DataColumn columnLevel6Percent;
+            private global::System.Data.DataColumn columnL6Percent;
             
             private global::System.Data.DataColumn columnLevel7;
             
-            private global::System.Data.DataColumn columnLevel7Percent;
+            private global::System.Data.DataColumn columnL7Percent;
             
             private global::System.Data.DataColumn columnLevel8;
             
-            private global::System.Data.DataColumn columnLevel8Percent;
+            private global::System.Data.DataColumn columnL8L6Percent;
+            
+            private global::System.Data.DataColumn columnL8Percent;
             
             private global::System.Data.DataColumn columnCampaindName;
             
@@ -13985,9 +13987,9 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.DataSet {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public global::System.Data.DataColumn Level0PercentColumn {
+            public global::System.Data.DataColumn L0PercentColumn {
                 get {
-                    return this.columnLevel0Percent;
+                    return this.columnL0Percent;
                 }
             }
             
@@ -14001,9 +14003,9 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.DataSet {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public global::System.Data.DataColumn Level1PercentColumn {
+            public global::System.Data.DataColumn L1PercentColumn {
                 get {
-                    return this.columnLevel1Percent;
+                    return this.columnL1Percent;
                 }
             }
             
@@ -14017,9 +14019,9 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.DataSet {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public global::System.Data.DataColumn Level2PercentColumn {
+            public global::System.Data.DataColumn L2PercentColumn {
                 get {
-                    return this.columnLevel2Percent;
+                    return this.columnL2Percent;
                 }
             }
             
@@ -14033,9 +14035,9 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.DataSet {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public global::System.Data.DataColumn Level3PercentColumn {
+            public global::System.Data.DataColumn L3PercentColumn {
                 get {
-                    return this.columnLevel3Percent;
+                    return this.columnL3Percent;
                 }
             }
             
@@ -14049,9 +14051,9 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.DataSet {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public global::System.Data.DataColumn Level4PercentColumn {
+            public global::System.Data.DataColumn L4PercentColumn {
                 get {
-                    return this.columnLevel4Percent;
+                    return this.columnL4Percent;
                 }
             }
             
@@ -14065,9 +14067,9 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.DataSet {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public global::System.Data.DataColumn Level5PercentColumn {
+            public global::System.Data.DataColumn L5PercentColumn {
                 get {
-                    return this.columnLevel5Percent;
+                    return this.columnL5Percent;
                 }
             }
             
@@ -14081,9 +14083,9 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.DataSet {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public global::System.Data.DataColumn Level6PercentColumn {
+            public global::System.Data.DataColumn L6PercentColumn {
                 get {
-                    return this.columnLevel6Percent;
+                    return this.columnL6Percent;
                 }
             }
             
@@ -14097,9 +14099,9 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.DataSet {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public global::System.Data.DataColumn Level7PercentColumn {
+            public global::System.Data.DataColumn L7PercentColumn {
                 get {
-                    return this.columnLevel7Percent;
+                    return this.columnL7Percent;
                 }
             }
             
@@ -14113,9 +14115,17 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.DataSet {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public global::System.Data.DataColumn Level8PercentColumn {
+            public global::System.Data.DataColumn L8L6PercentColumn {
                 get {
-                    return this.columnLevel8Percent;
+                    return this.columnL8L6Percent;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
+            public global::System.Data.DataColumn L8PercentColumn {
+                get {
+                    return this.columnL8Percent;
                 }
             }
             
@@ -14168,46 +14178,48 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.DataSet {
                         string Campaind, 
                         string SumCampaindLevel, 
                         string Level0, 
-                        string Level0Percent, 
+                        string L0Percent, 
                         string Level1, 
-                        string Level1Percent, 
+                        string L1Percent, 
                         string Level2, 
-                        string Level2Percent, 
+                        string L2Percent, 
                         string Level3, 
-                        string Level3Percent, 
+                        string L3Percent, 
                         string Level4, 
-                        string Level4Percent, 
+                        string L4Percent, 
                         string Level5, 
-                        string Level5Percent, 
+                        string L5Percent, 
                         string Level6, 
-                        string Level6Percent, 
+                        string L6Percent, 
                         string Level7, 
-                        string Level7Percent, 
+                        string L7Percent, 
                         string Level8, 
-                        string Level8Percent, 
+                        string L8L6Percent, 
+                        string L8Percent, 
                         string CampaindName) {
                 BC301Row rowBC301Row = ((BC301Row)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         Campaind,
                         SumCampaindLevel,
                         Level0,
-                        Level0Percent,
+                        L0Percent,
                         Level1,
-                        Level1Percent,
+                        L1Percent,
                         Level2,
-                        Level2Percent,
+                        L2Percent,
                         Level3,
-                        Level3Percent,
+                        L3Percent,
                         Level4,
-                        Level4Percent,
+                        L4Percent,
                         Level5,
-                        Level5Percent,
+                        L5Percent,
                         Level6,
-                        Level6Percent,
+                        L6Percent,
                         Level7,
-                        Level7Percent,
+                        L7Percent,
                         Level8,
-                        Level8Percent,
+                        L8L6Percent,
+                        L8Percent,
                         CampaindName};
                 rowBC301Row.ItemArray = columnValuesArray;
                 this.Rows.Add(rowBC301Row);
@@ -14234,23 +14246,24 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.DataSet {
                 this.columnCampaind = base.Columns["Campaind"];
                 this.columnSumCampaindLevel = base.Columns["SumCampaindLevel"];
                 this.columnLevel0 = base.Columns["Level0"];
-                this.columnLevel0Percent = base.Columns["Level0Percent"];
+                this.columnL0Percent = base.Columns["L0Percent"];
                 this.columnLevel1 = base.Columns["Level1"];
-                this.columnLevel1Percent = base.Columns["Level1Percent"];
+                this.columnL1Percent = base.Columns["L1Percent"];
                 this.columnLevel2 = base.Columns["Level2"];
-                this.columnLevel2Percent = base.Columns["Level2Percent"];
+                this.columnL2Percent = base.Columns["L2Percent"];
                 this.columnLevel3 = base.Columns["Level3"];
-                this.columnLevel3Percent = base.Columns["Level3Percent"];
+                this.columnL3Percent = base.Columns["L3Percent"];
                 this.columnLevel4 = base.Columns["Level4"];
-                this.columnLevel4Percent = base.Columns["Level4Percent"];
+                this.columnL4Percent = base.Columns["L4Percent"];
                 this.columnLevel5 = base.Columns["Level5"];
-                this.columnLevel5Percent = base.Columns["Level5Percent"];
+                this.columnL5Percent = base.Columns["L5Percent"];
                 this.columnLevel6 = base.Columns["Level6"];
-                this.columnLevel6Percent = base.Columns["Level6Percent"];
+                this.columnL6Percent = base.Columns["L6Percent"];
                 this.columnLevel7 = base.Columns["Level7"];
-                this.columnLevel7Percent = base.Columns["Level7Percent"];
+                this.columnL7Percent = base.Columns["L7Percent"];
                 this.columnLevel8 = base.Columns["Level8"];
-                this.columnLevel8Percent = base.Columns["Level8Percent"];
+                this.columnL8L6Percent = base.Columns["L8L6Percent"];
+                this.columnL8Percent = base.Columns["L8Percent"];
                 this.columnCampaindName = base.Columns["CampaindName"];
             }
             
@@ -14263,40 +14276,42 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.DataSet {
                 base.Columns.Add(this.columnSumCampaindLevel);
                 this.columnLevel0 = new global::System.Data.DataColumn("Level0", typeof(string), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnLevel0);
-                this.columnLevel0Percent = new global::System.Data.DataColumn("Level0Percent", typeof(string), null, global::System.Data.MappingType.Element);
-                base.Columns.Add(this.columnLevel0Percent);
+                this.columnL0Percent = new global::System.Data.DataColumn("L0Percent", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnL0Percent);
                 this.columnLevel1 = new global::System.Data.DataColumn("Level1", typeof(string), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnLevel1);
-                this.columnLevel1Percent = new global::System.Data.DataColumn("Level1Percent", typeof(string), null, global::System.Data.MappingType.Element);
-                base.Columns.Add(this.columnLevel1Percent);
+                this.columnL1Percent = new global::System.Data.DataColumn("L1Percent", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnL1Percent);
                 this.columnLevel2 = new global::System.Data.DataColumn("Level2", typeof(string), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnLevel2);
-                this.columnLevel2Percent = new global::System.Data.DataColumn("Level2Percent", typeof(string), null, global::System.Data.MappingType.Element);
-                base.Columns.Add(this.columnLevel2Percent);
+                this.columnL2Percent = new global::System.Data.DataColumn("L2Percent", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnL2Percent);
                 this.columnLevel3 = new global::System.Data.DataColumn("Level3", typeof(string), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnLevel3);
-                this.columnLevel3Percent = new global::System.Data.DataColumn("Level3Percent", typeof(string), null, global::System.Data.MappingType.Element);
-                base.Columns.Add(this.columnLevel3Percent);
+                this.columnL3Percent = new global::System.Data.DataColumn("L3Percent", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnL3Percent);
                 this.columnLevel4 = new global::System.Data.DataColumn("Level4", typeof(string), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnLevel4);
-                this.columnLevel4Percent = new global::System.Data.DataColumn("Level4Percent", typeof(string), null, global::System.Data.MappingType.Element);
-                base.Columns.Add(this.columnLevel4Percent);
+                this.columnL4Percent = new global::System.Data.DataColumn("L4Percent", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnL4Percent);
                 this.columnLevel5 = new global::System.Data.DataColumn("Level5", typeof(string), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnLevel5);
-                this.columnLevel5Percent = new global::System.Data.DataColumn("Level5Percent", typeof(string), null, global::System.Data.MappingType.Element);
-                base.Columns.Add(this.columnLevel5Percent);
+                this.columnL5Percent = new global::System.Data.DataColumn("L5Percent", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnL5Percent);
                 this.columnLevel6 = new global::System.Data.DataColumn("Level6", typeof(string), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnLevel6);
-                this.columnLevel6Percent = new global::System.Data.DataColumn("Level6Percent", typeof(string), null, global::System.Data.MappingType.Element);
-                base.Columns.Add(this.columnLevel6Percent);
+                this.columnL6Percent = new global::System.Data.DataColumn("L6Percent", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnL6Percent);
                 this.columnLevel7 = new global::System.Data.DataColumn("Level7", typeof(string), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnLevel7);
-                this.columnLevel7Percent = new global::System.Data.DataColumn("Level7Percent", typeof(string), null, global::System.Data.MappingType.Element);
-                base.Columns.Add(this.columnLevel7Percent);
+                this.columnL7Percent = new global::System.Data.DataColumn("L7Percent", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnL7Percent);
                 this.columnLevel8 = new global::System.Data.DataColumn("Level8", typeof(string), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnLevel8);
-                this.columnLevel8Percent = new global::System.Data.DataColumn("Level8Percent", typeof(string), null, global::System.Data.MappingType.Element);
-                base.Columns.Add(this.columnLevel8Percent);
+                this.columnL8L6Percent = new global::System.Data.DataColumn("L8L6Percent", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnL8L6Percent);
+                this.columnL8Percent = new global::System.Data.DataColumn("L8Percent", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnL8Percent);
                 this.columnCampaindName = new global::System.Data.DataColumn("CampaindName", typeof(string), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnCampaindName);
             }
@@ -25595,17 +25610,17 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.DataSet {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public string Level0Percent {
+            public string L0Percent {
                 get {
                     try {
-                        return ((string)(this[this.tableBC301.Level0PercentColumn]));
+                        return ((string)(this[this.tableBC301.L0PercentColumn]));
                     }
                     catch (global::System.InvalidCastException e) {
-                        throw new global::System.Data.StrongTypingException("The value for column \'Level0Percent\' in table \'BC301\' is DBNull.", e);
+                        throw new global::System.Data.StrongTypingException("The value for column \'L0Percent\' in table \'BC301\' is DBNull.", e);
                     }
                 }
                 set {
-                    this[this.tableBC301.Level0PercentColumn] = value;
+                    this[this.tableBC301.L0PercentColumn] = value;
                 }
             }
             
@@ -25627,17 +25642,17 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.DataSet {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public string Level1Percent {
+            public string L1Percent {
                 get {
                     try {
-                        return ((string)(this[this.tableBC301.Level1PercentColumn]));
+                        return ((string)(this[this.tableBC301.L1PercentColumn]));
                     }
                     catch (global::System.InvalidCastException e) {
-                        throw new global::System.Data.StrongTypingException("The value for column \'Level1Percent\' in table \'BC301\' is DBNull.", e);
+                        throw new global::System.Data.StrongTypingException("The value for column \'L1Percent\' in table \'BC301\' is DBNull.", e);
                     }
                 }
                 set {
-                    this[this.tableBC301.Level1PercentColumn] = value;
+                    this[this.tableBC301.L1PercentColumn] = value;
                 }
             }
             
@@ -25659,17 +25674,17 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.DataSet {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public string Level2Percent {
+            public string L2Percent {
                 get {
                     try {
-                        return ((string)(this[this.tableBC301.Level2PercentColumn]));
+                        return ((string)(this[this.tableBC301.L2PercentColumn]));
                     }
                     catch (global::System.InvalidCastException e) {
-                        throw new global::System.Data.StrongTypingException("The value for column \'Level2Percent\' in table \'BC301\' is DBNull.", e);
+                        throw new global::System.Data.StrongTypingException("The value for column \'L2Percent\' in table \'BC301\' is DBNull.", e);
                     }
                 }
                 set {
-                    this[this.tableBC301.Level2PercentColumn] = value;
+                    this[this.tableBC301.L2PercentColumn] = value;
                 }
             }
             
@@ -25691,17 +25706,17 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.DataSet {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public string Level3Percent {
+            public string L3Percent {
                 get {
                     try {
-                        return ((string)(this[this.tableBC301.Level3PercentColumn]));
+                        return ((string)(this[this.tableBC301.L3PercentColumn]));
                     }
                     catch (global::System.InvalidCastException e) {
-                        throw new global::System.Data.StrongTypingException("The value for column \'Level3Percent\' in table \'BC301\' is DBNull.", e);
+                        throw new global::System.Data.StrongTypingException("The value for column \'L3Percent\' in table \'BC301\' is DBNull.", e);
                     }
                 }
                 set {
-                    this[this.tableBC301.Level3PercentColumn] = value;
+                    this[this.tableBC301.L3PercentColumn] = value;
                 }
             }
             
@@ -25723,17 +25738,17 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.DataSet {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public string Level4Percent {
+            public string L4Percent {
                 get {
                     try {
-                        return ((string)(this[this.tableBC301.Level4PercentColumn]));
+                        return ((string)(this[this.tableBC301.L4PercentColumn]));
                     }
                     catch (global::System.InvalidCastException e) {
-                        throw new global::System.Data.StrongTypingException("The value for column \'Level4Percent\' in table \'BC301\' is DBNull.", e);
+                        throw new global::System.Data.StrongTypingException("The value for column \'L4Percent\' in table \'BC301\' is DBNull.", e);
                     }
                 }
                 set {
-                    this[this.tableBC301.Level4PercentColumn] = value;
+                    this[this.tableBC301.L4PercentColumn] = value;
                 }
             }
             
@@ -25755,17 +25770,17 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.DataSet {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public string Level5Percent {
+            public string L5Percent {
                 get {
                     try {
-                        return ((string)(this[this.tableBC301.Level5PercentColumn]));
+                        return ((string)(this[this.tableBC301.L5PercentColumn]));
                     }
                     catch (global::System.InvalidCastException e) {
-                        throw new global::System.Data.StrongTypingException("The value for column \'Level5Percent\' in table \'BC301\' is DBNull.", e);
+                        throw new global::System.Data.StrongTypingException("The value for column \'L5Percent\' in table \'BC301\' is DBNull.", e);
                     }
                 }
                 set {
-                    this[this.tableBC301.Level5PercentColumn] = value;
+                    this[this.tableBC301.L5PercentColumn] = value;
                 }
             }
             
@@ -25787,17 +25802,17 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.DataSet {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public string Level6Percent {
+            public string L6Percent {
                 get {
                     try {
-                        return ((string)(this[this.tableBC301.Level6PercentColumn]));
+                        return ((string)(this[this.tableBC301.L6PercentColumn]));
                     }
                     catch (global::System.InvalidCastException e) {
-                        throw new global::System.Data.StrongTypingException("The value for column \'Level6Percent\' in table \'BC301\' is DBNull.", e);
+                        throw new global::System.Data.StrongTypingException("The value for column \'L6Percent\' in table \'BC301\' is DBNull.", e);
                     }
                 }
                 set {
-                    this[this.tableBC301.Level6PercentColumn] = value;
+                    this[this.tableBC301.L6PercentColumn] = value;
                 }
             }
             
@@ -25819,17 +25834,17 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.DataSet {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public string Level7Percent {
+            public string L7Percent {
                 get {
                     try {
-                        return ((string)(this[this.tableBC301.Level7PercentColumn]));
+                        return ((string)(this[this.tableBC301.L7PercentColumn]));
                     }
                     catch (global::System.InvalidCastException e) {
-                        throw new global::System.Data.StrongTypingException("The value for column \'Level7Percent\' in table \'BC301\' is DBNull.", e);
+                        throw new global::System.Data.StrongTypingException("The value for column \'L7Percent\' in table \'BC301\' is DBNull.", e);
                     }
                 }
                 set {
-                    this[this.tableBC301.Level7PercentColumn] = value;
+                    this[this.tableBC301.L7PercentColumn] = value;
                 }
             }
             
@@ -25851,17 +25866,33 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.DataSet {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public string Level8Percent {
+            public string L8L6Percent {
                 get {
                     try {
-                        return ((string)(this[this.tableBC301.Level8PercentColumn]));
+                        return ((string)(this[this.tableBC301.L8L6PercentColumn]));
                     }
                     catch (global::System.InvalidCastException e) {
-                        throw new global::System.Data.StrongTypingException("The value for column \'Level8Percent\' in table \'BC301\' is DBNull.", e);
+                        throw new global::System.Data.StrongTypingException("The value for column \'L8L6Percent\' in table \'BC301\' is DBNull.", e);
                     }
                 }
                 set {
-                    this[this.tableBC301.Level8PercentColumn] = value;
+                    this[this.tableBC301.L8L6PercentColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
+            public string L8Percent {
+                get {
+                    try {
+                        return ((string)(this[this.tableBC301.L8PercentColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'L8Percent\' in table \'BC301\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableBC301.L8PercentColumn] = value;
                 }
             }
             
@@ -25919,14 +25950,14 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.DataSet {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public bool IsLevel0PercentNull() {
-                return this.IsNull(this.tableBC301.Level0PercentColumn);
+            public bool IsL0PercentNull() {
+                return this.IsNull(this.tableBC301.L0PercentColumn);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public void SetLevel0PercentNull() {
-                this[this.tableBC301.Level0PercentColumn] = global::System.Convert.DBNull;
+            public void SetL0PercentNull() {
+                this[this.tableBC301.L0PercentColumn] = global::System.Convert.DBNull;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -25943,14 +25974,14 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.DataSet {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public bool IsLevel1PercentNull() {
-                return this.IsNull(this.tableBC301.Level1PercentColumn);
+            public bool IsL1PercentNull() {
+                return this.IsNull(this.tableBC301.L1PercentColumn);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public void SetLevel1PercentNull() {
-                this[this.tableBC301.Level1PercentColumn] = global::System.Convert.DBNull;
+            public void SetL1PercentNull() {
+                this[this.tableBC301.L1PercentColumn] = global::System.Convert.DBNull;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -25967,14 +25998,14 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.DataSet {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public bool IsLevel2PercentNull() {
-                return this.IsNull(this.tableBC301.Level2PercentColumn);
+            public bool IsL2PercentNull() {
+                return this.IsNull(this.tableBC301.L2PercentColumn);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public void SetLevel2PercentNull() {
-                this[this.tableBC301.Level2PercentColumn] = global::System.Convert.DBNull;
+            public void SetL2PercentNull() {
+                this[this.tableBC301.L2PercentColumn] = global::System.Convert.DBNull;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -25991,14 +26022,14 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.DataSet {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public bool IsLevel3PercentNull() {
-                return this.IsNull(this.tableBC301.Level3PercentColumn);
+            public bool IsL3PercentNull() {
+                return this.IsNull(this.tableBC301.L3PercentColumn);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public void SetLevel3PercentNull() {
-                this[this.tableBC301.Level3PercentColumn] = global::System.Convert.DBNull;
+            public void SetL3PercentNull() {
+                this[this.tableBC301.L3PercentColumn] = global::System.Convert.DBNull;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -26015,14 +26046,14 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.DataSet {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public bool IsLevel4PercentNull() {
-                return this.IsNull(this.tableBC301.Level4PercentColumn);
+            public bool IsL4PercentNull() {
+                return this.IsNull(this.tableBC301.L4PercentColumn);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public void SetLevel4PercentNull() {
-                this[this.tableBC301.Level4PercentColumn] = global::System.Convert.DBNull;
+            public void SetL4PercentNull() {
+                this[this.tableBC301.L4PercentColumn] = global::System.Convert.DBNull;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -26039,14 +26070,14 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.DataSet {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public bool IsLevel5PercentNull() {
-                return this.IsNull(this.tableBC301.Level5PercentColumn);
+            public bool IsL5PercentNull() {
+                return this.IsNull(this.tableBC301.L5PercentColumn);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public void SetLevel5PercentNull() {
-                this[this.tableBC301.Level5PercentColumn] = global::System.Convert.DBNull;
+            public void SetL5PercentNull() {
+                this[this.tableBC301.L5PercentColumn] = global::System.Convert.DBNull;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -26063,14 +26094,14 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.DataSet {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public bool IsLevel6PercentNull() {
-                return this.IsNull(this.tableBC301.Level6PercentColumn);
+            public bool IsL6PercentNull() {
+                return this.IsNull(this.tableBC301.L6PercentColumn);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public void SetLevel6PercentNull() {
-                this[this.tableBC301.Level6PercentColumn] = global::System.Convert.DBNull;
+            public void SetL6PercentNull() {
+                this[this.tableBC301.L6PercentColumn] = global::System.Convert.DBNull;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -26087,14 +26118,14 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.DataSet {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public bool IsLevel7PercentNull() {
-                return this.IsNull(this.tableBC301.Level7PercentColumn);
+            public bool IsL7PercentNull() {
+                return this.IsNull(this.tableBC301.L7PercentColumn);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public void SetLevel7PercentNull() {
-                this[this.tableBC301.Level7PercentColumn] = global::System.Convert.DBNull;
+            public void SetL7PercentNull() {
+                this[this.tableBC301.L7PercentColumn] = global::System.Convert.DBNull;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -26111,14 +26142,26 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.DataSet {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public bool IsLevel8PercentNull() {
-                return this.IsNull(this.tableBC301.Level8PercentColumn);
+            public bool IsL8L6PercentNull() {
+                return this.IsNull(this.tableBC301.L8L6PercentColumn);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
-            public void SetLevel8PercentNull() {
-                this[this.tableBC301.Level8PercentColumn] = global::System.Convert.DBNull;
+            public void SetL8L6PercentNull() {
+                this[this.tableBC301.L8L6PercentColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
+            public bool IsL8PercentNull() {
+                return this.IsNull(this.tableBC301.L8PercentColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")]
+            public void SetL8PercentNull() {
+                this[this.tableBC301.L8PercentColumn] = global::System.Convert.DBNull;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]

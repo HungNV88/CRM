@@ -8,26 +8,24 @@
     ViewBag.Title = "Báo cáo tỷ lệ các level theo chiến dịch";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 
-    // Group
-    var groups = (List<GroupInfo>)ViewBag.Groups;
     var user = UserContext.GetCurrentUser();
     var branchId = UserContext.GetDefaultBranch();
-    if (user.GroupConsultantType != (int)GroupConsultantType.ManagerConsultant)
-    {
-        groups = groups.Where(c => c.LeaderId == UserContext.GetCurrentUser().UserID || c.GroupId == (int)ViewBag.GroupId).ToList();
-    }
+    //if (user.GroupConsultantType != (int)GroupConsultantType.ManagerConsultant)
+    //{
+    //    groups = groups.Where(c => c.LeaderId == UserContext.GetCurrentUser().UserID || c.GroupId == (int)ViewBag.GroupId).ToList();
+    //}
 
+    // Group
+    var groups = ViewBag.Groups;
     ((List<GroupInfo>)groups).RemoveAll(c => c.GroupId == 0);
-
-
-    groups = (List<GroupInfo>)groups.Where(c => c.BranchId == branchId).Where(c => c.EmployeeTypeId == (int)EmployeeType.Consultant).ToList();
-    var lstGroups = new SelectList(((List<GroupInfo>)groups).Where(c => c.BranchId == branchId).Where(c => c.EmployeeTypeId == (int)EmployeeType.Consultant), "GroupId", "Name");
+    ((List<GroupInfo>)groups).Insert(0, new GroupInfo { GroupId = 0, Name = "Tất cả", EmployeeTypeId = (int)EmployeeType.Consultant });
+    var lstGroups = new SelectList(((List<GroupInfo>)groups).Where(c => c.EmployeeTypeId == (int)EmployeeType.Consultant), "GroupId", "Name");
 
     // User
     var users = ViewBag.Users;
     // User
     ((List<UserInfo>)users).RemoveAll(c => c.GroupId == 0);
-    //((List<UserInfo>)users).Insert(0, new UserInfo { UserID = 0, FullName = "Tất cả" });
+    ((List<UserInfo>)users).Insert(0, new UserInfo { UserID = 0, FullName = "Tất cả" });
     var lstUsers = new SelectList(users, "UserID", "FullName");
 
     // SourceType
@@ -73,48 +71,48 @@
             @using (Ajax.BeginForm("BC301", "Report", new AjaxOptions { HttpMethod = "POST" }, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form", id = "uploadexcelform" }))
             {
                 @Html.AntiForgeryToken()
-                @*<div class="row">
-                    <label class="col-sm-1 control-label no-padding-right" style="text-align: left !important;" for="form-field-2">Nhóm </label>*@
-
-                    @*<div class="col-sm-2">
-                        @Html.DropDownList("GroupId", lstGroups, new { @class = "form-control" })  
-                    </div>*@
-                    
-                     @*<div>
-                         <div class="col-sm-1" style="width: 15%;">
-                             <input type="checkbox" id='chkGroups' checked />
-                             <label>Tất cả</label>
-                         </div>
-                        <div>
-                            @foreach (var item in groups)
-                            {                               
-                                    <div class="col-sm-1" style="width: 15%;">
-                                        <input type="checkbox" name='chkGroups' id='@(item.GroupId)_chkGroups' />
-                                        <label for="@(item.GroupId)_chkGroups">@item.Name</label>
-                                    </div>                            
-                            }
-                        </div>
-                    </div>*@
-                @*</div>*@
-
                 <div class="row">
-                        <label class="col-sm-2 control-label no-padding-right" style="text-align: left !important;" for="form-field-2">Tư vấn tuyển sinh</label>
-                        <div class="col-sm-3">
-                            @Html.DropDownList("UserId", lstUsers, new { @class = "form-control" })
-                        </div>
+                    <label class="col-sm-2 control-label no-padding-right" style="text-align: left !important;" for="form-field-2">Nhóm </label>
+
+                    <div class="col-sm-2">
+                        @Html.DropDownList("GroupId", lstGroups, new { @class = "form-control" })
+                    </div>
+
+                    @*<div>
+                     <div class="col-sm-1" style="width: 15%;">
+                         <input type="checkbox" id='chkGroups' checked />
+                         <label>Tất cả</label>
+                     </div>
+                    <div>
+                        @foreach (var item in groups)
+                        {
+                                <div class="col-sm-1" style="width: 15%;">
+                                    <input type="checkbox" name='chkGroups' id='@(item.GroupId)_chkGroups' />
+                                    <label for="@(item.GroupId)_chkGroups">@item.Name</label>
+                                </div>
+                        }
+                    </div>
+                </div>*@
+                </div>
+                <div class="space-6"></div>
+                <div class="row">
+                    <label class="col-sm-2 control-label no-padding-right" style="text-align: left !important;" for="form-field-2">Tư vấn tuyển sinh</label>
+                    <div class="col-sm-3">
+                        @Html.DropDownList("UserId", lstUsers, new { @class = "form-control" })
+                    </div>
                 </div>
                 <div class="space-6"></div>
                 @*<div class="row">
-                    
-                    <label class="col-sm-1 control-label no-padding-right" style="text-align: left !important;" for="form-field-2">Nguồn </label>
-                    <div class="col-sm-3">
-                        @Html.DropDownList("StatusType", lstStatusType, new { @class = "form-control" })
-                    </div>
-                    <label class="col-sm-1 control-label no-padding-right" style="text-align: left !important;visibility: hidden" for="form-field-2">Ngày bàn giao</label>
-                    <div class="col-sm-2" style="visibility: hidden">
-                        @Html.DropDownList("ddlDayReportType", (SelectList)ViewBag.DayReportTypes, new { @class = "form-control" })
-                    </div>
-                </div>*@
+
+                <label class="col-sm-1 control-label no-padding-right" style="text-align: left !important;" for="form-field-2">Nguồn </label>
+                <div class="col-sm-3">
+                    @Html.DropDownList("StatusType", lstStatusType, new { @class = "form-control" })
+                </div>
+                <label class="col-sm-1 control-label no-padding-right" style="text-align: left !important;visibility: hidden" for="form-field-2">Ngày bàn giao</label>
+                <div class="col-sm-2" style="visibility: hidden">
+                    @Html.DropDownList("ddlDayReportType", (SelectList)ViewBag.DayReportTypes, new { @class = "form-control" })
+                </div>
+            </div>*@
                 <div class="space-6"></div>
                 <div class="row">
                     <label class="col-sm-2 control-label no-padding-right" style="text-align: left !important;" for="form-field-2">Ngày bàn giao</label>
@@ -123,7 +121,7 @@
                             <label class="col-sm-1 control-label no-padding-right" style="text-align: left !important;" for="form-field-2" id="lblHandoverFromDate">Từ ngày</label>
                             <div class="col-sm-2">
                                 @Html.TextBox("HandoverFromDate", string.Empty, new { @class = "form-control" })
-                                
+
                             </div>
                         </div>
                         <div id="divDayTo">
@@ -134,13 +132,32 @@
                         </div>
                     </div>
                 </div>
-                <div class="space-6" ></div>
-                @*<div class="row" >
-                    <label class="col-sm-2 control-label no-padding-right" style="text-align: left !important;" for="form-field-3">Ngày xuất báo cáo</label>
-                    <div class="col-sm-2">
-                        @Html.TextBox("ToDate", DateTime.Now.ToString("dd/MM/yyyy"), new { @class = "form-control" })
+                <div class="space-6"></div>
+                <div class="row">
+                    <label class="col-sm-2 control-label no-padding-right" style="text-align: left !important;" for="form-field-2">Ngày gọi gần nhất</label>
+                    <div id="divCallDay">
+                        <div id="divCallDayFrom">
+                            <label class="col-sm-1 control-label no-padding-right" style="text-align: left !important;" for="form-field-2" id="lblCallFromDate">Từ ngày</label>
+                            <div class="col-sm-2">
+                                @Html.TextBox("CallFromDate", string.Empty, new { @class = "form-control" })
+
+                            </div>
+                        </div>
+                        <div id="divCallDayTo">
+                            <label class="col-sm-1 control-label no-padding-right" style="text-align: left !important;" for="form-field-3">Đến ngày </label>
+                            <div class="col-sm-2">
+                                @Html.TextBox("CallToDate", string.Empty, new { @class = "form-control" })
+                            </div>
+                        </div>
                     </div>
-                </div>*@
+                </div>
+                <div class="space-6"></div>
+                @*<div class="row" >
+                <label class="col-sm-2 control-label no-padding-right" style="text-align: left !important;" for="form-field-3">Ngày xuất báo cáo</label>
+                <div class="col-sm-2">
+                    @Html.TextBox("ToDate", DateTime.Now.ToString("dd/MM/yyyy"), new { @class = "form-control" })
+                </div>
+            </div>*@
                 <div class="space-6"></div>
                 <div class="row">
                     <div class="col-sm-5">
@@ -168,27 +185,61 @@
         $("#btnReport").click(function (e) {
             e.preventDefault();
             var userId = $("#UserId").val();
+            if (userId == null || userId == '') {
+                alert("Không có TVTS");
+                return;
+            }
             //var groupId = $("#GroupId").val(); //Su dung khi chi duoc chon 1 nhom.
+            //var groupId = $('#chkGroups').is(':checked') ? 0 : buildParamGroups();
+            var groupId = $('#GroupId').val();
             var branchId = '@ViewBag.BranchId';
             var handoverToDate = $("#HandoverToDate").val();
             var handoverFromDate = $("#HandoverFromDate").val();
-            var url = '/admin/report/showbc301?userId={0}&hFromDate={1}&hToDate={2}&reportType={3}';
-            var url = url.format(userId, handoverFromDate, handoverToDate, '@((int)ReportType.Pdf)');
+            var callFromDate = $("#CallFromDate").val();
+            var callToDate = $("#CallToDate").val();
+            checkDate(handoverFromDate, handoverToDate, callFromDate, callToDate);
+            var url = '/admin/report/showbc301?groupId={0}&userId={1}&hFromDate={2}&hToDate={3}&callFromDate={4}&callToDate={5}&reportType={6}';
+            var url = url.format(groupId, userId, handoverFromDate, handoverToDate, callFromDate, callToDate, '@((int)ReportType.Pdf)');
             $("#frame").attr("src", url);
         });
 
         $("#btnSave").click(function (e) {
             e.preventDefault();
             var userId = $("#UserId").val();
+            if (userId == null || userId == '') {
+                alert("Không có TVTS");
+                return;
+            }
             //var groupId = $("#GroupId").val(); //Su dung khi chi duoc chon 1 nhom.
+            //var groupId = $('#chkGroups').is(':checked') ? 0 : buildParamGroups();
+            var groupId = $('#GroupId').val();
             var branchId = '@ViewBag.BranchId';
             var handoverToDate = $("#HandoverToDate").val();
             var handoverFromDate = $("#HandoverFromDate").val();
-            var url = '/admin/report/showbc301?userId={0}&hFromDate={1}&hToDate={2}&reportType={3}';
-            var url = url.format(userId, handoverFromDate, handoverToDate, '@((int)ReportType.Excel)');
+            var callFromDate = $("#CallFromDate").val();
+            var callToDate = $("#CallToDate").val();
+            checkDate(handoverFromDate, handoverToDate, callFromDate, callToDate);
+            var url = '/admin/report/showbc301?groupId={0}&userId={1}&hFromDate={2}&hToDate={3}&callFromDate={4}&callToDate={5}&reportType={6}';
+            var url = url.format(groupId, userId, handoverFromDate, handoverToDate, callFromDate, callToDate, '@((int)ReportType.Excel)');
             $("#frame").attr("src", url);
         });
     });
+
+    function checkDate(hFromDate, hToDate, callFromDate, callToDate) {
+        if (hFromDate == '' && hToDate == '' && callFromDate == '' && callToDate == '') {
+            alert("Bạn vui lòng chọn ngày bàn giao hoặc ngày gọi để xuất báo cáo");
+            return;
+        }
+        if ((hFromDate == '' && hToDate != '') || (hFromDate != '' && hToDate == '')) {
+            alert("Bạn vui lòng chọn ngày bắt đầu và kết thúc bàn giao");
+            return;
+        }
+        if ((callFromDate == '' && callToDate != '') || (callFromDate != '' && callToDate == '')) {
+            alert("Bạn vui lòng chọn ngày bắt đầu và kết thúc gọi");
+            return;
+        }
+
+    }
 
     function loadLatch() {
         var lumpedId = $('#ddlLumpedId').val();
@@ -227,20 +278,28 @@
     function initPage() {
         var dateNow = new Date();
         var date = dateNow.getDate();
-        var month = dateNow.getMonth();
+        if (date < 10) {
+            date = "0" + date;
+        }
+        var month = dateNow.getMonth() + 1;
+        if (month < 10) {
+            month = "0" + month;
+        }
         var year = dateNow.getFullYear();
         var currentDate = date + "/" + month + "/" + year;
-        $("#HandoverToDate").datepicker({ format: 'dd/mm/yyyy', autoclose: true });
+        $("#HandoverToDate").datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly: true, endDate: "+0d" });
         $("#HandoverToDate").val(currentDate);
-        $("#HandoverFromDate").datepicker({ format: 'dd/mm/yyyy', autoclose: true });
+        $("#HandoverFromDate").datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly: true, endDate: "+0d" });
         $("#HandoverFromDate").val(currentDate);
+        $("#CallFromDate").datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly: true, endDate: "+0d" });
+        $("#CallToDate").datepicker({ format: 'dd/mm/yyyy', autoclose: true, dateonly: true, endDate: "+0d" });
 
         //var groupIds = $('#chkGroups').is(':checked') ? '' : buildParamGroups();
 
         // Group
-        //$("#GroupId").change(function () {
-        //    loadUserByGroupId();
-        //});
+        $("#GroupId").change(function () {
+            loadUserByGroupId();
+        });
 
         // Change Lumped
         //loadLatch();
