@@ -1333,15 +1333,20 @@ namespace TamoCRM.Web.Mvc.Areas.Admin.Controllers
             #endregion
 
             #region tính cho từng TVTS
-            var campaindTypeId = 0;
+            var campaindTypeId = -1;
             foreach (var data in lstData)
             {
                 if(campaindTypeId == data.CampaindTypeId)
                 {
                     continue;
                 }
+
                 campaindTypeId = data.CampaindTypeId;
                 var campaindName = data.CampaindName;
+                if (campaindName == null || campaindName == "")
+                {
+                    campaindName = "Khác";
+                }
                 var listTemp = lstData;
                 var level1 = listTemp.Where(c => c.LevelId == (int)LevelType.L1 && c.CampaindTypeId == campaindTypeId && c.LevelId < (int)LevelType.L3M).Sum(c => c.Count);
                 var level2 = listTemp.Where(c => c.LevelId == (int)LevelType.L2 && c.CampaindTypeId == campaindTypeId && c.LevelId < (int)LevelType.L3M).Sum(c => c.Count);
